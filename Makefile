@@ -1,6 +1,4 @@
-#---------------------------------------------------------------------------------
 .SUFFIXES:
-#---------------------------------------------------------------------------------
 
 ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
@@ -9,80 +7,31 @@ endif
 TOPDIR ?= $(CURDIR)
 include $(DEVKITPRO)/libnx/switch_rules
 
-#---------------------------------------------------------------------------------
-# TARGET is the name of the output
-# BUILD is the directory where object files & intermediate files will be placed
-# SOURCES is a list of directories containing source code
-# DATA is a list of directories containing data files
-# INCLUDES is a list of directories containing header files
-# EXEFS_SRC is the optional input directory containing data copied into exefs, if anything this normally should only contain "main.npdm".
-# ROMFS is the directory containing data to be added to RomFS, relative to the Makefile (Optional)
-#
-# NO_ICON: if set to anything, do not use icon.
-# NO_NACP: if set to anything, no .nacp file is generated.
-# APP_TITLE is the name of the app stored in the .nacp file (Optional)
-# APP_AUTHOR is the author of the app stored in the .nacp file (Optional)
-# APP_VERSION is the version of the app stored in the .nacp file (Optional)
-# APP_TITLEID is the titleID of the app stored in the .nacp file (Optional)
-# ICON is the filename of the icon (.jpg), relative to the project folder.
-#   If not set, it attempts to use one of the following (in this order):
-#     - <Project name>.jpg
-#     - icon.jpg
-#     - <libnx folder>/default_icon.jpg
-#---------------------------------------------------------------------------------
-TARGET      := $(notdir $(CURDIR))
-BUILD       := build
-SOURCES     := source source/install source/ipc source/lib source/ui source/nx source/nx/ipc source/util
-DATA        := data
-INCLUDES    := include
-EXEFS_SRC   := exefs_src
-APP_TITLE   := Tinfoil
-APP_AUTHOR  := Adubbz
-APP_VERSION := 0.0.1
-
-#ROMFS	:=	romfs
-
-#---------------------------------------------------------------------------------
-# options for code generation
-#---------------------------------------------------------------------------------
-
-# NOTE: I currently compile with
-# export NXLINK_DEBUG=1 && make && nxlink -a ip --server ./Tinfoil.nro
-# If changing from NXLINK_DEBUG=0 to 1, make sure to use make clean first.
-
-ifeq ($(NXLINK_DEBUG),1)
-DEFINES +=	-DNXLINK_DEBUG
-endif
+TARGET		:=	sysnut
+BUILD		:=	build
+SOURCES		:=	source
+DATA		:=	data
+INCLUDES	:=	include
+EXEFS_SRC	:=	exefs_src
+ROMFS	:=	romfs
 
 ARCH	:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
-			$(ARCH) $(DEFINES) 
+CFLAGS	:=	-g -Wall -Wextra -O2 -ffunction-sections \
+			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
-LIBS	:= -lm -lnx
+LIBS	:= -lnx -lm -lmpg123 `freetype-config --libs`
 
-
-
-#---------------------------------------------------------------------------------
-# list of directories containing libraries, this must be the top level containing
-# include and lib
-#---------------------------------------------------------------------------------
 LIBDIRS	:= $(PORTLIBS) $(LIBNX)
 
-
-#---------------------------------------------------------------------------------
-# no real need to edit anything past this point unless you need to add additional
-# rules for different file extensions
-#---------------------------------------------------------------------------------
 ifneq ($(BUILD),$(notdir $(CURDIR)))
-#---------------------------------------------------------------------------------
 
 export OUTPUT	:=	$(CURDIR)/$(TARGET)
 export TOPDIR	:=	$(CURDIR)
@@ -97,19 +46,11 @@ CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
 BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
 
-#---------------------------------------------------------------------------------
-# use CXX for linking C++ projects, CC for standard C
-#---------------------------------------------------------------------------------
 ifeq ($(strip $(CPPFILES)),)
-#---------------------------------------------------------------------------------
 	export LD	:=	$(CC)
-#---------------------------------------------------------------------------------
 else
-#---------------------------------------------------------------------------------
 	export LD	:=	$(CXX)
-#---------------------------------------------------------------------------------
 endif
-#---------------------------------------------------------------------------------
 
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
 export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
@@ -139,28 +80,21 @@ endif
 
 .PHONY: $(BUILD) clean all
 
-#---------------------------------------------------------------------------------
 all: $(BUILD)
 
 $(BUILD):
 	@[ -d $@ ] || mkdir -p $@
 	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
-#---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).kip
 
-
-#---------------------------------------------------------------------------------
 else
 .PHONY:	all
 
 DEPENDS	:=	$(OFILES:.o=.d)
 
-#---------------------------------------------------------------------------------
-# main targets
-#---------------------------------------------------------------------------------
 all	:	$(OUTPUT).kip
 
 $(OUTPUT).kip	:	$(OUTPUT).elf
@@ -169,16 +103,10 @@ $(OUTPUT).elf	:	$(OFILES)
 
 $(OFILES_SRC)	: $(HFILES_BIN)
 
-#---------------------------------------------------------------------------------
-# you need a rule like this for each extension you use as binary data
-#---------------------------------------------------------------------------------
-%.bin.o	:	%.bin
-#---------------------------------------------------------------------------------
+%.bin.o	%_bin.h :	%.bin
 	@echo $(notdir $<)
 	@$(bin2o)
 
 -include $(DEPENDS)
 
-#---------------------------------------------------------------------------------------
 endif
-#---------------------------------------------------------------------------------------
