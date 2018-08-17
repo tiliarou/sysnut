@@ -21,4 +21,7 @@ private:
 	int m_clientSocket = 0;
 };
 
-void runServer();
+extern "C"
+{
+	void runServer();
+}
