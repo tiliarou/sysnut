@@ -13,7 +13,7 @@
 #define HEAP_SIZE 0x000540000
 #define SOCK_BUFFERSIZE 16384
 
-void runServer();
+void runMainLoop();
 
 // we aren't an applet
 u32 __nx_applet_type = AppletType_None;
@@ -119,6 +119,7 @@ int main(int argc, char **argv)
 
 	network_pre_init();
 	
+	/*
 	Thread serverThread;
 	Result rc = threadCreate(&serverThread, runServer, NULL, 0x4000, 49, 3);
 
@@ -128,12 +129,9 @@ int main(int argc, char **argv)
 	rc = threadStart(&serverThread);
 
 	if (R_FAILED(rc))
-		fatalSimple(rc);
+		fatalSimple(rc);*/
 
-	while (appletMainLoop())
-	{
-		svcSleepThread(30000000L);
-	}
+	runMainLoop();
 
 	network_post_exit();
 

@@ -13,13 +13,9 @@ public:
 	~Server();
 
 	bool run();
+	bool step();
 	bool isActive();
 	Socket& socket() { return m_socket; }
 private:
 	Socket m_socket;
 };
-
-extern "C"
-{
-	void runServer();
-}

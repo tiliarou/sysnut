@@ -36,6 +36,17 @@ bool Server::isActive()
 	//return appletMainLoop();
 }
 
+bool Server::step()
+{
+	auto callback = [](Socket *s) {
+		s->write("hello world\n", sizeof("hello world\n"));
+		printf("closing client\n");
+	};
+
+	socket().accept(callback);
+	return true;
+}
+
 bool Server::run()
 {
 	if (!socket().isOpen())
@@ -45,21 +56,9 @@ bool Server::run()
 
 	while (true)
 	{
-		//printf("waiting for client...\n");
-
-		auto callback = [](Socket *s) {
-			s->write("hello world\n", sizeof("hello world\n"));
-			printf("closing client\n");
-		};
-		
-		socket().accept(callback);
+		step();
 	}
 
 	return true;
 }
 
-void runServer()
-{
-	Server server;
-	server.run();
-}

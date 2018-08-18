@@ -17,6 +17,7 @@ Socket::~Socket()
 int Socket::operator=(int socket)
 {
 	set(socket);
+	return socket;
 }
 
 void Socket::set(int socket)
@@ -53,7 +54,7 @@ int Socket::bind(int port)
 	}
 
 	fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFL, 0) & ~O_NONBLOCK);
-	return 0;
+	return 1;
 }
 
 int Socket::listen(int queueMax)
@@ -73,6 +74,7 @@ int Socket::accept(void(*callback)(Socket* s))
 		callback(&s);
 	}
 	s.close();
+	return 0;
 }
 
 size_t Socket::write(const void* buf, size_t len)
