@@ -3,8 +3,8 @@
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include "socket.h"
 
-#define int8 unsigned char
 
 class Server
 {
@@ -13,12 +13,10 @@ public:
 	~Server();
 
 	bool run();
-	bool close();
-	bool isOpen();
-	size_t write(const void* buf, size_t len);
+	bool isActive();
+	Socket& socket() { return m_socket; }
 private:
-	int m_serverSocket = 0;
-	int m_clientSocket = 0;
+	Socket m_socket;
 };
 
 extern "C"
