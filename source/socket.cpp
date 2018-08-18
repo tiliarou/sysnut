@@ -53,7 +53,7 @@ int Socket::bind(int port)
 		return -1;
 	}
 
-	fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFL, 0) & ~O_NONBLOCK);
+	fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFL, 0) | O_NONBLOCK);
 	return 1;
 }
 
