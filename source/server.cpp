@@ -15,14 +15,18 @@ Server::Server()
 
 	if (socket().bind(REMOTE_INSTALL_PORT) < 0)
 	{
-		printf("Failed to bind to socket\n");
+		printf("Failed to bind to socket %u\n", errno);
 		return;
 	}
 
 	if (socket().listen() < 0)
 	{
-		printf("Failed to listen on server socket. Error code:\n");
+		printf("Failed to listen on server socket. Error code: %u\n", errno);
 		socket().close();
+	}
+	else
+	{
+		printf("listening\n");
 	}
 }
 
