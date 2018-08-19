@@ -1,4 +1,5 @@
 #include "socket.h"
+#include <errno.h>
 
 Socket::Socket()
 {
@@ -30,7 +31,7 @@ bool Socket::close()
 	if (isOpen())
 	{
 		::close(m_socket);
-		m_socket = 0;
+		m_socket = -1;
 		return true;
 	}
 	return false;
@@ -38,7 +39,7 @@ bool Socket::close()
 
 bool Socket::isOpen()
 {
-	return m_socket > 0;
+	return m_socket >= 0;
 }
 
 int Socket::bind(int port)
@@ -59,7 +60,14 @@ int Socket::bind(int port)
 
 int Socket::listen(int queueMax)
 {
-	return ::listen(m_socket, queueMax);
+	int r = ::listen(m_socket, queueMax);
+
+	if (r)
+	{
+		close();
+	}
+
+	return r;
 }
 
 int Socket::accept(void(*callback)(Socket* s))
@@ -68,13 +76,19 @@ int Socket::accept(void(*callback)(Socket* s))
 	socklen_t clientLen = sizeof(client);
 
 	Socket s(::accept(m_socket, (struct sockaddr*)&client, &clientLen));
+	int r = s;
 
 	if (s >= 0)
 	{
 		callback(&s);
 	}
+	else if(errno == ENETDOWN || r == ENETDOWN)
+	{
+		s.close();
+		close();
+	}
 	s.close();
-	return 0;
+	return r;
 }
 
 size_t Socket::write(const void* buf, size_t len)

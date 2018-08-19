@@ -30,10 +30,9 @@ Server::~Server()
 {
 }
 
-bool Server::isActive()
+bool Server::isListening()
 {
-	return true;
-	//return appletMainLoop();
+	return socket().isOpen();
 }
 
 bool Server::step()

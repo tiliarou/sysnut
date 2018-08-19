@@ -14,7 +14,7 @@ public:
 
 	bool run();
 	bool step();
-	bool isActive();
+	bool isListening();
 	Socket& socket() { return m_socket; }
 private:
 	Socket m_socket;

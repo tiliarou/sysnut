@@ -8,10 +8,14 @@ extern "C"
 
 void runMainLoop()
 {
-	Server s;
 	while (appletMainLoop())
 	{
-		s.step();
-		svcSleepThread(30000000L);
+		svcSleepThread(500000000L);
+		Server s;
+		for(int i=0; i < 10 && appletMainLoop() && s.isListening(); i++)
+		{
+			s.step();
+			svcSleepThread(30000000L);
+		}
 	}
 }
