@@ -7,6 +7,8 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <switch.h>
+#include "nx/ipc/tin_ipc.h"
+#include "error.hpp"
 
 
 #define TITLE_ID 0x420000000000000E
@@ -70,10 +72,13 @@ void __appInit(void)
 	rc = hidInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
+	if (R_FAILED(esInitialize()))
+		fatalSimple(0xBEE5);
 }
 
 void __appExit(void)
 {
+	esExit();
 	fsdevUnmountAll();
 	fsExit();
 	smExit();
@@ -111,29 +116,91 @@ void network_post_exit(void)
 	socketExit();
 }
 
+/*
+typedef struct {
+	u8 c[0x10];
+} RightsId;
+*/
+
+void dumpTickets()
+{
+	RightsId* rightsIds = NULL;
+	u32 rightsIdCount = 0;
+	u32 installedTicketCount = 0;
+	FILE* f = fopen("/titlekeys.txt", "w+");
+	u8 titleKey[16];
+
+	ASSERT_OK(esCountPersonalizedTicket(&installedTicketCount), "Failed to count personalized tickets");
+
+	rightsIds = malloc(sizeof(RightsId) * installedTicketCount);
+	memset(rightsIds, NULL, sizeof(RightsId) * installedTicketCount);
+
+	ASSERT_OK(esListPersonalizedTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list personalized tickets");
+
+	for (unsigned int i = 0; i < rightsIdCount; i++)
+	{
+		for (unsigned int j = 0; j < sizeof(RightsId); j++)
+		{
+			fprintf(f, "%02X", rightsIds[i].c[j]);
+		}
+		fprintf(f, "|");
+
+		memset(&titleKey, NULL, sizeof(titleKey));
+		ASSERT_OK(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
+
+		for (unsigned int j = 0; j < sizeof(titleKey); j++)
+		{
+			fprintf(f, "%02X", titleKey[j]);
+		}
+
+		fprintf(f, "\n");
+	}
+
+	free(rightsIds);
+	fprintf(f, "\n");
+
+
+	ASSERT_OK(esCountCommonTicket(&installedTicketCount), "Failed to count common tickets");
+
+	rightsIds = malloc(sizeof(RightsId) * installedTicketCount);
+	memset(rightsIds, NULL, sizeof(RightsId) * installedTicketCount);
+
+	ASSERT_OK(esListCommonTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list common tickets");
+
+	for (unsigned int i = 0; i < rightsIdCount; i++)
+	{
+		for (unsigned int j = 0; j < sizeof(RightsId); j++)
+		{
+			fprintf(f, "%02X", rightsIds[i].c[j]);
+		}
+		fprintf(f, "|");
+
+		memset(&titleKey, NULL, sizeof(titleKey));
+		ASSERT_OK(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
+
+		for (unsigned int j = 0; j < sizeof(titleKey); j++)
+		{
+			fprintf(f, "%02X", titleKey[j]);
+		}
+
+		fprintf(f, "\n");
+	}
+
+	free(rightsIds);
+
+	fclose(f);
+}
 
 int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
 
-	network_pre_init();
-	
-	/*
-	Thread serverThread;
-	Result rc = threadCreate(&serverThread, runServer, NULL, 0x4000, 49, 3);
+	dumpTickets();
 
-	if (R_FAILED(rc))
-		fatalSimple(rc);
-
-	rc = threadStart(&serverThread);
-
-	if (R_FAILED(rc))
-		fatalSimple(rc);*/
-
-	runMainLoop();
-
-	network_post_exit();
+	//network_pre_init();
+	//runMainLoop();
+	//network_post_exit();
 
 	return 0;
 }

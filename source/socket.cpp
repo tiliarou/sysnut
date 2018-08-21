@@ -1,5 +1,6 @@
 #include "socket.h"
 #include <errno.h>
+#include "log.h"
 
 Socket::Socket()
 {
@@ -82,11 +83,13 @@ int Socket::accept(void(*callback)(Socket* s))
 	{
 		callback(&s);
 	}
-	else if(errno == ENETDOWN || r == ENETDOWN)
+	else if(errno != EAGAIN)
 	{
+		print("accept err: %d / %u\n", r, errno);
 		s.close();
 		close();
 	}
+	
 	s.close();
 	return r;
 }

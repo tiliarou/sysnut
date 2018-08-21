@@ -9,7 +9,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 TARGET		:=	sysnut
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source source/ipc source/nx source/nx/ipc
 DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src

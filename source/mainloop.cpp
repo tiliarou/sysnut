@@ -1,6 +1,7 @@
 #include "server.h"
 #include <stdio.h>
 #include <switch.h>
+#include "log.h"
 
 extern "C"
 {
@@ -9,11 +10,10 @@ extern "C"
 
 void runMainLoop()
 {
-	stdout = stderr = fopen("/sysnut.log", "a");
-	printf("start up\n");
+	print("start up\n");
 	while (appletMainLoop())
 	{
-		printf("loop start\n");
+		print("loop start\n");
 		svcSleepThread(500000000L);
 		Server s;
 		while(appletMainLoop() && s.isListening())
@@ -21,7 +21,7 @@ void runMainLoop()
 			s.step();
 			svcSleepThread(30000000L);
 		}
-		printf("loop end\n");
+		print("loop end\n");
 	}
-	printf("shutdown");
+	print("shutdown");
 }
