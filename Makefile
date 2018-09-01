@@ -9,7 +9,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 TARGET		:=	sysnut
 BUILD		:=	build
-SOURCES		:=	source source/ipc source/nx source/nx/ipc
+SOURCES		:=	source source/ipc source/nx source/nx/ipc source/install
 DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
@@ -22,7 +22,7 @@ CFLAGS	:=	-g -Wall -Wextra -O2 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)

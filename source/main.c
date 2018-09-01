@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <switch.h>
 #include "nx/ipc/tin_ipc.h"
+#include "nx/ipc/spl.h"
 #include "error.hpp"
 
 
@@ -74,10 +75,18 @@ void __appInit(void)
 		fatalSimple(rc);
 	if (R_FAILED(esInitialize()))
 		fatalSimple(0xBEE5);
+
+	if (R_FAILED(splInitialize()))
+		fatalSimple(0xBEE6);
+
+	if (R_FAILED(splCryptoInitialize()))
+		fatalSimple(0xBEE7);
 }
 
 void __appExit(void)
 {
+	splCryptoExit();
+	splExit();
 	esExit();
 	fsdevUnmountAll();
 	fsExit();
@@ -122,6 +131,10 @@ typedef struct {
 } RightsId;
 */
 
+static const uint8_t g_titlekey_seal_key_source[0x10] = {
+	0xCB, 0xB7, 0x6E, 0x38, 0xA1, 0xCB, 0x77, 0x0F, 0xB2, 0xA5, 0xB2, 0x9D, 0xD8, 0x56, 0x9F, 0x76
+};
+
 void dumpTickets()
 {
 	RightsId* rightsIds = NULL;
@@ -129,6 +142,20 @@ void dumpTickets()
 	u32 installedTicketCount = 0;
 	FILE* f = fopen("/titlekeys.txt", "w+");
 	u8 titleKey[16];
+	u8 kek[16];
+	u32 cryptoHandle = 0;
+
+	splCryptoLockAesEngine(&cryptoHandle);
+
+	memset(kek, NULL, sizeof(kek));
+	splCryptoGenerateAesKek(g_titlekey_seal_key_source, 0, 0, kek);
+
+	for (unsigned int j = 0; j < sizeof(kek); j++)
+	{
+		fprintf(f, "%02X", kek[j]);
+	}
+
+	fprintf(f, "\n");
 
 	ASSERT_OK(esCountPersonalizedTicket(&installedTicketCount), "Failed to count personalized tickets");
 
@@ -189,6 +216,8 @@ void dumpTickets()
 	free(rightsIds);
 
 	fclose(f);
+
+	splCryptoUnlockAesEngine(cryptoHandle);
 }
 
 int main(int argc, char **argv)
