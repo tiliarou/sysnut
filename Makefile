@@ -9,7 +9,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 TARGET		:=	sysnut
 BUILD		:=	build
-SOURCES		:=	source source/ipc source/nx source/nx/ipc source/install
+SOURCES		:=	source source/ipc source/nx source/nx/ipc source/install source/util
 DATA		:=	data
 INCLUDES	:=	include
 EXEFS_SRC	:=	exefs_src
@@ -88,14 +88,14 @@ $(BUILD):
 
 clean:
 	@echo clean ...
-	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).kip
+	@rm -fr $(BUILD) $(TARGET).elf $(TARGET).kip $(TARGET).nro
 
 else
 .PHONY:	all
 
 DEPENDS	:=	$(OFILES:.o=.d)
 
-all	:	$(OUTPUT).kip
+all	:	$(OUTPUT).kip $(OUTPUT).nro
 
 $(OUTPUT).kip	:	$(OUTPUT).elf
 

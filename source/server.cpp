@@ -3,6 +3,8 @@
 #include <errno.h>
 #include "log.h"
 
+#include "install/install_nsp_remote.hpp"
+
 #define REMOTE_INSTALL_PORT 2000
 
 Server::Server()
@@ -44,6 +46,14 @@ bool Server::step()
 {
 	auto callback = [](Socket *s) {
 		s->write("hello world\n", sizeof("hello world\n"));
+		
+		tin::install::nsp::NetworkNSPInstallTask task(FsStorageId_SdCard, false, "guest:guest@192.168.254.11:9000/api/download/0100ADF0096F2000/title.nsp");
+
+		task.PrepareForInstall();
+		task.DebugPrintInstallData();
+		task.Install();
+		task.DebugPrintInstallData();
+							
 		print("closing client\n");
 	};
 

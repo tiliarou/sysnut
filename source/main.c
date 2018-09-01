@@ -225,11 +225,11 @@ int main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	dumpTickets();
+	//dumpTickets();
 
-	//network_pre_init();
-	//runMainLoop();
-	//network_post_exit();
+	network_pre_init();
+	runMainLoop();
+	network_post_exit();
 
 	return 0;
 }

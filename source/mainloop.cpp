@@ -23,5 +23,5 @@ void runMainLoop()
 		}
 		print("loop end\n");
 	}
-	print("shutdown");
+	print("shutdown\n");
 }
