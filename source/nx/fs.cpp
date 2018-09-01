@@ -26,7 +26,7 @@ namespace nx::fs
         if (sizeRead != size)
         {
             std::string msg = "Size read " + std::string("" + sizeRead) + " doesn't match expected size " + std::string("" + size);
-			printf("%s\n", msg.c_str());
+			print("%s\n", msg.c_str());
 			return;
         }
     }
@@ -91,7 +91,7 @@ namespace nx::fs
 
         if (path.length() >= FS_MAX_PATH)
 		{
-			printf("Directory path is too long!\n");
+			print("Directory path is too long!\n");
             return -1;
 		}
 
@@ -117,7 +117,7 @@ namespace nx::fs
     {
         if (path.length() >= FS_MAX_PATH)
 		{
-            printf("Directory path is too long!\n");
+            print("Directory path is too long!\n");
             //return;
 		}
 
@@ -134,7 +134,7 @@ namespace nx::fs
         // Account for null at the end of c strings
         if (path.length() >= FS_MAX_PATH)
 		{
-            printf("Directory path is too long!\n");
+            print("Directory path is too long!\n");
             //return IDirectory();
 		}
 

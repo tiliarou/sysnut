@@ -26,7 +26,7 @@ namespace tin::install
         ASSERT_OK(m_contentMeta.ParseData(m_cnmtByteBuf.data(), m_cnmtByteBuf.size()), "Failed to parse data");
 
         if (m_ignoreReqFirmVersion)
-            printf("WARNING: Required system firmware version is being IGNORED!\n");
+            print("WARNING: Required system firmware version is being IGNORED!\n");
 
         ASSERT_OK(m_contentMeta.GetInstallContentMeta(&m_metaRecord, m_cnmtContentRecord, m_installContentMetaData, m_ignoreReqFirmVersion), "Failed to get install content meta");
     }
@@ -88,7 +88,7 @@ namespace tin::install
         storageRecord.storageId = m_destStorageId;
         storageRecords.push_back(storageRecord);
 
-        printf("Installing ticket and cert...\n");
+        print("Installing ticket and cert...\n");
 
         this->InstallTicketCert();
 
@@ -99,16 +99,16 @@ namespace tin::install
             nsDeleteApplicationRecord(baseTitleId);
 
 
-        printf("Pushing application record...\n");
+        print("Pushing application record...\n");
         ASSERT_OK(nsPushApplicationRecord(baseTitleId, 0x3, storageRecords.data(), storageRecords.size() * sizeof(ContentStorageRecord)), "Failed to push application record");
 
-        printf("Writing content records...\n");
+        print("Writing content records...\n");
         this->WriteRecords();
 
         // Install CNMT
         this->InstallCNMT();
 
-        printf("Installing NCAs...\n");
+        print("Installing NCAs...\n");
         for (auto& record : m_contentMeta.m_contentRecords)
         {
             this->InstallNCA(record.ncaId);

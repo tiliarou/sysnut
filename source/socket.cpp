@@ -2,6 +2,8 @@
 #include <errno.h>
 #include "log.h"
 
+Socket* currentSocket = NULL;
+
 Socket::Socket()
 {
 	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
@@ -81,15 +83,17 @@ int Socket::accept(void(*callback)(Socket* s))
 
 	if (s >= 0)
 	{
+		currentSocket = &s;
 		callback(&s);
 	}
 	else if(errno != EAGAIN)
 	{
+		currentSocket = NULL;
 		print("accept err: %d / %u\n", r, errno);
 		s.close();
 		close();
 	}
-	
+	currentSocket = NULL;
 	s.close();
 	return r;
 }

@@ -15,7 +15,7 @@ namespace tin::install::nsp
     // TODO: Do verification: PFS0 magic, sizes not zero
     void RemoteNSP::RetrieveHeader()
     {
-        printf("Retrieving remote NSP header...\n");
+        print("Retrieving remote NSP header...\n");
 
         // Retrieve the base header
         m_headerBytes.resize(sizeof(PFS0BaseHeader), 0);
@@ -37,25 +37,40 @@ namespace tin::install::nsp
         print("Retrieving %s\n", ncaFileName.c_str());
 
         size_t ncaSize = fileEntry->fileSize;
+		print("1\n");
         u64 fileOff = 0;
-        size_t readSize = 0x200000; // 8MB buff
-        auto readBuffer = std::make_unique<u8[]>(readSize);
-
-        if (readBuffer == NULL)
-			printf("Failed to allocate read buffer for %s\n", ncaFileName.c_str());
-            return;
+		print("2\n");
+        size_t readSize = 0x20000; // 8MB buff
+		print("3\n");
+		u8* readBuffer = (u8*)malloc(readSize); // std::make_unique<u8[]>(readSize);
+		print("4\n");
+		if (readBuffer == NULL)
+		{
+			print("Failed to allocate read buffer for %s\n", ncaFileName.c_str());
+			return;
+		}
+		print("5\n");
 
         while (fileOff < ncaSize) 
         {   
             if (fileOff + readSize >= ncaSize) readSize = ncaSize - fileOff;
+			print("read size: %d\n", readSize);
 
-            m_download.BufferDataRange(readBuffer.get(), this->GetDataOffset() + fileEntry->dataOffset + fileOff, readSize, progressFunc);
+            m_download.BufferDataRange(readBuffer, this->GetDataOffset() + fileEntry->dataOffset + fileOff, readSize, progressFunc);
 
-            if (processBlockFunc != nullptr)
-                processBlockFunc(readBuffer.get(), readSize, fileOff, ncaSize);
+			print("finished chunk\n");
+
+			if (processBlockFunc != nullptr)
+			{
+				processBlockFunc(readBuffer, readSize, fileOff, ncaSize);
+			}
 
             fileOff += readSize;
         }
+
+		free(readBuffer);
+
+		print("Finished %s\n", ncaFileName.c_str());
     }
 
     const PFS0FileEntry* RemoteNSP::GetFileEntry(unsigned int index)
@@ -81,8 +96,10 @@ namespace tin::install::nsp
             std::string name(this->GetFileEntryName(fileEntry));
             auto foundExtension = name.substr(name.find(".") + 1); 
 
-            if (foundExtension == extension)
-                return fileEntry;
+			if (foundExtension == extension)
+			{
+				return fileEntry;
+			}
         }
 
         return nullptr;
@@ -95,8 +112,10 @@ namespace tin::install::nsp
             const PFS0FileEntry* fileEntry = this->GetFileEntry(i);
             std::string foundName(this->GetFileEntryName(fileEntry));
 
-            if (foundName == name)
-                return fileEntry;
+			if (foundName == name)
+			{
+				return fileEntry;
+			}
         }
 
         return nullptr;

@@ -152,7 +152,7 @@ namespace tin::network
         {
             if (sizeRead + streamBufSize > size)
             {
-                printf("New read size 0x%lx would exceed total expected size 0x%lx\n", sizeRead + streamBufSize, size);
+                print("New read size 0x%lx would exceed total expected size 0x%lx\n", sizeRead + streamBufSize, size);
                 return 0;
             }
 

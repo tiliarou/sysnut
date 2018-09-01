@@ -47,7 +47,7 @@ namespace tin::util
 
         if (sizeRead < sizeof(appControlData.nacp))
         {
-			printf("Incorrect size for nacp\n");
+			print("Incorrect size for nacp\n");
 			return std::string();
         }
 
@@ -57,7 +57,7 @@ namespace tin::util
 
         if (languageEntry == NULL)
         {
-			printf("Language entry is null!\n");
+			print("Language entry is null!\n");
 			return std::string();
         }
 

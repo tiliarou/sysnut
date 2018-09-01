@@ -21,7 +21,7 @@ namespace tin::install::nsp
 
         if (fileEntry == nullptr)
 		{
-            printf("Failed to find cnmt file entry!\n");
+            print("Failed to find cnmt file entry!\n");
 			return;
 		}
 
@@ -31,7 +31,7 @@ namespace tin::install::nsp
 
         nx::ncm::ContentStorage contentStorage(m_destStorageId);
 
-        printf("CNMT Name: %s\n", cnmtNcaName.c_str());
+        print("CNMT Name: %s\n", cnmtNcaName.c_str());
 
         // We install the cnmt nca early to read from it later
         this->InstallNCA(cnmtNcaId);
@@ -62,7 +62,7 @@ namespace tin::install::nsp
         std::string ncaFileName = m_remoteNSP.GetFileEntryName(fileEntry);
         size_t ncaSize = fileEntry->fileSize;
 
-        printf("Installing %s to storage Id %u\n", ncaFileName.c_str(), m_destStorageId);
+        print("Installing %s to storage Id %u\n", ncaFileName.c_str(), m_destStorageId);
 
         nx::ncm::ContentStorage contentStorage(m_destStorageId);
 
@@ -78,7 +78,7 @@ namespace tin::install::nsp
         {
             contentStorage.WritePlaceholder(ncaId, blockStartOffset, blockBuf, bufSize);
             float progress = (float)blockStartOffset / (float)ncaSize;
-            printf("> Progress: %lu/%lu MB (%d%s)\r", (blockStartOffset / 1000000), (ncaSize / 1000000), (int)(progress * 100.0), "%");
+            print("> Progress: %lu/%lu MB (%d%s)\r", (blockStartOffset / 1000000), (ncaSize / 1000000), (int)(progress * 100.0), "%");
         };
 
         //auto progressFunc = [&] (size_t sizeRead) {};
@@ -86,13 +86,13 @@ namespace tin::install::nsp
         m_remoteNSP.RetrieveAndProcessNCA(ncaId, installBlockFunc, nullptr);
 
         // Clean up the line for whatever comes next
-        printf("                                                           \r");
-        printf("Registering placeholder...\n");
+        print("                                                           \r");
+        print("Registering placeholder...\n");
         
 
 		/*if(!contentStorage.Register(ncaId, ncaId))
 		{
-			printf(("Failed to register " + ncaFileName + ". It may already exist.\n").c_str());
+			print(("Failed to register " + ncaFileName + ". It may already exist.\n").c_str());
 			return;
 		}*/
 		contentStorage.Register(ncaId, ncaId);
@@ -107,14 +107,14 @@ namespace tin::install::nsp
         const PFS0FileEntry* tikFileEntry = m_remoteNSP.GetFileEntryByExtension("tik");
         u64 tikSize = tikFileEntry->fileSize;
         auto tikBuf = std::make_unique<u8[]>(tikSize);
-        printf("> Reading tik\n");
+        print("> Reading tik\n");
         m_remoteNSP.m_download.BufferDataRange(tikBuf.get(), m_remoteNSP.GetDataOffset() + tikFileEntry->dataOffset, tikSize, nullptr);
 
         // Read the cert file and put it into a buffer
         const PFS0FileEntry* certFileEntry = m_remoteNSP.GetFileEntryByExtension("cert");
         u64 certSize = certFileEntry->fileSize;
         auto certBuf = std::make_unique<u8[]>(certSize);
-        printf("> Reading cert\n");
+        print("> Reading cert\n");
         m_remoteNSP.m_download.BufferDataRange(certBuf.get(), m_remoteNSP.GetDataOffset() + certFileEntry->dataOffset, certSize, nullptr);
 
         // Finally, let's actually import the ticket
