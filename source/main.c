@@ -57,22 +57,28 @@ void __appInit(void)
 {
 	Result rc;
 	svcSleepThread(10000000000L);
+
 	rc = smInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
+
 	rc = fsInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
 	registerFspLr();
+
 	rc = fsdevMountSdmc();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
+
 	rc = timeInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
+
 	rc = hidInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
+
 	if (R_FAILED(esInitialize()))
 		fatalSimple(0xBEE5);
 
@@ -81,10 +87,33 @@ void __appInit(void)
 
 	if (R_FAILED(splCryptoInitialize()))
 		fatalSimple(0xBEE7);
+
+
+
+	if (R_FAILED(ncmextInitialize()))
+		fatalSimple(0xBEEF);
+
+	if (R_FAILED(ncmInitialize()))
+		fatalSimple(0xBEE2);
+
+	if (R_FAILED(nsInitialize()))
+		fatalSimple(0xBEE3);
+
+	if (R_FAILED(nsextInitialize()))
+		fatalSimple(0xBEE4);
+
+	if (R_FAILED(nifmInitialize()))
+		fatalSimple(0xBEE6);
 }
 
 void __appExit(void)
 {
+	nifmExit();
+	ncmextExit();
+	ncmExit();
+	nsExit();
+	nsextExit();
+
 	splCryptoExit();
 	splExit();
 	esExit();
