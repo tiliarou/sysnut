@@ -26,7 +26,7 @@ namespace tin::install::nsp
         m_headerBytes.resize(sizeof(PFS0BaseHeader) + remainingHeaderSize, 0);
         m_download.BufferDataRange(m_headerBytes.data() + sizeof(PFS0BaseHeader), sizeof(PFS0BaseHeader), remainingHeaderSize, nullptr);
 
-        LOG_DEBUG("Full header: \n");
+        print("Full header: \n");
     }
 
     void RemoteNSP::RetrieveAndProcessNCA(NcmNcaId ncaId, std::function<void (void* blockBuf, size_t bufSize, size_t blockStartOffset, size_t ncaSize)> processBlockFunc, std::function<void (size_t sizeRead)> progressFunc)
@@ -34,7 +34,7 @@ namespace tin::install::nsp
         const PFS0FileEntry* fileEntry = this->GetFileEntryByNcaId(ncaId);
         std::string ncaFileName = this->GetFileEntryName(fileEntry);
 
-        LOG_DEBUG("Retrieving %s\n", ncaFileName.c_str());
+        print("Retrieving %s\n", ncaFileName.c_str());
 
         size_t ncaSize = fileEntry->fileSize;
         u64 fileOff = 0;
@@ -60,13 +60,15 @@ namespace tin::install::nsp
 
     const PFS0FileEntry* RemoteNSP::GetFileEntry(unsigned int index)
     {
-        if (index >= this->GetBaseHeader()->numFiles)
-            THROW_FORMAT("File entry index is out of bounds\n")
+		if (index >= this->GetBaseHeader()->numFiles)
+			print("File entry index is out of bounds\n");
     
         size_t fileEntryOffset = sizeof(PFS0BaseHeader) + index * sizeof(PFS0FileEntry);
 
-        if (m_headerBytes.size() < fileEntryOffset + sizeof(PFS0FileEntry))
-            THROW_FORMAT("Header bytes is too small to get file entry!");
+		if (m_headerBytes.size() < fileEntryOffset + sizeof(PFS0FileEntry))
+		{
+			print("Header bytes is too small to get file entry!");
+		}
 
         return reinterpret_cast<PFS0FileEntry*>(m_headerBytes.data() + fileEntryOffset);
     }
@@ -125,7 +127,7 @@ namespace tin::install::nsp
     const PFS0BaseHeader* RemoteNSP::GetBaseHeader()
     {
         if (m_headerBytes.empty())
-            THROW_FORMAT("Cannot retrieve header as header bytes are empty. Have you retrieved it yet?\n");
+            print("Cannot retrieve header as header bytes are empty. Have you retrieved it yet?\n");
 
         return reinterpret_cast<PFS0BaseHeader*>(m_headerBytes.data());
     }
@@ -133,7 +135,7 @@ namespace tin::install::nsp
     u64 RemoteNSP::GetDataOffset()
     {
         if (m_headerBytes.empty())
-            THROW_FORMAT("Cannot get data offset as header is empty. Have you retrieved it yet?\n");
+            print("Cannot get data offset as header is empty. Have you retrieved it yet?\n");
 
         return m_headerBytes.size();
     }

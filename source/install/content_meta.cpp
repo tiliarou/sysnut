@@ -17,7 +17,7 @@ namespace tin::install
 
         if (dataSize < sizeof(ContentMetaHeader))
         {
-            LOG_DEBUG("Data size is too small! 0x%lx", dataSize);
+            print("Data size is too small! 0x%lx", dataSize);
             return -1;
         }
 

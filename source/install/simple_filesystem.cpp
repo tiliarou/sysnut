@@ -20,7 +20,7 @@ namespace tin::install::nsp
 
     bool SimpleFileSystem::HasFile(std::string path)
     {
-		LOG_DEBUG(("Attempting to find file at " + m_rootPath + path + "\n").c_str());
+		print(("Attempting to find file at " + m_rootPath + path + "\n").c_str());
 		m_fileSystem->OpenFile(m_rootPath + path);
 		return true;
     }

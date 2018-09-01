@@ -71,7 +71,7 @@ namespace tin::install::nsp
         contentStorage.DeletePlaceholder(ncaId);
 
 
-        LOG_DEBUG("Size: 0x%lx\n", ncaSize);
+        print("Size: 0x%lx\n", ncaSize);
         contentStorage.CreatePlaceholder(ncaId, ncaId, ncaSize);
 
         auto installBlockFunc = [&] (void* blockBuf, size_t bufSize, size_t blockStartOffset, size_t ncaSize)

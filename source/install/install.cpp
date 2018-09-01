@@ -61,7 +61,7 @@ namespace tin::install
         }
         rc = 0;
 
-        LOG_DEBUG("Content meta count: %u\n", contentMetaCount);
+        print("Content meta count: %u\n", contentMetaCount);
 
         // Obtain any existing app record content meta and append it to our vector
         if (contentMetaCount > 0)
@@ -128,7 +128,7 @@ namespace tin::install
         }
 
 
-        LOG_DEBUG("Post Install Records: \n");
+        print("Post Install Records: \n");
         this->DebugPrintInstallData();
     }
 
@@ -190,9 +190,9 @@ namespace tin::install
 				return;
             }
 
-            LOG_DEBUG("Application content meta key: \n");
+            print("Application content meta key: \n");
             printBytes(nxlinkout, (u8*)&latestApplicationContentMetaKey, sizeof(NcmMetaRecord), true);
-            LOG_DEBUG("Application content meta: \n");
+            print("Application content meta: \n");
             printBytes(nxlinkout, appContentRecordBuf.get(), appContentRecordSize, true);
 
             if (hasUpdate)
@@ -210,27 +210,27 @@ namespace tin::install
 					return;
                 }
 
-                LOG_DEBUG("Patch content meta key: \n");
+                print("Patch content meta key: \n");
                 printBytes(nxlinkout, (u8*)&latestPatchContentMetaKey, sizeof(NcmMetaRecord), true);
-                LOG_DEBUG("Patch content meta: \n");
+                print("Patch content meta: \n");
                 printBytes(nxlinkout, patchContentRecordBuf.get(), patchContentRecordsSize, true);
             }
             else
             {
-                LOG_DEBUG("No update records found, or an error occurred.\n");
+                print("No update records found, or an error occurred.\n");
             }
 
             auto appRecordBuf = std::make_unique<u8[]>(0x100);
             u32 numEntriesRead;
             ASSERT_OK(nsListApplicationRecordContentMeta(0, baseTitleId, appRecordBuf.get(), 0x100, &numEntriesRead), "Failed to list application record content meta");
 
-            LOG_DEBUG("Application record content meta: \n");
+            print("Application record content meta: \n");
             printBytes(nxlinkout, appRecordBuf.get(), 0x100, true);
         }
         catch (std::runtime_error& e)
         {
             serviceClose(&contentMetaDatabase.s);
-            LOG_DEBUG("Failed to log install data. Error: %s", e.what());
+            print("Failed to log install data. Error: %s", e.what());
         }
 
         #endif

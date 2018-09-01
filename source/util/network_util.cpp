@@ -54,7 +54,7 @@ namespace tin::network
 
         if (!curl)
         {
-            THROW_FORMAT("Failed to initialize curl\n");
+            print("Failed to initialize curl\n");
         }
 
         curl_easy_setopt(curl, CURLOPT_URL, m_url.c_str());
@@ -67,7 +67,7 @@ namespace tin::network
         rc = curl_easy_perform(curl);
         if (rc != CURLE_OK)
         {
-            THROW_FORMAT("Failed to retrieve HTTP Header: %s\n", curl_easy_strerror(rc));
+            print("Failed to retrieve HTTP Header: %s\n", curl_easy_strerror(rc));
         }
 
         u64 httpCode = 0;
@@ -76,7 +76,7 @@ namespace tin::network
 
         if (httpCode != 200 && httpCode != 204)
         {
-            THROW_FORMAT("Unexpected HTTP response code when retrieving header: %lu\n", httpCode);
+            print("Unexpected HTTP response code when retrieving header: %lu\n", httpCode);
         }
     }
 
@@ -110,7 +110,7 @@ namespace tin::network
 
             if (!curl)
             {
-                THROW_FORMAT("Failed to initialize curl\n");
+                print("Failed to initialize curl\n");
             }
 
             curl_easy_setopt(curl, CURLOPT_URL, m_url.c_str());
@@ -122,7 +122,7 @@ namespace tin::network
             rc = curl_easy_perform(curl);
             if (rc != CURLE_OK)
             {
-                THROW_FORMAT("Failed to retrieve HTTP Header: %s\n", curl_easy_strerror(rc));
+                print("Failed to retrieve HTTP Header: %s\n", curl_easy_strerror(rc));
             }
 
             u64 httpCode = 0;
@@ -171,7 +171,7 @@ namespace tin::network
     {
         if (!m_rangesSupported)
         {
-            THROW_FORMAT("Attempted range request when ranges aren't supported!\n");
+            print("Attempted range request when ranges aren't supported!\n");
         }
 
         auto writeDataFunc = streamFunc;
@@ -181,14 +181,14 @@ namespace tin::network
 
         if (!curl)
         {
-            THROW_FORMAT("Failed to initialize curl\n");
+            print("Failed to initialize curl\n");
         }
 
         std::stringstream ss;
         ss << offset << "-" << (offset + size - 1);
         auto range = ss.str();
-        LOG_DEBUG("Requesting from range: %s\n", range.c_str());
-        LOG_DEBUG("Read size: %lx\n", size);
+        print("Requesting from range: %s\n", range.c_str());
+        print("Read size: %lx\n", size);
 
         curl_easy_setopt(curl, CURLOPT_URL, m_url.c_str());
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -200,7 +200,7 @@ namespace tin::network
         rc = curl_easy_perform(curl);
         if (rc != CURLE_OK)
         {
-            THROW_FORMAT("Failed to perform range request: %s\n", curl_easy_strerror(rc));
+            print("Failed to perform range request: %s\n", curl_easy_strerror(rc));
         }
 
         u64 httpCode = 0;
@@ -209,7 +209,7 @@ namespace tin::network
 
         if (httpCode != 206)
         {
-            THROW_FORMAT("Failed to request range! Response code is %lu\n", httpCode);
+            print("Failed to request range! Response code is %lu\n", httpCode);
         }
     }
 
