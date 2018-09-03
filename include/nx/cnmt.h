@@ -90,7 +90,13 @@ public:
 	~Cnmt();
 
 	bool open(string& path, char* mode = "rb");
+	Buffer& buffer() { return m_buffer; }
 
+	ContentMetaHeader* contentMetaHeader() { return reinterpret_cast<ContentMetaHeader*>(buffer().buffer());  }
+	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().c_str() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
 
+	HashedContentRecord* begin() { return hashedContentRecord(0); }
+	HashedContentRecord* end() { return hashedContentRecord(contentMetaHeader()->contentCount - 1); }
 private:
+	Buffer m_buffer;
 };

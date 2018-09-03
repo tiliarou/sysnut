@@ -78,12 +78,17 @@ u64 File::size()
 	return sz;
 }
 
-u64 File::read(Buffer buffer, u64 sz)
+u64 File::read(Buffer& buffer, u64 sz)
 {
 	if (!isOpen())
 	{
 		error("tried to read from closed file\n");
 		return 0;
+	}
+
+	if (!sz)
+	{
+		sz = size();
 	}
 
 	buffer.resize(sz);

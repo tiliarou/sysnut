@@ -13,7 +13,7 @@ public:
 	bool seek(u64 offset, int whence);
 	u64 tell();
 	u64 size();
-	u64 read(Buffer buffer, u64 sz);
+	u64 read(Buffer& buffer, u64 sz = 0);
 
 	bool isOpen();
 

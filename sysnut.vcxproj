@@ -101,6 +101,11 @@
   <ItemGroup>
     <ClCompile Include="source\log.cpp" />
     <ClCompile Include="source\mainloop.cpp" />
+    <ClCompile Include="source\mbedtls\aes.c" />
+    <ClCompile Include="source\mbedtls\cipher.c" />
+    <ClCompile Include="source\mbedtls\cipher_wrap.c" />
+    <ClCompile Include="source\mbedtls\platform_util.c" />
+    <ClCompile Include="source\nx\crypto.cpp" />
     <ClCompile Include="source\nx\buffer.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
@@ -117,7 +122,9 @@
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\error.hpp" />
     <ClInclude Include="include\log.h" />
+    <ClInclude Include="include\mbedtls\config.h" />
     <ClInclude Include="include\nut.h" />
+    <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
     <ClInclude Include="include\nx\directory.h" />
