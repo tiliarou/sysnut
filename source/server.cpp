@@ -49,10 +49,11 @@ bool Server::step()
 		
 		tin::install::nsp::NetworkNSPInstallTask task(FsStorageId_SdCard, false, "guest:guest@192.168.254.11:9000/api/download/01009CE00AFAE000/title.nsp");
 
-		task.PrepareForInstall();
-		task.DebugPrintInstallData();
-		task.Install();
-		task.DebugPrintInstallData();
+		if (task.PrepareForInstall() && task.Install())
+		{
+			print("success\n");
+			// success
+		}
 							
 		print("closing client\n");
 	};

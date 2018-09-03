@@ -9,20 +9,19 @@
 
 namespace tin::install::nsp
 {
-    NetworkNSPInstallTask::NetworkNSPInstallTask(FsStorageId destStorageId, bool ignoreReqFirmVersion, std::string url) :
-        IInstallTask(destStorageId, ignoreReqFirmVersion), m_remoteNSP(url)
+    NetworkNSPInstallTask::NetworkNSPInstallTask(FsStorageId destStorageId, bool ignoreReqFirmVersion, std::string url) : IInstallTask(destStorageId, ignoreReqFirmVersion), m_remoteNSP(url)
     {
         m_remoteNSP.RetrieveHeader();
     }
 
-    void NetworkNSPInstallTask::ReadCNMT()
+    bool NetworkNSPInstallTask::ReadCNMT()
     {
         const PFS0FileEntry* fileEntry = m_remoteNSP.GetFileEntryByExtension("cnmt.nca");
 
         if (fileEntry == nullptr)
 		{
             print("Failed to find cnmt file entry!\n");
-			return;
+			return false;
 		}
 
         std::string cnmtNcaName(m_remoteNSP.GetFileEntryName(fileEntry));
@@ -39,7 +38,9 @@ namespace tin::install::nsp
 
         // Create the cnmt filesystem
         nx::fs::IFileSystem cnmtNCAFileSystem;
+
         ASSERT_OK(cnmtNCAFileSystem.OpenFileSystemWithId(cnmtNCAFullPath, FsFileSystemType_ContentMeta, 0), ("Failed to open content meta file system " + cnmtNCAFullPath).c_str());
+
         tin::install::nsp::SimpleFileSystem cnmtNCASimpleFileSystem(cnmtNCAFileSystem, "/", cnmtNCAFullPath + "/");
         
         // Find and read the cnmt file
@@ -54,9 +55,11 @@ namespace tin::install::nsp
         m_cnmtContentRecord.ncaId = cnmtNcaId;
         *(u64*)m_cnmtContentRecord.size = cnmtNcaSize & 0xFFFFFFFFFFFF;
         m_cnmtContentRecord.type = NcmContentType_CNMT;
+
+		return true;
     }
 
-    void NetworkNSPInstallTask::InstallNCA(const NcmNcaId& ncaId)
+    bool NetworkNSPInstallTask::InstallNCA(const NcmNcaId& ncaId)
     {
         const PFS0FileEntry* fileEntry = m_remoteNSP.GetFileEntryByNcaId(ncaId);
         std::string ncaFileName = m_remoteNSP.GetFileEntryName(fileEntry);
@@ -67,7 +70,6 @@ namespace tin::install::nsp
         nx::ncm::ContentStorage contentStorage(m_destStorageId);
 
         // Attempt to delete any leftover placeholders
-
         contentStorage.DeletePlaceholder(ncaId);
 
 
@@ -83,25 +85,28 @@ namespace tin::install::nsp
 
         //auto progressFunc = [&] (size_t sizeRead) {};
 
-        m_remoteNSP.RetrieveAndProcessNCA(ncaId, installBlockFunc, nullptr);
+		if (!m_remoteNSP.RetrieveAndProcessNCA(ncaId, installBlockFunc, nullptr))
+		{
+			return false;
+		}
 
         // Clean up the line for whatever comes next
         print("                                                           \r");
         print("Registering placeholder...\n");
         
 
-		/*if(!contentStorage.Register(ncaId, ncaId))
+		if(!contentStorage.Register(ncaId, ncaId))
 		{
 			print(("Failed to register " + ncaFileName + ". It may already exist.\n").c_str());
-			return;
-		}*/
-		contentStorage.Register(ncaId, ncaId);
+			return false;
+		}
 
         contentStorage.DeletePlaceholder(ncaId);
 
+		return true;
     }
 
-    void NetworkNSPInstallTask::InstallTicketCert()
+    bool NetworkNSPInstallTask::InstallTicketCert()
     {        
         // Read the tik file and put it into a buffer
         const PFS0FileEntry* tikFileEntry = m_remoteNSP.GetFileEntryByExtension("tik");
@@ -119,11 +124,14 @@ namespace tin::install::nsp
 
         // Finally, let's actually import the ticket
         ASSERT_OK(esImportTicket(tikBuf.get(), tikSize, certBuf.get(), certSize), "Failed to import ticket");
+
+		return true;
     }
 
-    void NetworkNSPInstallTask::InstallCNMT()
+    bool NetworkNSPInstallTask::InstallCNMT()
     {
         // We manually install CNMTs early, so don't do it during
         // the install process
+		return true;
     }
 }

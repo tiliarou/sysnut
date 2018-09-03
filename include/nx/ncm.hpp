@@ -20,11 +20,11 @@ namespace nx::ncm
             ContentStorage(FsStorageId storageId);
             ~ContentStorage();
 
-            void CreatePlaceholder(const NcmNcaId &placeholderId, const NcmNcaId &registeredId, size_t size);
-            void DeletePlaceholder(const NcmNcaId &placeholderId);
-            void WritePlaceholder(const NcmNcaId &placeholderId, u64 offset, void *buffer, size_t bufSize);
-            void Register(const NcmNcaId &placeholderId, const NcmNcaId &registeredId);
-            void Delete(const NcmNcaId &registeredId);
+            bool CreatePlaceholder(const NcmNcaId &placeholderId, const NcmNcaId &registeredId, size_t size);
+            bool DeletePlaceholder(const NcmNcaId &placeholderId);
+            bool WritePlaceholder(const NcmNcaId &placeholderId, u64 offset, void *buffer, size_t bufSize);
+            bool Register(const NcmNcaId &placeholderId, const NcmNcaId &registeredId);
+            bool Delete(const NcmNcaId &registeredId);
             std::string GetPath(const NcmNcaId &registeredId);
     };
 }

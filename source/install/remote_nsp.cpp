@@ -13,43 +13,48 @@ namespace tin::install::nsp
     }
 
     // TODO: Do verification: PFS0 magic, sizes not zero
-    void RemoteNSP::RetrieveHeader()
+    bool RemoteNSP::RetrieveHeader()
     {
         print("Retrieving remote NSP header...\n");
+		memset(m_headerBytes, 0, sizeof(m_headerBytes));
+		m_headerSize = 0;
 
         // Retrieve the base header
-        m_headerBytes.resize(sizeof(PFS0BaseHeader), 0);
-        m_download.BufferDataRange(m_headerBytes.data(), 0x0, sizeof(PFS0BaseHeader), nullptr);
+		m_headerSize = sizeof(PFS0BaseHeader);
+        m_download.BufferDataRange(m_headerBytes, 0x0, m_headerSize, nullptr);
 
         // Retrieve the full header
-        size_t remainingHeaderSize = this->GetBaseHeader()->numFiles * sizeof(PFS0FileEntry) + this->GetBaseHeader()->stringTableSize;
-        m_headerBytes.resize(sizeof(PFS0BaseHeader) + remainingHeaderSize, 0);
-        m_download.BufferDataRange(m_headerBytes.data() + sizeof(PFS0BaseHeader), sizeof(PFS0BaseHeader), remainingHeaderSize, nullptr);
+        size_t remainingHeaderSize = GetBaseHeader()->numFiles * sizeof(PFS0FileEntry) + GetBaseHeader()->stringTableSize;
 
-        print("Full header: \n");
+		m_headerSize += remainingHeaderSize;
+
+		if (m_headerSize >= MAX_NSP_HEADER_SIZE)
+		{
+			print("NSP header too large! %d bytes\n", m_headerSize);
+			return false;
+		}
+
+        m_download.BufferDataRange(m_headerBytes + sizeof(PFS0BaseHeader), sizeof(PFS0BaseHeader), remainingHeaderSize, nullptr);
+		print("Total header size: %d bytes\n", m_headerSize);
     }
 
-    void RemoteNSP::RetrieveAndProcessNCA(NcmNcaId ncaId, std::function<void (void* blockBuf, size_t bufSize, size_t blockStartOffset, size_t ncaSize)> processBlockFunc, std::function<void (size_t sizeRead)> progressFunc)
+    bool RemoteNSP::RetrieveAndProcessNCA(NcmNcaId ncaId, std::function<void (void* blockBuf, size_t bufSize, size_t blockStartOffset, size_t ncaSize)> processBlockFunc, std::function<void (size_t sizeRead)> progressFunc)
     {
-        const PFS0FileEntry* fileEntry = this->GetFileEntryByNcaId(ncaId);
-        std::string ncaFileName = this->GetFileEntryName(fileEntry);
+        const PFS0FileEntry* fileEntry = GetFileEntryByNcaId(ncaId);
+        std::string ncaFileName = GetFileEntryName(fileEntry);
 
         print("Retrieving %s\n", ncaFileName.c_str());
 
         size_t ncaSize = fileEntry->fileSize;
-		print("1\n");
         u64 fileOff = 0;
-		print("2\n");
         size_t readSize = 0x20000; // 8MB buff
-		print("3\n");
 		u8* readBuffer = (u8*)malloc(readSize); // std::make_unique<u8[]>(readSize);
-		print("4\n");
+
 		if (readBuffer == NULL)
 		{
 			print("Failed to allocate read buffer for %s\n", ncaFileName.c_str());
-			return;
+			return false;
 		}
-		print("5\n");
 
         while (fileOff < ncaSize) 
         {   
@@ -71,6 +76,7 @@ namespace tin::install::nsp
 		free(readBuffer);
 
 		print("Finished %s\n", ncaFileName.c_str());
+		return true;
     }
 
     const PFS0FileEntry* RemoteNSP::GetFileEntry(unsigned int index)
@@ -80,12 +86,12 @@ namespace tin::install::nsp
     
         size_t fileEntryOffset = sizeof(PFS0BaseHeader) + index * sizeof(PFS0FileEntry);
 
-		if (m_headerBytes.size() < fileEntryOffset + sizeof(PFS0FileEntry))
+		if (m_headerSize < fileEntryOffset + sizeof(PFS0FileEntry))
 		{
 			print("Header bytes is too small to get file entry!");
 		}
 
-        return reinterpret_cast<PFS0FileEntry*>(m_headerBytes.data() + fileEntryOffset);
+        return reinterpret_cast<PFS0FileEntry*>(m_headerBytes + fileEntryOffset);
     }
 
     const PFS0FileEntry* RemoteNSP::GetFileEntryByExtension(std::string extension)
@@ -140,22 +146,26 @@ namespace tin::install::nsp
     const char* RemoteNSP::GetFileEntryName(const PFS0FileEntry* fileEntry)
     {
         u64 stringTableStart = sizeof(PFS0BaseHeader) + this->GetBaseHeader()->numFiles * sizeof(PFS0FileEntry);
-        return reinterpret_cast<const char*>(m_headerBytes.data() + stringTableStart + fileEntry->stringTableOffset);
+        return reinterpret_cast<const char*>(m_headerBytes + stringTableStart + fileEntry->stringTableOffset);
     }
 
     const PFS0BaseHeader* RemoteNSP::GetBaseHeader()
     {
-        if (m_headerBytes.empty())
-            print("Cannot retrieve header as header bytes are empty. Have you retrieved it yet?\n");
+		if (m_headerSize == 0)
+		{
+			print("Cannot retrieve header as header bytes are empty. Have you retrieved it yet?\n");
+		}
 
-        return reinterpret_cast<PFS0BaseHeader*>(m_headerBytes.data());
+        return reinterpret_cast<PFS0BaseHeader*>(m_headerBytes);
     }
 
     u64 RemoteNSP::GetDataOffset()
     {
-        if (m_headerBytes.empty())
+        if (m_headerSize == 0)
+		{
             print("Cannot get data offset as header is empty. Have you retrieved it yet?\n");
+		}
 
-        return m_headerBytes.size();
+        return m_headerSize;
     }
 }

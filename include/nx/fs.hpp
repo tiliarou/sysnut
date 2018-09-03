@@ -14,17 +14,17 @@ namespace nx::fs
 
         private:
             FsFile m_file;
-
             IFile(FsFile& file);
 
         public:
             // Don't allow copying, or garbage may be closed by the destructor
+			IFile();
             IFile& operator=(const IFile&) = delete;
             IFile(const IFile&) = delete;   
 
             ~IFile();
 
-            void Read(u64 offset, void* buf, size_t size);
+            bool Read(u64 offset, void* buf, size_t size);
             u64 GetSize();
     };
 
@@ -34,7 +34,7 @@ namespace nx::fs
 
         private:
             FsDir m_dir;
-
+			IDirectory();
             IDirectory(FsDir& dir);
 
         public:
@@ -44,7 +44,7 @@ namespace nx::fs
 
             ~IDirectory();
 
-            void Read(u64 inval, FsDirectoryEntry* buf, size_t numEntries);
+            bool Read(u64 inval, FsDirectoryEntry* buf, size_t numEntries);
             u64 GetEntryCount();
     };
 

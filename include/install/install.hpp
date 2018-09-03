@@ -25,18 +25,16 @@ namespace tin::install
 
             IInstallTask(FsStorageId destStorageId, bool ignoreReqFirmVersion);
 
-            virtual void ReadCNMT() = 0;
-            virtual void ParseCNMT();
+            virtual bool ReadCNMT() = 0;
+            virtual bool ParseCNMT();
 
-            virtual void WriteRecords();
-            virtual void InstallTicketCert() = 0;
-            virtual void InstallNCA(const NcmNcaId &ncaId) = 0;
-            virtual void InstallCNMT() = 0;
+            virtual bool WriteRecords();
+            virtual bool InstallTicketCert() = 0;
+            virtual bool InstallNCA(const NcmNcaId &ncaId) = 0;
+            virtual bool InstallCNMT() = 0;
 
         public:
-            virtual void PrepareForInstall();
-            virtual void Install();
-
-            virtual void DebugPrintInstallData();
+            virtual bool PrepareForInstall();
+            virtual bool Install();
     };
 }

@@ -14,10 +14,10 @@ namespace tin::install::nsp
             tin::install::nsp::SimpleFileSystem* const m_simpleFileSystem;
 
         protected:
-            void ReadCNMT() override;
-            void InstallNCA(const NcmNcaId& ncaId) override;
-            void InstallTicketCert() override;
-            void InstallCNMT() override;
+            bool ReadCNMT() override;
+			bool InstallNCA(const NcmNcaId& ncaId) override;
+			bool InstallTicketCert() override;
+			bool InstallCNMT() override;
 
         public:
             NSPInstallTask(tin::install::nsp::SimpleFileSystem& simpleFileSystem, FsStorageId destStorageId, bool ignoreReqFirmVersion);

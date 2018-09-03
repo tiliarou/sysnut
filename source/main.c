@@ -13,7 +13,7 @@
 
 
 #define TITLE_ID 0x420000000000000E
-#define HEAP_SIZE 0x000540000
+#define HEAP_SIZE 0x000A40000
 #define SOCK_BUFFERSIZE 16384
 
 void runMainLoop();
@@ -186,12 +186,12 @@ void dumpTickets()
 
 	fprintf(f, "\n");
 
-	ASSERT_OK(esCountPersonalizedTicket(&installedTicketCount), "Failed to count personalized tickets");
+	ASSERT_VOID(esCountPersonalizedTicket(&installedTicketCount), "Failed to count personalized tickets");
 
 	rightsIds = malloc(sizeof(RightsId) * installedTicketCount);
 	memset(rightsIds, NULL, sizeof(RightsId) * installedTicketCount);
 
-	ASSERT_OK(esListPersonalizedTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list personalized tickets");
+	ASSERT_VOID(esListPersonalizedTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list personalized tickets");
 
 	for (unsigned int i = 0; i < rightsIdCount; i++)
 	{
@@ -202,7 +202,7 @@ void dumpTickets()
 		fprintf(f, "|");
 
 		memset(&titleKey, NULL, sizeof(titleKey));
-		ASSERT_OK(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
+		ASSERT_VOID(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
 
 		for (unsigned int j = 0; j < sizeof(titleKey); j++)
 		{
@@ -216,12 +216,12 @@ void dumpTickets()
 	fprintf(f, "\n");
 
 
-	ASSERT_OK(esCountCommonTicket(&installedTicketCount), "Failed to count common tickets");
+	ASSERT_VOID(esCountCommonTicket(&installedTicketCount), "Failed to count common tickets");
 
 	rightsIds = malloc(sizeof(RightsId) * installedTicketCount);
 	memset(rightsIds, NULL, sizeof(RightsId) * installedTicketCount);
 
-	ASSERT_OK(esListCommonTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list common tickets");
+	ASSERT_VOID(esListCommonTicket(&rightsIdCount, rightsIds, installedTicketCount * sizeof(RightsId)), "Failed to list common tickets");
 
 	for (unsigned int i = 0; i < rightsIdCount; i++)
 	{
@@ -232,7 +232,7 @@ void dumpTickets()
 		fprintf(f, "|");
 
 		memset(&titleKey, NULL, sizeof(titleKey));
-		ASSERT_OK(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
+		ASSERT_VOID(esGetTitleKey(&rightsIds[i], &titleKey, sizeof(titleKey)), "Failed to get title key");
 
 		for (unsigned int j = 0; j < sizeof(titleKey); j++)
 		{

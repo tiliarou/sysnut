@@ -5,7 +5,7 @@ namespace nx::ncm
 {
     ContentStorage::ContentStorage(FsStorageId storageId) 
     {
-        ASSERT_OK(ncmOpenContentStorage(storageId, &m_contentStorage), "Failed to open NCM ContentStorage");
+        ASSERT_VOID(ncmOpenContentStorage(storageId, &m_contentStorage), "Failed to open NCM ContentStorage");
     }
 
     ContentStorage::~ContentStorage()
@@ -13,35 +13,45 @@ namespace nx::ncm
         serviceClose(&m_contentStorage.s);
     }
 
-    void ContentStorage::CreatePlaceholder(const NcmNcaId &placeholderId, const NcmNcaId &registeredId, size_t size)
+    bool ContentStorage::CreatePlaceholder(const NcmNcaId &placeholderId, const NcmNcaId &registeredId, size_t size)
     {
         ASSERT_OK(ncmCreatePlaceHolder(&m_contentStorage, &placeholderId, &registeredId, size), "Failed to create placeholder");
+
+		return true;
     }
             
-    void ContentStorage::DeletePlaceholder(const NcmNcaId &placeholderId)
+    bool ContentStorage::DeletePlaceholder(const NcmNcaId &placeholderId)
     {
-        ASSERT_OK(ncmDeletePlaceHolder(&m_contentStorage, &placeholderId), "Failed to delete placeholder");
+		ASSERT_OK(ncmDeletePlaceHolder(&m_contentStorage, &placeholderId), "Failed to delete placeholder");
+
+		return true;
     }
 
-    void ContentStorage::WritePlaceholder(const NcmNcaId &placeholderId, u64 offset, void *buffer, size_t bufSize)
+    bool ContentStorage::WritePlaceholder(const NcmNcaId &placeholderId, u64 offset, void *buffer, size_t bufSize)
     {
-        ASSERT_OK(ncmWritePlaceHolder(&m_contentStorage, &placeholderId, offset, buffer, bufSize), "Failed to write to placeholder");
+		ASSERT_OK(ncmWritePlaceHolder(&m_contentStorage, &placeholderId, offset, buffer, bufSize), "Failed to write to placeholder");
+
+		return true;
     }
 
-    void ContentStorage::Register(const NcmNcaId &placeholderId, const NcmNcaId &registeredId)
+    bool ContentStorage::Register(const NcmNcaId &placeholderId, const NcmNcaId &registeredId)
     {
-        ASSERT_OK(ncmContentStorageRegister(&m_contentStorage, &registeredId, &placeholderId), "Failed to register placeholder NCA");
+		ASSERT_OK(ncmContentStorageRegister(&m_contentStorage, &registeredId, &placeholderId), "Failed to register placeholder NCA");
+
+		return true;
     }
 
-    void ContentStorage::Delete(const NcmNcaId &registeredId)
+    bool ContentStorage::Delete(const NcmNcaId &registeredId)
     {
-        ASSERT_OK(ncmDelete(&m_contentStorage, &registeredId), "Failed to delete registered NCA");
+		ASSERT_OK(ncmDelete(&m_contentStorage, &registeredId), "Failed to delete registered NCA");
+
+		return true;
     }
 
     std::string ContentStorage::GetPath(const NcmNcaId &registeredId)
     {
         char pathBuf[FS_MAX_PATH] = {0};
-        ASSERT_OK(ncmContentStorageGetPath(&m_contentStorage, &registeredId, pathBuf, FS_MAX_PATH), "Failed to get installed NCA path");
+        ASSERT_STR(ncmContentStorageGetPath(&m_contentStorage, &registeredId, pathBuf, FS_MAX_PATH), "Failed to get installed NCA path");
         return std::string(pathBuf);
     }
 }

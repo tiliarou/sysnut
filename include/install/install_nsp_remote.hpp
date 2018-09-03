@@ -13,10 +13,10 @@ namespace tin::install::nsp
             RemoteNSP m_remoteNSP;
 
         protected:
-            void ReadCNMT() override;
-            void InstallNCA(const NcmNcaId& ncaId) override;
-            void InstallTicketCert() override;
-            void InstallCNMT() override;
+			bool ReadCNMT() override;
+			bool InstallNCA(const NcmNcaId& ncaId) override;
+			bool InstallTicketCert() override;
+			bool InstallCNMT() override;
 
         public:
             NetworkNSPInstallTask(FsStorageId destStorageId, bool ignoreReqFirmVersion, std::string url);
