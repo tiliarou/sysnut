@@ -1,9 +1,9 @@
 #pragma once
 
-#include <switch.h>
-#include <switch/types.h>
+#include "nut.h"
 #include "nx/string.h"
 #include "nx/file.h"
+#include "nx/nca.h"
 
 #define MAX_CNMT_SIZE 0x4000
 
@@ -61,7 +61,7 @@ struct AddOnContentMetaExtendedHeader
 
 struct ContentRecord
 {
-	NcmNcaId ncaId;
+	NcaId ncaId;
 	u8 size[0x6];
 	u8 contentType;
 	u8 unk;

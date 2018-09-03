@@ -1,6 +1,5 @@
+#include "nut.h"
 #include "server.h"
-#include <stdio.h>
-#include <switch.h>
 #include "log.h"
 
 extern "C"

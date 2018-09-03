@@ -1,9 +1,7 @@
 #include "server.h"
 #include <stdio.h>
-#include <errno.h>
 #include "log.h"
 
-#include "install/install_nsp_remote.hpp"
 
 #define REMOTE_INSTALL_PORT 2000
 
@@ -11,20 +9,20 @@ Server::Server()
 {
 	if (!socket().isOpen())
 	{
-		print("Failed to create a server socket. Error code %u\n", errno);
+		print("Failed to create a server socket. Error code %u, socket %d\n", socket().errorCode(), (int)socket());
 		return;
 	}
 
 
 	if (socket().bind(REMOTE_INSTALL_PORT) < 0)
 	{
-		print("Failed to bind to socket %u\n", errno);
+		print("Failed to bind to socket %u\n", socket().errorCode());
 		return;
 	}
 
 	if (socket().listen() < 0)
 	{
-		print("Failed to listen on server socket. Error code: %u\n", errno);
+		print("Failed to listen on server socket. Error code: %u\n", socket().errorCode());
 		socket().close();
 	}
 	else
@@ -47,13 +45,13 @@ bool Server::step()
 	auto callback = [](Socket *s) {
 		s->write("hello world\n", sizeof("hello world\n"));
 		
-		tin::install::nsp::NetworkNSPInstallTask task(FsStorageId_SdCard, false, "guest:guest@192.168.254.11:9000/api/download/01009CE00AFAE000/title.nsp");
+		/*tin::install::nsp::NetworkNSPInstallTask task(FsStorageId_SdCard, false, "guest:guest@192.168.254.11:9000/api/download/01009CE00AFAE000/title.nsp");
 
 		if (task.PrepareForInstall() && task.Install())
 		{
 			print("success\n");
 			// success
-		}
+		}*/
 							
 		print("closing client\n");
 	};

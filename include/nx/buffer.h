@@ -1,5 +1,5 @@
 #pragma once
-#include <switch/types.h>
+#include "nut.h"
 
 class Buffer
 {

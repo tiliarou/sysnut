@@ -36,7 +36,7 @@ bool Cnmt::open(string path)
 
 	memset(buffer, 0, sizeof(buffer));
 
-	if(!read())
+	//if(!read())
 
 	if (bufferSize < sizeof(ContentMetaHeader))
 	{
@@ -44,7 +44,7 @@ bool Cnmt::open(string path)
 		return false;
 	}
 
-	memcpy(&m_contentMetaHeader, m_contentMetaBytes.data(), sizeof(ContentMetaHeader));
+	/*memcpy(&m_contentMetaHeader, m_contentMetaBytes.data(), sizeof(ContentMetaHeader));
 
 	for (unsigned int i = 0; i < m_contentMetaHeader.contentCount; i++)
 	{
@@ -53,7 +53,7 @@ bool Cnmt::open(string path)
 		// Don't install delta fragments. Even patches don't seem to install them.
 		if (hashedContentRecord.record.contentType <= 5)
 			m_contentRecords.push_back(hashedContentRecord.record);
-	}
+	}*/
 
 	return true;
 }

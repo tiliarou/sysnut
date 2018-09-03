@@ -3,10 +3,33 @@
 #include "log.h"
 
 Socket* currentSocket = NULL;
+bool isNetworkInitialized = false;
+
+bool initializeNetwork()
+{
+	if (isNetworkInitialized)
+	{
+		return true;
+	}
+
+#ifdef _MSC_VER
+	WSADATA wsaData;
+	int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
+
+	if (result != 0)
+	{
+		print("WSAStartup failed with error: %d\n", result);
+		return false;
+	}
+#endif
+	isNetworkInitialized = true;
+	return true;
+}
 
 Socket::Socket()
 {
-	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+	initializeNetwork();
+	m_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 }
 
 Socket::Socket(int socket)
@@ -33,7 +56,7 @@ bool Socket::close()
 {
 	if (isOpen())
 	{
-		::close(m_socket);
+		::closesocket(m_socket);
 		m_socket = -1;
 		return true;
 	}
@@ -56,8 +79,12 @@ int Socket::bind(int port)
 		close();
 		return -1;
 	}
-
+#ifdef _MSC_VER
+	u_long mode = 1;
+	ioctlsocket(m_socket, FIONBIO, &mode);
+#else
 	fcntl(m_socket, F_SETFL, fcntl(m_socket, F_GETFL, 0) | O_NONBLOCK);
+#endif
 	return 1;
 }
 
@@ -86,10 +113,10 @@ int Socket::accept(void(*callback)(Socket* s))
 		currentSocket = &s;
 		callback(&s);
 	}
-	else if(errno != EAGAIN)
+	else if(!errorWouldBlock())
 	{
 		currentSocket = NULL;
-		print("accept err: %d / %u\n", r, errno);
+		print("accept err: %d / %u\n", r, errorCode());
 		s.close();
 		close();
 	}
@@ -103,9 +130,27 @@ size_t Socket::write(const void* buf, size_t len)
 	size_t blockSizeWritten = 0;
 	size_t sizeWritten = 0;
 
-	while ((sizeWritten += (blockSizeWritten = send(m_socket, (int8*)buf + sizeWritten, len - sizeWritten, 0)) < len) && (blockSizeWritten > 0))
+	while ((sizeWritten += (blockSizeWritten = send(m_socket, (char*)buf + sizeWritten, len - sizeWritten, 0)) < len) && (blockSizeWritten > 0))
 	{
 	}
 
 	return sizeWritten;
+}
+
+int Socket::errorCode()
+{
+#ifdef _MSC_VER
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
+}
+
+bool Socket::errorWouldBlock()
+{
+#ifdef _MSC_VER
+	return WSAGetLastError() == WSAEWOULDBLOCK;
+#else
+	return errno == EAGAIN;
+#endif
 }
