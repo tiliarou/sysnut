@@ -10,7 +10,7 @@ Cnmt::~Cnmt()
 {
 }
 
-bool Cnmt::open(string path)
+bool Cnmt::open(string& path, char* mode)
 {
 	u8 buffer[MAX_CNMT_SIZE];
 	u64 bufferSize;
@@ -55,10 +55,5 @@ bool Cnmt::open(string path)
 			m_contentRecords.push_back(hashedContentRecord.record);
 	}*/
 
-	return true;
-}
-
-bool Cnmt::close()
-{
 	return true;
 }

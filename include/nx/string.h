@@ -9,4 +9,6 @@ public:
 	~string();
 	operator char*() const { return c_str(); }
 private:
+	string(string const&);
+	string& operator=(string const&);
 };

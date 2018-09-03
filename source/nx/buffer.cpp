@@ -5,20 +5,27 @@
 
 Buffer::Buffer()
 {
+	buffer() = NULL;
+	size() = 0;
+	bufferSize() = 0;
 }
 
 Buffer::~Buffer()
 {
-	if (buffer())
-	{
-		free(buffer());
-		buffer() = NULL;
-	}
+	close();
 }
 
 bool Buffer::resize(u64 newSize)
 {
-	void* newBuffer = malloc(newSize);
+	if (buffer() && newSize <= bufferSize())
+	{
+		size() = newSize;
+		return true;
+	}
+
+	u64 newBufferSize = (newSize / BUFFER_ALIGN) * BUFFER_ALIGN + BUFFER_ALIGN;
+
+	void* newBuffer = malloc(newBufferSize);
 
 	if (!newBuffer)
 	{
@@ -34,6 +41,7 @@ bool Buffer::resize(u64 newSize)
 
 	buffer() = newBuffer;
 	size() = newSize;
+	bufferSize() = newBufferSize;
 	return true;
 }
 
@@ -45,4 +53,28 @@ char* Buffer::c_str() const
 	}
 
 	return (char*)buffer();
+}
+
+bool Buffer::close()
+{
+	if (!buffer())
+	{
+		return false;
+	}
+
+	free(buffer());
+	size() = 0;
+	bufferSize() = 0;
+	buffer() = NULL;
+	return true;
+}
+
+bool Buffer::set(const void* src, u64 sz)
+{
+	if (!resize(sz))
+	{
+		return false;
+	}
+	memcpy(buffer(), src, sz);
+	return true;
 }

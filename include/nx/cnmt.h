@@ -89,8 +89,7 @@ public:
 	Cnmt();
 	~Cnmt();
 
-	bool open(string path);
-	bool close();
+	bool open(string& path, char* mode = "rb");
 
 
 private:
