@@ -15,6 +15,19 @@ Buffer::~Buffer()
 	close();
 }
 
+Buffer::Buffer(const Buffer& src)
+{
+	resize(src.size());
+	set(src.buffer(), src.size());
+}
+
+Buffer& Buffer::operator=(const Buffer& src)
+{
+	resize(src.size());
+	set(src.buffer(), src.size());
+	return *this;
+}
+
 bool Buffer::resize(u64 newSize)
 {
 	if (buffer() && newSize <= bufferSize())
@@ -25,7 +38,7 @@ bool Buffer::resize(u64 newSize)
 
 	u64 newBufferSize = (newSize / BUFFER_ALIGN) * BUFFER_ALIGN + BUFFER_ALIGN;
 
-	void* newBuffer = malloc(newBufferSize);
+	void* newBuffer = malloc((size_t)newBufferSize);
 
 	if (!newBuffer)
 	{
@@ -35,7 +48,7 @@ bool Buffer::resize(u64 newSize)
 
 	if (buffer())
 	{
-		memcpy(newBuffer, buffer(), size());
+		memcpy(newBuffer, buffer(), (size_t)size());
 		free(buffer());
 	}
 
@@ -75,6 +88,6 @@ bool Buffer::set(const void* src, u64 sz)
 	{
 		return false;
 	}
-	memcpy(buffer(), src, sz);
+	memcpy(buffer(), src, (size_t)sz);
 	return true;
 }

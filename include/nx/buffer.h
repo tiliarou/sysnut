@@ -9,11 +9,18 @@ public:
 	Buffer();
 	~Buffer();
 
+	Buffer(const Buffer& src);
+	Buffer& operator=(const Buffer& src);
+
 	bool resize(u64 newSize);
 
 	const void* buffer() const { return m_buffer; }
 	void*& buffer() { return m_buffer; }
+
+	const u64& size() const { return m_size; }
 	u64& size() { return m_size;  }
+
+	const u64& bufferSize() const { return m_bufferSize; }
 	u64& bufferSize() { return m_bufferSize; }
 
 	bool set(const void* src, u64 sz);
@@ -22,8 +29,6 @@ public:
 	char* c_str() const;
 
 private:
-	Buffer(Buffer const&);
-	Buffer& operator=(Buffer const&);
 
 	void* m_buffer = NULL;
 	u64 m_size = 0;
