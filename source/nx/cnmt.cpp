@@ -3,7 +3,7 @@
 #include "log.h"
 #include <string.h>
 
-Cnmt::Cnmt() : File()
+Cnmt::Cnmt() : Nca()
 {
 }
 
@@ -13,7 +13,7 @@ Cnmt::~Cnmt()
 
 bool Cnmt::open(string& path, char* mode)
 {
-	if (!File::open(path))
+	if (!Nca::open(path, mode))
 	{
 		return false;
 	}
@@ -34,7 +34,7 @@ bool Cnmt::open(string& path, char* mode)
 	print("key size: %d\n", sizeof(HEADER_KEY));
 	Crypto crypto(HEADER_KEY, 32, MBEDTLS_CIPHER_AES_128_XTS);
 	//Buffer tmp(buffer());
-	crypto.xtsDecrypt(buffer().buffer(), buffer().buffer(), buffer().size(), 0, 0x200);
+	crypto.xtsDecrypt(buffer().buffer(), buffer().buffer(), 0x400, 0, 0x200);
 
 	if (buffer().size() < sizeof(ContentMetaHeader))
 	{

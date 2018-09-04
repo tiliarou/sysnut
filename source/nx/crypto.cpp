@@ -150,3 +150,64 @@ void Crypto::xtsDecrypt( void *dst, const void *src, size_t l, size_t sector, si
         decrypt((char *)dst + i, (const char *)src + i, sector_size);
     }
 }
+
+static int ishex(char c) {
+	if ('a' <= c && c <= 'f') return 1;
+	if ('A' <= c && c <= 'F') return 1;
+	if ('0' <= c && c <= '9') return 1;
+	return 0;
+}
+
+static char hextoi(char c) {
+	if ('a' <= c && c <= 'f') return c - 'a' + 0xA;
+	if ('A' <= c && c <= 'F') return c - 'A' + 0xA;
+	if ('0' <= c && c <= '9') return c - '0';
+	return 0;
+}
+
+Buffer uhx(const char* hex, int len)
+{
+	Buffer buf;
+
+	if (len)
+	{
+		len *= 2;
+	}
+	else
+	{
+		len = strlen(hex);
+	}
+
+	buf.resize(len / 2);
+
+	if (len % 2)
+	{
+		error("Key (%s) must be an even number of characters!\n", hex, len);
+		buf.resize(0);
+		return buf;
+	}
+
+	for (unsigned int i = 0; i < len / 2; i++)
+	{
+		if (!ishex(hex[i]))
+		{
+			error("Key (%s) must be %d hex digits!\n", hex, len);
+			buf.resize(0);
+			return buf;
+		}
+	}
+
+	u8* key = (u8*)buf.buffer();
+	memset(key, 0, len >> 1);
+
+	for (unsigned int i = 0; i < len; i++) {
+		char val = hextoi(hex[i]);
+
+		if ((i & 1) == 0) {
+			val <<= 4;
+		}
+		key[i >> 1] |= val;
+	}
+
+	return buf;
+}

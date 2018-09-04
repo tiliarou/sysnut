@@ -21,12 +21,14 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B51A2D95-7036-4D6B-A92B-59AD89730DDC}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -124,6 +126,7 @@
     <ClInclude Include="include\log.h" />
     <ClInclude Include="include\mbedtls\config.h" />
     <ClInclude Include="include\nut.h" />
+    <ClInclude Include="include\nx\bktr.h" />
     <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
@@ -136,9 +139,11 @@
     <ClInclude Include="include\nx\ipc\ns_ext.h" />
     <ClInclude Include="include\nx\ipc\spl.h" />
     <ClInclude Include="include\nx\ipc\tin_ipc.h" />
+    <ClInclude Include="include\nx\ivfc.h" />
     <ClInclude Include="include\nx\nca.h" />
     <ClInclude Include="include\nx\ncm.hpp" />
     <ClInclude Include="include\nx\nsp.h" />
+    <ClInclude Include="include\nx\pfs0.h" />
     <ClInclude Include="include\nx\string.h" />
     <ClInclude Include="include\server.h" />
     <ClInclude Include="include\socket.h" />

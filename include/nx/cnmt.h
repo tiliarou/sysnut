@@ -83,7 +83,7 @@ struct InstallContentMetaHeader
 	u16 padding;
 } PACKED;
 
-class Cnmt : public File
+class Cnmt : public Nca
 {
 public:
 	Cnmt();

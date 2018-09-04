@@ -91,3 +91,32 @@ bool Buffer::set(const void* src, u64 sz)
 	memcpy(buffer(), src, (size_t)sz);
 	return true;
 }
+
+void Buffer::dump(int sz, int offset)
+{
+	if (!sz)
+	{
+		sz = size() - offset;
+	}
+	else
+	{
+		sz += offset;
+	}
+
+	for (unsigned long i = offset; i < sz; i++)
+	{
+		if ((i+1) % 32 == 0)
+		{
+			debug("%2.2X\n", (u8)c_str()[i]);
+		}
+		else if ((i+1) % 4 == 0)
+		{
+			debug("%2.2X ", (u8)c_str()[i]);
+		}
+		else
+		{
+			debug("%2.2X", (u8)c_str()[i]);
+		}
+	}
+	debug("\n");
+}
