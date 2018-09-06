@@ -1,6 +1,5 @@
 #pragma once
 #include "nx/buffer.h"
-
 #include "mbedtls/cipher.h"
 
 #define HEADER_KEY "AEAAB1CA08ADF9BEF12991F369E3C567D6881E4E4A6A47A51F6E4877062D542D"

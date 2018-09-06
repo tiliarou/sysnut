@@ -17,7 +17,7 @@ Crypto::Crypto(const void *key, unsigned int key_size, aes_mode_t mode)
         fatal("Failed to set up AES context!\n");
     }
         
-    if (mbedtls_cipher_setkey(&cipherDec, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT) || mbedtls_cipher_setkey(&cipherEnc, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT))
+    if (mbedtls_cipher_setkey(&cipherDec, (const unsigned char*)key, key_size * 8, MBEDTLS_DECRYPT) || mbedtls_cipher_setkey(&cipherEnc, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT))
 	{
         fatal("Failed to set key for AES context!\n");
     }
