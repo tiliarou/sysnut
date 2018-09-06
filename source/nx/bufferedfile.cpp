@@ -14,3 +14,77 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
 	crypto().key() = key;
 	return true;
 }
+
+bool BufferedFile::open(string& path, char* mode)
+{
+	return File::open(path, mode);
+}
+
+bool BufferedFile::close()
+{
+	return File::close();
+}
+
+bool BufferedFile::seek(u64 offset, int whence)
+{
+	currentPosition() = offset;
+	return true;
+}
+
+bool BufferedFile::rewind()
+{
+	currentPosition() = 0;
+	return true;
+}
+
+u64 BufferedFile::read(Buffer& buffer, u64 sz)
+{
+	if (currentPosition() + sz > size())
+	{
+		sz = size() - currentPosition();
+	}
+
+	if (!page().contains(currentPosition(), sz))
+	{
+		page().load(this, currentPosition(), sz);
+	}
+
+	page().slice(buffer, currentPosition() - page().pageOffset(), currentPosition() - page().pageOffset() + sz);
+	currentPosition() += sz;
+	return sz;
+}
+
+bool Page::contains(u64 offset, u64 sz)
+{
+	if (!active())
+	{
+		return false;
+	}
+
+	u64 pageId = offset / PAGE_ALIGNMENT;
+
+	if (pageId != id())
+	{
+		return false;
+	}
+
+	if (offset + sz <= pageOffset() + size())
+	{
+		return true;
+	}
+
+	return false;
+}
+
+bool Page::load(File* f, u64 offset, u64 sz)
+{
+	if (active() && dirty())
+	{
+		// flush page before unloading
+	}
+
+	id() = offset / PAGE_ALIGNMENT;
+	u64 lastPage = (offset + sz) / PAGE_ALIGNMENT + 1;
+
+	return f->read(*this, (lastPage - id()) * PAGE_ALIGNMENT) != 0;
+}

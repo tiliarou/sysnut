@@ -28,6 +28,20 @@ Buffer& Buffer::operator=(const Buffer& src)
 	return *this;
 }
 
+bool Buffer::slice(Buffer& out, s64 start, s64 end)
+{
+	u64 sz = end - start;
+
+	if (!out.resize(sz))
+	{
+		return false;
+	}
+
+	memcpy(out.buffer(), c_str() + start, sz);
+
+	return true;
+}
+
 bool Buffer::resize(u64 newSize)
 {
 	if (buffer() && newSize <= bufferSize())

@@ -51,8 +51,6 @@ bool Nca::open(string& path, char* mode)
 	crypto.xtsDecrypt(header.buffer(), header.buffer(), 0xC00, 0, 0x200);
 	memcpy(dynamic_cast<nca_header_t*>(this), header.buffer(), sizeof(nca_header_t));
 
-	header.dump();
-
 	if (magic == MAGIC_NCA3)
 	{
 	}

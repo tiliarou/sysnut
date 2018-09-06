@@ -21,6 +21,7 @@ public:
 	u64& partitionSize() { return m_partitionSize; }
 
 	bool isOpen();
+	bool isPartition() { return m_parent != NULL; }
 
 protected:
 	bool setParent(File* parent);
@@ -28,4 +29,5 @@ protected:
 	File* m_parent = NULL;
 	u64 m_partitionOffset = 0;
 	u64 m_partitionSize = 0;
+	u64 m_size = 0;
 };

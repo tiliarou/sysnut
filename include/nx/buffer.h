@@ -12,6 +12,8 @@ public:
 	Buffer(const Buffer& src);
 	Buffer& operator=(const Buffer& src);
 
+	bool slice(Buffer& out, s64 start, s64 end);
+
 	bool resize(u64 newSize);
 
 	const void* buffer() const { return m_buffer; }

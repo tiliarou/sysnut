@@ -27,6 +27,8 @@ bool File::open(string& path, char* mode)
 		return false;
 	}
 
+	size(); // just cache the file size
+
 	return true;
 }
 
@@ -108,6 +110,16 @@ u64 File::tell()
 
 u64 File::size()
 {
+	if (isPartition())
+	{
+		return partitionSize();
+	}
+
+	if (m_size)
+	{
+		return m_size;
+	}
+
 	u64 currentPosition = tell();
 
 	if (!seek(0, SEEK_END))
@@ -115,11 +127,11 @@ u64 File::size()
 		return 0;
 	}
 
-	u64 sz = tell();
+	m_size = tell();
 
 	seek(currentPosition, SEEK_SET);
 
-	return sz;
+	return m_size;
 }
 
 u64 File::read(Buffer& buffer, u64 sz)
