@@ -233,71 +233,71 @@ bool Keys::open(const char* file)
 				continue;
 			}
 			int matchedKey = 0;
-			if (strcmp(key, "aesKekGenerationSource") == 0) {
+			if (strcmp(key, "aes_kek_generation_source") == 0) {
 				uhx(aesKekGenerationSource, value, sizeof(aesKekGenerationSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "aesKeyGenerationSource") == 0) {
+			else if (strcmp(key, "aes_key_generation_source") == 0) {
 				uhx(aesKeyGenerationSource, value, sizeof(aesKeyGenerationSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "keyAreaKeyApplicationSource") == 0) {
+			else if (strcmp(key, "key_area_key_application_source") == 0) {
 				uhx(keyAreaKeyApplicationSource, value, sizeof(keyAreaKeyApplicationSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "keyAreaKeyOceanSource") == 0) {
+			else if (strcmp(key, "key_area_key_ocean_source") == 0) {
 				uhx(keyAreaKeyOceanSource, value, sizeof(keyAreaKeyOceanSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "keyAreaKeySystemSource") == 0) {
+			else if (strcmp(key, "key_area_key_system_source") == 0) {
 				uhx(keyAreaKeySystemSource, value, sizeof(keyAreaKeySystemSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "titlekekSource") == 0) {
+			else if (strcmp(key, "titlekek_source") == 0) {
 				uhx(titlekekSource, value, sizeof(titlekekSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "headerKekSource") == 0) {
+			else if (strcmp(key, "header_kek_source") == 0) {
 				uhx(headerKekSource, value, sizeof(headerKekSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "headerKeySource") == 0) {
+			else if (strcmp(key, "header_key_source") == 0) {
 				uhx(headerKeySource, value, sizeof(headerKeySource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "headerKey") == 0) {
+			else if (strcmp(key, "header_key") == 0) {
 				uhx(headerKey, value, sizeof(headerKey));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "package2KeySource") == 0) {
+			else if (strcmp(key, "package2_key_source") == 0) {
 				uhx(package2KeySource, value, sizeof(package2KeySource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "sdCardKekSource") == 0) {
+			else if (strcmp(key, "sd_card_kek_source") == 0) {
 				uhx(sdCardKekSource, value, sizeof(sdCardKekSource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "sdCardNcaKeySource") == 0) {
+			else if (strcmp(key, "sd_card_nca_key_source") == 0) {
 				uhx(sdCardKeySources[1], value, sizeof(sdCardKeySources[1]));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "sdCardSaveKeySource") == 0) {
+			else if (strcmp(key, "sd_card_save_key_source") == 0) {
 				uhx(sdCardKeySources[0], value, sizeof(sdCardKeySources[0]));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "masterKeySource") == 0) {
+			else if (strcmp(key, "master_key_source") == 0) {
 				uhx(masterKeySource, value, sizeof(masterKeySource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "keyblobMacKeySource") == 0) {
+			else if (strcmp(key, "keyblob_mac_key_source") == 0) {
 				uhx(keyblobMacKeySource, value, sizeof(keyblobMacKeySource));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "secureBootKey") == 0) {
+			else if (strcmp(key, "secure_boot_key") == 0) {
 				uhx(secureBootKey, value, sizeof(secureBootKey));
 				matchedKey = 1;
 			}
-			else if (strcmp(key, "tsecKey") == 0) {
+			else if (strcmp(key, "tsec_key") == 0) {
 				uhx(tsecKey, value, sizeof(tsecKey));
 				matchedKey = 1;
 			}
@@ -310,28 +310,28 @@ bool Keys::open(const char* file)
 			else {
 				char testName[0x100] = { 0 };
 				for (unsigned int i = 0; i < 0x20 && !matchedKey; i++) {
-					snprintf(testName, sizeof(testName), "keyblobKeySource_%02x", i);
+					snprintf(testName, sizeof(testName), "keyblob_key_source_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyblobKeySources[i], value, sizeof(keyblobKeySources[i]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "keyblobKey_%02x", i);
+					snprintf(testName, sizeof(testName), "keyblob_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyblobKeys[i], value, sizeof(keyblobKeys[i]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "keyblobMacKey_%02x", i);
+					snprintf(testName, sizeof(testName), "keyblob_mac_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyblobMacKeys[i], value, sizeof(keyblobMacKeys[i]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "encryptedKeyblob_%02x", i);
+					snprintf(testName, sizeof(testName), "encrypted_keyblob_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(encryptedKeyBlobs[i], value, sizeof(encryptedKeyBlobs[i]));
 						matchedKey = 1;
@@ -345,21 +345,21 @@ bool Keys::open(const char* file)
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "masterKey_%02x", i);
+					snprintf(testName, sizeof(testName), "master_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(masterKeys[i], value, sizeof(masterKeys[i]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "package1Key_%02x", i);
+					snprintf(testName, sizeof(testName), "package1_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(package1Keys[i], value, sizeof(package1Keys[i]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "package2Key_%02x", i);
+					snprintf(testName, sizeof(testName), "package2_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(package2Keys[i], value, sizeof(package2Keys[i]));
 						matchedKey = 1;
@@ -373,21 +373,21 @@ bool Keys::open(const char* file)
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "keyAreaKeyApplication_%02x", i);
+					snprintf(testName, sizeof(testName), "key_area_key_application_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyAreaKeys[i][0], value, sizeof(keyAreaKeys[i][0]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "keyAreaKeyOcean_%02x", i);
+					snprintf(testName, sizeof(testName), "key_area_key_ocean_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyAreaKeys[i][1], value, sizeof(keyAreaKeys[i][1]));
 						matchedKey = 1;
 						break;
 					}
 
-					snprintf(testName, sizeof(testName), "keyAreaKeySystem_%02x", i);
+					snprintf(testName, sizeof(testName), "key_area_key_system_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(keyAreaKeys[i][2], value, sizeof(keyAreaKeys[i][2]));
 						matchedKey = 1;
