@@ -40,3 +40,5 @@ public:
 	u8 acidFixedKeyModulus[0x100];         /* ACID fixed key RSA pubk. */
 	u8 package2FixedKeyModulus[0x100];     /* Package2 Header RSA pubk. */
 };
+
+Keys& keys();

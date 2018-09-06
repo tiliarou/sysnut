@@ -1,6 +1,7 @@
 #include "nx/nca.h"
 #include "nx/crypto.h"
 #include "log.h"
+#include "nx/keys.h"
 
 Nca::Nca() : File()
 {
@@ -46,8 +47,7 @@ bool Nca::open(string& path, char* mode)
 		return false;
 	}
 
-	Buffer key = uhx(HEADER_KEY, 32);
-	Crypto crypto(key.buffer(), key.size(), MBEDTLS_CIPHER_AES_128_XTS);
+	Crypto crypto(keys().headerKey, sizeof(keys().headerKey), MBEDTLS_CIPHER_AES_128_XTS);
 	crypto.xtsDecrypt(header.buffer(), header.buffer(), 0xC00, 0, 0x200);
 	memcpy(dynamic_cast<nca_header_t*>(this), header.buffer(), sizeof(nca_header_t));
 

@@ -3,7 +3,12 @@
 #include <stdio.h>
 #include "log.h"
 
-Keys keys("keys.txt");
+Keys g_keys("keys.txt");
+
+Keys& keys()
+{
+	return g_keys;
+}
 
 static int getKv(FILE *f, char **key, char **value)
 {
