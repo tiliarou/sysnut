@@ -1,5 +1,7 @@
 #pragma once
 
+#include "nx/fs.h"
+
 #define IVFC_HEADER_SIZE 0xE0
 #define IVFC_MAX_LEVEL 6
 #define IVFC_MAX_BUFFERSIZE 0x4000

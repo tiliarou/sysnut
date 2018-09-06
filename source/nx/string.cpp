@@ -12,6 +12,23 @@ string::string(const char* s)
 	c_str()[len - 1] = NULL;
 }
 
+bool string::set(const void* src, u64 sz)
+{
+	if (sz == 0)
+	{
+		sz = strlen((const char*)src);
+	}
+
+	if(!Buffer::set(src, sz + 1))
+	{
+		return false;
+	}
+
+	this->c_str()[sz] = NULL;
+
+	return true;
+}
+
 string::~string()
 {
 }

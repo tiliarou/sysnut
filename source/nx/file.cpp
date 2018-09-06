@@ -8,6 +8,7 @@ File::File()
 
 File::~File()
 {
+	close();
 }
 
 bool File::open(string& path, char* mode)
@@ -29,6 +30,27 @@ bool File::open(string& path, char* mode)
 	return true;
 }
 
+bool File::setParent(File* parent)
+{
+	if (isOpen())
+	{
+		close();
+	}
+
+	// todo notify parent
+	m_parent = parent;
+	return true;
+}
+
+bool File::setPartition(File* parent, u64 offset, u64 sz)
+{
+	setParent(parent);
+	partitionOffset() = offset;
+	partitionSize() = sz;
+
+	return true;
+}
+
 bool File::close()
 {
 	if (!f)
@@ -36,8 +58,18 @@ bool File::close()
 		return false;
 	}
 
-	fclose(f);
-	f = NULL;
+	if (f)
+	{
+		fclose(f);
+		f = NULL;
+	}
+
+	if (m_parent)
+	{
+		// todo notify parent
+		m_parent = NULL;
+	}
+
 	return true;
 }
 
@@ -48,7 +80,12 @@ bool File::seek(u64 offset, int whence)
 		error("tried to seek on closed file\n");
 		return false;
 	}
-	return fseek(f, offset, whence) == 0;
+	return fseek(f, partitionOffset() + offset, whence) == 0;
+}
+
+bool File::rewind()
+{
+	return seek(0);
 }
 
 u64 File::tell()
@@ -59,7 +96,14 @@ u64 File::tell()
 		return false;
 	}
 
-	return ftell(f);
+	u64 pos = ftell(f);
+
+	if (partitionOffset() > pos)
+	{
+		return 0;
+	}
+
+	return pos - partitionOffset();
 }
 
 u64 File::size()
@@ -98,5 +142,5 @@ u64 File::read(Buffer& buffer, u64 sz)
 
 bool File::isOpen()
 {
-	return f != NULL;
+	return f != NULL || m_parent != NULL;
 }

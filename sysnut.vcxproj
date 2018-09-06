@@ -112,9 +112,12 @@
     <ClCompile Include="source\nx\cnmt.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
+    <ClCompile Include="source\nx\fs.cpp" />
     <ClCompile Include="source\nx\install.cpp" />
+    <ClCompile Include="source\nx\keys.cpp" />
     <ClCompile Include="source\nx\nca.cpp" />
     <ClCompile Include="source\nx\nsp.cpp" />
+    <ClCompile Include="source\nx\pfs0.cpp" />
     <ClCompile Include="source\nx\string.cpp" />
     <ClCompile Include="source\server.cpp" />
     <ClCompile Include="source\socket.cpp" />
@@ -140,10 +143,13 @@
     <ClInclude Include="include\nx\ipc\spl.h" />
     <ClInclude Include="include\nx\ipc\tin_ipc.h" />
     <ClInclude Include="include\nx\ivfc.h" />
+    <ClInclude Include="include\nx\keys.h" />
     <ClInclude Include="include\nx\nca.h" />
     <ClInclude Include="include\nx\ncm.hpp" />
     <ClInclude Include="include\nx\nsp.h" />
+    <ClInclude Include="include\nx\fs.h" />
     <ClInclude Include="include\nx\pfs0.h" />
+    <ClInclude Include="include\nx\primitives.h" />
     <ClInclude Include="include\nx\string.h" />
     <ClInclude Include="include\server.h" />
     <ClInclude Include="include\socket.h" />

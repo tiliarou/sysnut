@@ -1,5 +1,7 @@
 #pragma once
 
+#include "nx/ivfc.h"
+
 #define MAGIC_BKTR 0x52544B42
 
 typedef struct {
@@ -10,6 +12,13 @@ typedef struct {
     uint32_t num_entries;
     uint32_t _0x1C; /* Reserved? */
 } bktr_header_t;
+
+typedef struct {
+	ivfc_hdr_t ivfc_header;
+	uint8_t _0xE0[0x18];
+	bktr_header_t relocation_header;
+	bktr_header_t subsection_header;
+} bktr_superblock_t;
 
 #pragma pack(push, 1)
 typedef struct {

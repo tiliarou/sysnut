@@ -7,6 +7,7 @@ public:
 	string();
 	string(const char* s);
 	~string();
+	bool set(const void* src, u64 sz=0);
 	operator char*() const { return c_str(); }
 private:
 	string(string const&);

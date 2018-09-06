@@ -4,10 +4,28 @@
 
 Nca::Nca() : File()
 {
+	memset(&fs, 0, sizeof(fs));
+}
+
+Nca::~Nca()
+{
+}
+
+Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry)
+{
+	switch (fsHeader.fs_type)
+	{
+		case FS_TYPE_PFS0:
+			return new Pfs0(fsHeader, sectionEntry);
+		default:
+			return NULL;
+	}
 }
 
 bool Nca::open(string& path, char* mode)
 {
+	Buffer header;
+
 	if (!File::open(path))
 	{
 		return false;
@@ -20,20 +38,49 @@ bool Nca::open(string& path, char* mode)
 		return false;
 	}
 
-	Buffer enc;
 
-	if (!read(enc, 0xC00))
+	if (!read(header, 0xC00))
 	{
 		print("Failed to read file %s\n", path.c_str());
 		close();
 		return false;
 	}
 
-	header().resize(enc.size());
-
 	Buffer key = uhx(HEADER_KEY, 32);
 	Crypto crypto(key.buffer(), key.size(), MBEDTLS_CIPHER_AES_128_XTS);
-	crypto.xtsDecrypt(header().buffer(), enc.buffer(), 0x400, 0, 0x200);
+	crypto.xtsDecrypt(header.buffer(), header.buffer(), 0xC00, 0, 0x200);
+	memcpy(dynamic_cast<nca_header_t*>(this), header.buffer(), sizeof(nca_header_t));
+
+	header.dump();
+
+	if (magic == MAGIC_NCA3)
+	{
+	}
+	else
+	{
+		error("Unknown NCA magic (decryption failed?): %x\n", magic);
+		close();
+		return false;
+	}
+
+	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
+	{
+		fs[i] = loadFs(fs_headers[i], section_entries[i]);
+	}
 
 	return true;
+}
+
+bool Nca::close()
+{
+	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
+	{
+		if (fs[i])
+		{
+			delete fs[i];
+			fs[i] = NULL;
+		}
+	}
+
+	return File::close();
 }

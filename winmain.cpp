@@ -22,7 +22,7 @@ int main()
 		print("%2.2x ", (u8)cnmt.buffer().c_str()[i]);
 	}
 	print("\n");*/
-	cnmt.header().dump(0x200);
+	//cnmt.header().dump(0, 0x400);
 	//uhx("AEAAB1CA08ADF9BEF12991F369E3C567D6881E4E4A6A47A51F6E4877062D542D").dump();
 	return 0;
 	/*for(int i=0; i < cnmt.contentMetaHeader()->contentCount; i++)

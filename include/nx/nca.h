@@ -4,6 +4,9 @@
 #include "nx/ivfc.h"
 #include "nx/bktr.h"
 #include "nx/file.h"
+#include "nx/fs.h"
+
+#define MEDIA_SIZE 0x200
 
 typedef struct {
 	u8 c[0x10];
@@ -12,61 +15,6 @@ typedef struct {
 #define MAGIC_NCA3 0x3341434E /* "NCA3" */
 #define MAGIC_NCA2 0x3241434E /* "NCA2" */
 #define MAGIC_NCA0 0x3041434E /* "NCA0" */
-
-typedef struct {
-	uint32_t media_start_offset;
-	uint32_t media_end_offset;
-	uint8_t _0x8[0x8]; /* Padding. */
-} nca_section_entry_t;
-
-typedef struct {
-	ivfc_hdr_t ivfc_header;
-	uint8_t _0xE0[0x18];
-	bktr_header_t relocation_header;
-	bktr_header_t subsection_header;
-} bktr_superblock_t;
-
-typedef enum {
-	PARTITION_ROMFS = 0,
-	PARTITION_PFS0 = 1
-} section_partition_type_t;
-
-typedef enum {
-	FS_TYPE_PFS0 = 2,
-	FS_TYPE_ROMFS = 3
-} section_fs_type_t;
-
-typedef enum {
-	CRYPT_NONE = 1,
-	CRYPT_XTS = 2,
-	CRYPT_CTR = 3,
-	CRYPT_BKTR = 4,
-	CRYPT_NCA0 = MAGIC_NCA0
-} section_crypt_type_t;
-
-/* NCA FS header. */
-typedef struct {
-	uint8_t _0x0;
-	uint8_t _0x1;
-	uint8_t partition_type;
-	uint8_t fs_type;
-	uint8_t crypt_type;
-	uint8_t _0x5[0x3];
-	union { /* FS-specific superblock. Size = 0x138. */
-		pfs0_superblock_t pfs0_superblock;
-		romfs_superblock_t romfs_superblock;
-		//nca0_romfs_superblock_t nca0_romfs_superblock;
-		bktr_superblock_t bktr_superblock;
-	};
-	union {
-		uint8_t section_ctr[0x8];
-		struct {
-			uint32_t section_ctr_low;
-			uint32_t section_ctr_high;
-		};
-	};
-	uint8_t _0x148[0xB8]; /* Padding. */
-} nca_fs_header_t;
 
 /* Nintendo content archive header. */
 typedef struct {
@@ -124,14 +72,16 @@ private:
 	u8 m_buffer[0x10];
 };
 
-class Nca : public File
+class Nca : public File, public nca_header_t
 {
 public:
 	Nca();
+	virtual ~Nca();
 
-	bool open(string& path, char* mode = "rb");
-	Buffer& header() { return m_header; }
+	virtual bool open(string& path, char* mode = "rb");
+	virtual bool close();
 
 private:
-	Buffer m_header;
+	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry);
+	Fs* fs[4];
 };

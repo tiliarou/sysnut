@@ -7,16 +7,25 @@ class File
 {
 public:
 	File();
-	~File();
-	bool open(string& path, char* mode = "rb");
-	bool close();
-	bool seek(u64 offset, int whence);
+	virtual ~File();
+	virtual bool open(string& path, char* mode = "rb");
+	bool setPartition(File* parent, u64 offset, u64 sz);
+	virtual bool close();
+	bool seek(u64 offset, int whence = 0);
+	bool rewind();
 	u64 tell();
 	u64 size();
 	u64 read(Buffer& buffer, u64 sz = 0);
 
+	u64& partitionOffset() { return m_partitionOffset; }
+	u64& partitionSize() { return m_partitionSize; }
+
 	bool isOpen();
 
-private:
+protected:
+	bool setParent(File* parent);
 	FILE* f = NULL;
+	File* m_parent = NULL;
+	u64 m_partitionOffset = 0;
+	u64 m_partitionSize = 0;
 };
