@@ -3,7 +3,7 @@
 #include "nx/pfs0.h"
 #include "nx/ivfc.h"
 #include "nx/bktr.h"
-#include "nx/file.h"
+#include "nx/bufferedfile.h"
 #include "nx/fs.h"
 
 #define MEDIA_SIZE 0x200
@@ -72,7 +72,7 @@ private:
 	u8 m_buffer[0x10];
 };
 
-class Nca : public File, public nca_header_t
+class Nca : public BufferedFile, public nca_header_t
 {
 public:
 	Nca();

@@ -3,7 +3,7 @@
 #include "log.h"
 #include "nx/keys.h"
 
-Nca::Nca() : File()
+Nca::Nca() : BufferedFile()
 {
 	memset(&fs, 0, sizeof(fs));
 }

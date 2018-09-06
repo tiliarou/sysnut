@@ -1,5 +1,6 @@
 #pragma once
 #include "nut.h"
+#include "nx/crypto.h"
 #include "nx/file.h"
 #include "nx/directory.h"
 
@@ -12,14 +13,6 @@ typedef enum {
 	FS_TYPE_PFS0 = 2,
 	FS_TYPE_ROMFS = 3
 } section_fs_type_t;
-
-typedef enum {
-	CRYPT_NONE = 1,
-	CRYPT_XTS = 2,
-	CRYPT_CTR = 3,
-	CRYPT_BKTR = 4,
-	CRYPT_NCA0 = 0x3041434E //MAGIC_NCA0
-} section_crypt_type_t;
 
 /* NCA FS header. */
 typedef struct {

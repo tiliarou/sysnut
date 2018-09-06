@@ -107,6 +107,7 @@
     <ClCompile Include="source\mbedtls\cipher.c" />
     <ClCompile Include="source\mbedtls\cipher_wrap.c" />
     <ClCompile Include="source\mbedtls\platform_util.c" />
+    <ClCompile Include="source\nx\bufferedfile.cpp" />
     <ClCompile Include="source\nx\crypto.cpp" />
     <ClCompile Include="source\nx\buffer.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
@@ -130,6 +131,7 @@
     <ClInclude Include="include\mbedtls\config.h" />
     <ClInclude Include="include\nut.h" />
     <ClInclude Include="include\nx\bktr.h" />
+    <ClInclude Include="include\nx\bufferedfile.h" />
     <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />

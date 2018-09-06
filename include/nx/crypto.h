@@ -2,11 +2,17 @@
 #include "nx/buffer.h"
 #include "mbedtls/cipher.h"
 
-#define HEADER_KEY "AEAAB1CA08ADF9BEF12991F369E3C567D6881E4E4A6A47A51F6E4877062D542D"
+typedef enum {
+	CRYPT_NULL = 0,
+	CRYPT_NONE = 1,
+	CRYPT_XTS = 2,
+	CRYPT_CTR = 3,
+	CRYPT_BKTR = 4,
+	CRYPT_NCA0 = 0x3041434E //MAGIC_NCA0
+} crypt_type_t;
 
 typedef mbedtls_cipher_type_t aes_mode_t;
 
-Buffer uhx(const char* hex, int len = 0);
 
 class Crypto
 {

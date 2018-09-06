@@ -1,5 +1,6 @@
 #include "nx/cnmt.h"
 #include "nx/crypto.h"
+#include "nx/keys.h"
 #include "log.h"
 #include <string.h>
 
@@ -31,9 +32,8 @@ bool Cnmt::open(string& path, char* mode)
 		close();
 		return false;
 	}
-	print("key size: %d\n", sizeof(HEADER_KEY));
-	Crypto crypto(HEADER_KEY, 32, MBEDTLS_CIPHER_AES_128_XTS);
-	//Buffer tmp(buffer());
+
+	Crypto crypto(keys().headerKey, sizeof(keys().headerKey), MBEDTLS_CIPHER_AES_128_XTS);
 	crypto.xtsDecrypt(buffer().buffer(), buffer().buffer(), 0x400, 0, 0x200);
 
 	if (buffer().size() < sizeof(ContentMetaHeader))
