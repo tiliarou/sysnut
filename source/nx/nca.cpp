@@ -19,7 +19,7 @@ Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Bu
 		case FS_TYPE_PFS0:
 		{
 			Pfs0* fs = new Pfs0(fsHeader, sectionEntry, _key);
-			fs->open2(this, fs->media_start_offset * MEDIA_SIZE, (fs->media_end_offset * MEDIA_SIZE) - (fs->media_start_offset * MEDIA_SIZE));
+			fs->open2(this, fs->media_start_offset * MEDIA_SIZE + fs->superBlock().pfs0_offset, (fs->media_end_offset * MEDIA_SIZE) - (fs->media_start_offset * MEDIA_SIZE) - fs->superBlock().pfs0_offset);
 			return fs;
 		}
 		default:

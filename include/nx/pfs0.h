@@ -1,14 +1,15 @@
 #pragma once
 #include "nut.h"
+#include "nx/primitives.h"
 #include "nx/fs.h"
 
 #define MAGIC_PFS0 0x30534650
 
 typedef struct {
-	uint64_t offset;
-	uint64_t size;
-	uint32_t string_table_offset;
-	uint32_t reserved;
+	u64 offset;
+	u64 size;
+	u32 string_table_offset;
+	u32 reserved;
 } pfs0_file_entry_t;
 
 typedef struct {
@@ -57,14 +58,14 @@ private:
 } pfs0_header_t;
 
 typedef struct {
-    uint8_t master_hash[0x20]; /* SHA-256 hash of the hash table. */
-    uint32_t block_size; /* In bytes. */
-    uint32_t always_2;
-    uint64_t hash_table_offset; /* Normally zero. */
-    uint64_t hash_table_size; 
-    uint64_t pfs0_offset;
-    uint64_t pfs0_size;
-    uint8_t _0x48[0xF0];
+    u8 master_hash[0x20]; /* SHA-256 hash of the hash table. */
+    u32 block_size; /* In bytes. */
+    u32 always_2;
+    u64 hash_table_offset; /* Normally zero. */
+    u64 hash_table_size; 
+    u64 pfs0_offset;
+    u64 pfs0_size;
+    u8 _0x48[0xF0];
 } pfs0_superblock_t;
 
 class Pfs0 : public Fs, public pfs0_header_t

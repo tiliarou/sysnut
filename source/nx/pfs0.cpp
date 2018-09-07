@@ -21,7 +21,17 @@ bool Pfs0::init()
 		error("Failed to read!\n");
 	}
 
+	memcpy(dynamic_cast<pfs0_header_t*>(this), t.buffer(), sizeof(pfs0_header_t));
+
+	if (magic() != MAGIC_PFS0)
+	{
+		error("Invalid PFS0 Magic!  bad key?\n");
+		close();
+		return false;
+	}
+
 	t.dump();
+
 
 	return true;
 }

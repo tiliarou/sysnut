@@ -3,7 +3,7 @@
 #include "nx/buffer.h"
 #include "mbedtls/cipher.h"
 
-typedef enum {
+typedef enum : u8 {
 	CRYPT_NULL = 0,
 	CRYPT_NONE = 1,
 	CRYPT_XTS = 2,
