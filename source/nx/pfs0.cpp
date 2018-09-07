@@ -13,25 +13,35 @@ bool Pfs0::init()
 		return false;
 	}
 
-	//print("%d files\n", this->numFiles());
-
-	Buffer t;
-	if (!read(t))
+	if (!read(m_header, sizeof(pfs0_header_t)))
 	{
 		error("Failed to read!\n");
+		return false;
 	}
 
-	memcpy(dynamic_cast<pfs0_header_t*>(this), t.buffer(), sizeof(pfs0_header_t));
-
-	if (magic() != MAGIC_PFS0)
+	if (header().magic() != MAGIC_PFS0)
 	{
 		error("Invalid PFS0 Magic!  bad key?\n");
 		close();
 		return false;
 	}
 
-	t.dump();
+	m_header.dump();
 
+	rewind();
+	if (!read(m_header, header().size()))
+	{
+		error("Failed to read!\n");
+		return false;
+	}
+
+	print("header size: %x\n", this->size());
+
+	for (int i = 0; i < header().numFiles(); i++)
+	{
+		string n = header().fileName(i);
+		print("file: %s\n", n.c_str());
+	}
 
 	return true;
 }

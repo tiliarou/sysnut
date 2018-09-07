@@ -73,14 +73,14 @@ bool Buffer::resize(u64 newSize)
 	return true;
 }
 
-char* Buffer::c_str() const
+char* Buffer::c_str(u64 i) const
 {
 	if (!buffer())
 	{
 		return "";
 	}
 
-	return (char*)buffer();
+	return (char*)buffer() + i;
 }
 
 bool Buffer::close()

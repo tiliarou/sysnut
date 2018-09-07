@@ -6,10 +6,7 @@ string::string() : Buffer()
 
 string::string(const char* s)
 {
-	u64 len = strlen(s)+1;
-	resize(len);
-	set(s, len);
-	c_str()[len - 1] = NULL;
+	set(s, 0);
 }
 
 string::string(const string& src)
@@ -42,4 +39,40 @@ bool string::set(const void* src, u64 sz)
 
 string::~string()
 {
+}
+
+bool string::startsWith(string& s)
+{
+	if (s.size() > size())
+	{
+		return false;
+	}
+
+	for (int i = 0; i < s.size(); i++)
+	{
+		if (*c_str(i) != *s.c_str(i))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool string::endsWith(string& s)
+{
+	if (s.size() > size())
+	{
+		return false;
+	}
+
+	for (int i = 0, j=size() - s.size(); i < s.size(); i++, j++)
+	{
+		if (*c_str(j) != *s.c_str(i))
+		{
+			return false;
+		}
+	}
+
+	return true;
 }

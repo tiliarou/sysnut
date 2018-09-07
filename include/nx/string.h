@@ -12,5 +12,10 @@ public:
 	~string();
 	bool set(const void* src, u64 sz=0);
 	operator char*() const { return c_str(); }
+
+	const u64 size() const { return m_size ? m_size - 1 : 0; }
+
+	bool startsWith(string& s);
+	bool endsWith(string& s);
 private:
 };
