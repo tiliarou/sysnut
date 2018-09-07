@@ -118,6 +118,7 @@
     <ClCompile Include="source\nx\keys.cpp" />
     <ClCompile Include="source\nx\nca.cpp" />
     <ClCompile Include="source\nx\nsp.cpp" />
+    <ClCompile Include="source\nx\partitionfile.cpp" />
     <ClCompile Include="source\nx\pfs0.cpp" />
     <ClCompile Include="source\nx\string.cpp" />
     <ClCompile Include="source\server.cpp" />
@@ -150,6 +151,7 @@
     <ClInclude Include="include\nx\ncm.hpp" />
     <ClInclude Include="include\nx\nsp.h" />
     <ClInclude Include="include\nx\fs.h" />
+    <ClInclude Include="include\nx\partitionfile.h" />
     <ClInclude Include="include\nx\pfs0.h" />
     <ClInclude Include="include\nx\primitives.h" />
     <ClInclude Include="include\nx\string.h" />

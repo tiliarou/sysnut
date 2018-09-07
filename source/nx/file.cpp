@@ -44,43 +44,6 @@ bool File::init()
 	return true;
 }
 
-bool File::setParent(File* parent)
-{
-	if (isOpen())
-	{
-		close();
-	}
-
-	// todo notify parent
-	m_parent = parent;
-	return true;
-}
-
-bool File::setPartition(File* parent, u64 offset, u64 sz)
-{
-	if (isOpen())
-	{
-		close();
-	}
-	if (!sz)
-	{
-		print("setting part size... %x %x\n", offset, parent->size());
-		sz = parent->size() - offset;
-	}
-	else
-	{
-		print("parition %x, %x\n", (u32)offset, (u32)sz);
-	}
-
-	setParent(parent);
-	partitionOffset() = offset;
-	partitionSize() = sz;
-
-	print("created partition %x, %x\n", offset, sz);
-
-	return init();
-}
-
 bool File::close()
 {
 	if (!f)
@@ -88,18 +51,9 @@ bool File::close()
 		return false;
 	}
 
-	if (f)
-	{
-		fclose(f);
-		f = NULL;
-	}
 
-	if (m_parent)
-	{
-		// todo notify parent
-		m_parent = NULL;
-	}
-
+	fclose(f);
+	f = NULL;
 	return true;
 }
 
@@ -111,15 +65,7 @@ bool File::seek(u64 offset, int whence)
 		return false;
 	}
 
-	if (f)
-	{
-		return fseek(f, partitionOffset() + offset, whence) == 0;
-	}
-
-	if (m_parent)
-	{
-		return m_parent->seek(partitionOffset() + offset, whence);
-	}
+	return fseek(f, offset, whence) == 0;
 }
 
 bool File::rewind()
@@ -137,21 +83,11 @@ u64 File::tell()
 
 	u64 pos = ftell(f);
 
-	if (partitionOffset() > pos)
-	{
-		return 0;
-	}
-
-	return pos - partitionOffset();
+	return pos;
 }
 
 u64 File::size()
 {
-	if (isPartition())
-	{
-		return partitionSize();
-	}
-
 	if (m_size)
 	{
 		return m_size;
@@ -188,20 +124,12 @@ u64 File::read(Buffer& buffer, u64 sz)
 
 	u64 r;
 
-	if (f)
-	{
-		r = fread(buffer.c_str(), 1, sz, f);
-	}
 
-	if (m_parent)
-	{
-		r = m_parent->read(buffer, sz);
-	}
-
+	r = fread(buffer.c_str(), 1, sz, f);
 	return r;
 }
 
 bool File::isOpen()
 {
-	return f != NULL || m_parent != NULL;
+	return f != NULL;
 }

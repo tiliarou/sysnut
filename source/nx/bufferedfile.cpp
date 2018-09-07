@@ -55,7 +55,7 @@ bool BufferedFile::seekThrough(u64 offset, int whence)
 {
 	seek(offset, whence);
 
-	return File::seek(offset + partitionOffset(), whence);
+	return File::seek(offset, whence);
 }
 
 bool BufferedFile::rewind()
@@ -135,7 +135,7 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 		pageSize = size() - pageOffset();
 	}
 
-	print("tell: %x, pageOffset = %x, partitionOffset = %x\n", (u32)f->tell(), (u32)pageOffset(), f->partitionOffset());
+	print("tell: %x, pageOffset = %x\n", (u32)f->tell(), (u32)pageOffset());
 	f->seekThrough(pageOffset());
 	u64 r = f->readThrough(*this, pageSize);
 

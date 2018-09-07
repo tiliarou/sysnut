@@ -9,7 +9,6 @@ public:
 	File();
 	virtual ~File();
 	virtual bool open(string& path, char* mode = "rb");
-	bool setPartition(File* parent, u64 offset, u64 sz);
 	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);
@@ -18,19 +17,11 @@ public:
 	u64 size();
 	virtual u64 read(Buffer& buffer, u64 sz = 0);
 
-	u64& partitionOffset() { return m_partitionOffset; }
-	u64& partitionSize() { return m_partitionSize; }
-
 	bool isOpen();
-	bool isPartition() { return m_parent != NULL; }
 	string& path() { return m_path; }
 
 protected:
-	bool setParent(File* parent);
 	FILE* f = NULL;
 	string m_path;
-	File* m_parent = NULL;
-	u64 m_partitionOffset = 0;
-	u64 m_partitionSize = 0;
 	u64 m_size = 0;
 };
