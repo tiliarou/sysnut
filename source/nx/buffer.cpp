@@ -30,6 +30,7 @@ Buffer& Buffer::operator=(const Buffer& src)
 
 bool Buffer::slice(Buffer& out, s64 start, s64 end)
 {
+	print("slicing %d, %d\n", (s32)start, (s32)end);
 	u64 sz = end - start;
 
 	if (!out.resize(sz))

@@ -47,7 +47,8 @@ public:
 	bool seek(u64 offset, int whence = 0);
 	bool rewind();
 	u64 tell() { return currentPosition(); }
-	u64 read(Buffer& buffer, u64 sz = 0);
+	virtual u64 read(Buffer& buffer, u64 sz = 0);
+	u64 readThrough(Buffer& buffer, u64 sz = 0);
 
 	const u64& currentPosition() const { return m_currentPosition; }
 	u64& currentPosition() { return m_currentPosition; }

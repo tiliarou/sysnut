@@ -51,7 +51,7 @@ bool BufferedFile::rewind()
 
 u64 BufferedFile::read(Buffer& buffer, u64 sz)
 {
-	if (currentPosition() + sz > size())
+	if (!sz || currentPosition() + sz > size())
 	{
 		sz = size() - currentPosition();
 	}
@@ -61,13 +61,22 @@ u64 BufferedFile::read(Buffer& buffer, u64 sz)
 		page().load(this, currentPosition(), sz);
 	}
 
-	page().slice(buffer, currentPosition() - page().pageOffset(), currentPosition() - page().pageOffset() + sz);
+	if (!page().slice(buffer, currentPosition() - page().pageOffset(), currentPosition() - page().pageOffset() + sz))
+	{
+		return false;
+	}
 	currentPosition() += sz;
 	return sz;
 }
 
+u64 BufferedFile::readThrough(Buffer& buffer, u64 sz)
+{
+	return File::read(buffer, sz);
+}
+
 FileCrypto::FileCrypto() : Crypto()
 {
+	type() = CRYPT_NULL;
 }
 
 bool Page::contains(u64 offset, u64 sz)
@@ -101,7 +110,12 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 
 	id() = offset / PAGE_ALIGNMENT;
 	u64 lastPage = (offset + sz) / PAGE_ALIGNMENT + 1;
-	u64 r = reinterpret_cast<File*>(f)->read(*this, (lastPage - id()) * PAGE_ALIGNMENT);
+	u64 pageSize = (lastPage - id()) * PAGE_ALIGNMENT;
+	if (pageOffset() + pageSize > size())
+	{
+		pageSize = size() - pageOffset();
+	}
+	u64 r = f->readThrough(*this, pageSize);
 
 	if (!r)
 	{

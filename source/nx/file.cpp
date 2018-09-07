@@ -56,9 +56,25 @@ bool File::setParent(File* parent)
 
 bool File::setPartition(File* parent, u64 offset, u64 sz)
 {
+	if (isOpen())
+	{
+		close();
+	}
+	if (!sz)
+	{
+		print("setting part size... %x %x\n", offset, parent->size());
+		sz = parent->size() - offset;
+	}
+	else
+	{
+		print("parition %x, %x\n", (u32)offset, (u32)sz);
+	}
+
 	setParent(parent);
 	partitionOffset() = offset;
 	partitionSize() = sz;
+
+	print("created partition %x, %x\n", offset, sz);
 
 	return init();
 }
@@ -159,15 +175,19 @@ u64 File::read(Buffer& buffer, u64 sz)
 
 	buffer.resize(sz);
 
+	u64 r;
+
 	if (f)
 	{
-		return fread(buffer.c_str(), 1, sz, f);
+		r = fread(buffer.c_str(), 1, sz, f);
 	}
 
 	if (m_parent)
 	{
-		return m_parent->read(buffer, sz);
+		r = m_parent->read(buffer, sz);
 	}
+
+	return r;
 }
 
 bool File::isOpen()

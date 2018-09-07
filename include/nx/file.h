@@ -16,7 +16,7 @@ public:
 	bool rewind();
 	u64 tell();
 	u64 size();
-	u64 read(Buffer& buffer, u64 sz = 0);
+	virtual u64 read(Buffer& buffer, u64 sz = 0);
 
 	u64& partitionOffset() { return m_partitionOffset; }
 	u64& partitionSize() { return m_partitionSize; }
