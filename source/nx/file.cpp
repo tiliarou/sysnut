@@ -43,6 +43,26 @@ bool File::open(string& path, char* mode)
 	return true;
 }
 
+bool File::open2(File* f, u64 offset, u64 sz)
+{
+	if (!sz)
+	{
+		print("setting part size... %x %x\n", offset, f->size());
+		sz = f->size() - offset;
+	}
+	else
+	{
+		print("parition %x, %x\n", (u32)offset, (u32)sz);
+	}
+
+	setParent(f);
+	partitionOffset() = offset;
+	partitionSize() = sz;
+
+	print("created partition offset = %x, size = %x\n", offset, sz);
+	return init();
+}
+
 u64 File::read(Buffer& buffer, u64 sz)
 {
 	if (!isOpen())
@@ -78,7 +98,14 @@ u64 File::tell()
 		return false;
 	}
 
-	return m_parent->tell();
+	u64 pos = parent()->tell();
+
+	if (partitionOffset() > pos)
+	{
+		return 0;
+	}
+
+	return pos - partitionOffset();
 }
 
 bool File::seek(u64 offset, int whence)
@@ -89,7 +116,17 @@ bool File::seek(u64 offset, int whence)
 		return false;
 	}
 
-	return m_parent->seek(offset, whence);
+	switch (whence)
+	{
+		case SEEK_SET:
+			return parent()->seek(offset + partitionOffset(), SEEK_SET);
+		case SEEK_CUR:
+			return parent()->seek(offset, SEEK_CUR);
+		case SEEK_END:
+			return parent()->seek(size() - partitionOffset() - offset, SEEK_SET);
+	}
+
+	return false;
 }
 
 bool File::close()

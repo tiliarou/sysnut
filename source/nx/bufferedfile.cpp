@@ -53,7 +53,7 @@ bool BufferedFile::seek(u64 offset, int whence)
 
 bool BufferedFile::seekThrough(u64 offset, int whence)
 {
-	seek(offset, whence);
+	File::seek(offset, whence);
 
 	return File::seek(offset, whence);
 }
