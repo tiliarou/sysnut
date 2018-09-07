@@ -10,6 +10,7 @@ public:
 	virtual ~File();
 	virtual bool open(string& path, char* mode = "rb");
 	bool setPartition(File* parent, u64 offset, u64 sz);
+	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);
 	bool rewind();

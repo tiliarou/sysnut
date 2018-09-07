@@ -1,5 +1,6 @@
 #pragma once
 #include "nut.h"
+#include "nx/primitives.h"
 #include "nx/pfs0.h"
 #include "nx/ivfc.h"
 #include "nx/bktr.h"
@@ -18,32 +19,32 @@ typedef struct {
 
 /* Nintendo content archive header. */
 typedef struct {
-	uint8_t fixed_key_sig[0x100]; /* RSA-PSS signature over header with fixed key. */
-	uint8_t npdm_key_sig[0x100]; /* RSA-PSS signature over header with key in NPDM. */
+	u8 fixed_key_sig[0x100]; /* RSA-PSS signature over header with fixed key. */
+	u8 npdm_key_sig[0x100]; /* RSA-PSS signature over header with key in NPDM. */
 	uint32_t magic;
-	uint8_t distribution; /* System vs gamecard. */
-	uint8_t content_type;
-	uint8_t crypto_type; /* Which keyblob (field 1) */
-	uint8_t kaek_ind; /* Which kaek index? */
-	uint64_t nca_size; /* Entire archive size. */
-	uint64_t title_id;
-	uint8_t _0x218[0x4]; /* Padding. */
+	u8 distribution; /* System vs gamecard. */
+	u8 content_type;
+	u8 crypto_type; /* Which keyblob (field 1) */
+	u8 kaek_ind; /* Which kaek index? */
+	u64 nca_size; /* Entire archive size. */
+	u64 title_id;
+	u8 _0x218[0x4]; /* Padding. */
 	union {
 		uint32_t sdk_version; /* What SDK was this built with? */
 		struct {
-			uint8_t sdk_revision;
-			uint8_t sdk_micro;
-			uint8_t sdk_minor;
-			uint8_t sdk_major;
+			u8 sdk_revision;
+			u8 sdk_micro;
+			u8 sdk_minor;
+			u8 sdk_major;
 		};
 	};
-	uint8_t crypto_type2; /* Which keyblob (field 2) */
-	uint8_t _0x221[0xF]; /* Padding. */
-	uint8_t rights_id[0x10]; /* Rights ID (for titlekey crypto). */
+	u8 crypto_type2; /* Which keyblob (field 2) */
+	u8 _0x221[0xF]; /* Padding. */
+	u8 rights_id[0x10]; /* Rights ID (for titlekey crypto). */
 	nca_section_entry_t section_entries[4]; /* Section entry metadata. */
-	uint8_t section_hashes[4][0x20]; /* SHA-256 hashes for each section header. */
-	uint8_t encrypted_keys[4][0x10]; /* Encrypted key area. */
-	uint8_t _0x340[0xC0]; /* Padding. */
+	u8 section_hashes[4][0x20]; /* SHA-256 hashes for each section header. */
+	u8 encrypted_keys[4][0x10]; /* Encrypted key area. */
+	u8 _0x340[0xC0]; /* Padding. */
 	nca_fs_header_t fs_headers[4]; /* FS section headers. */
 } nca_header_t;
 
@@ -81,7 +82,10 @@ public:
 	virtual bool open(string& path, char* mode = "rb");
 	virtual bool close();
 
+	Buffer& key() { return m_key; }
+
 private:
-	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry);
+	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
 	Fs* fs[4];
+	Buffer m_key;
 };

@@ -1,4 +1,5 @@
 #pragma once
+#include "nx/primitives.h"
 #include "nx/buffer.h"
 #include "mbedtls/cipher.h"
 
@@ -22,6 +23,9 @@ public:
 	~Crypto();
 
 	void setIv(const void *iv, size_t l);
+	bool setKey(const void *key, unsigned int key_size);
+	bool setMode(aes_mode_t mode);
+	bool setCounter(const u8* counter);
 
 	void encrypt(void *dst, const void *src, size_t l);
 	void decrypt(void *dst, const void *src, size_t l);
@@ -31,7 +35,10 @@ public:
 	void xtsEncrypt(void *dst, const void *src, size_t l, size_t sector, size_t sector_size);
 	void xtsDecrypt(void *dst, const void *src, size_t l, size_t sector, size_t sector_size);
 
+	const u8* updateCounter(u64 ofs);
+
 private:
+	u8 counter[0x8];
 	mbedtls_cipher_context_t cipherEnc;
 	mbedtls_cipher_context_t cipherDec;
 };

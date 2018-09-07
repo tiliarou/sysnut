@@ -1,4 +1,5 @@
 #include "nx/bufferedfile.h"
+#include "log.h"
 
 BufferedFile::BufferedFile() : File()
 {
@@ -12,6 +13,18 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
 {
 	crypto().type() = cryptoType;
 	crypto().key() = key;
+
+	switch (crypto().type())
+	{
+		case CRYPT_CTR:
+			crypto().setMode(MBEDTLS_CIPHER_AES_128_CTR);
+			crypto().setKey(key.buffer(), key.size());
+			break;
+		case CRYPT_XTS:
+			crypto().setMode(MBEDTLS_CIPHER_AES_128_XTS);
+			crypto().setKey(key.buffer(), key.size());
+			break;
+	}
 	return true;
 }
 
@@ -33,8 +46,7 @@ bool BufferedFile::seek(u64 offset, int whence)
 
 bool BufferedFile::rewind()
 {
-	currentPosition() = 0;
-	return true;
+	return seek(0);
 }
 
 u64 BufferedFile::read(Buffer& buffer, u64 sz)
@@ -52,6 +64,10 @@ u64 BufferedFile::read(Buffer& buffer, u64 sz)
 	page().slice(buffer, currentPosition() - page().pageOffset(), currentPosition() - page().pageOffset() + sz);
 	currentPosition() += sz;
 	return sz;
+}
+
+FileCrypto::FileCrypto() : Crypto()
+{
 }
 
 bool Page::contains(u64 offset, u64 sz)
@@ -76,7 +92,7 @@ bool Page::contains(u64 offset, u64 sz)
 	return false;
 }
 
-bool Page::load(File* f, u64 offset, u64 sz)
+bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 {
 	if (active() && dirty())
 	{
@@ -85,6 +101,24 @@ bool Page::load(File* f, u64 offset, u64 sz)
 
 	id() = offset / PAGE_ALIGNMENT;
 	u64 lastPage = (offset + sz) / PAGE_ALIGNMENT + 1;
+	u64 r = reinterpret_cast<File*>(f)->read(*this, (lastPage - id()) * PAGE_ALIGNMENT);
 
-	return f->read(*this, (lastPage - id()) * PAGE_ALIGNMENT) != 0;
+	if (!r)
+	{
+		return false;
+	}
+
+	switch(f->crypto().type())
+	{
+		case CRYPT_NULL:
+		case CRYPT_NONE:
+			break;
+		case CRYPT_CTR:
+			break;
+		default:
+			error("Unknown crypto: %d\n", f->crypto().type());
+			return false;
+	}
+
+	return true;
 }

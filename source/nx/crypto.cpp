@@ -5,6 +5,8 @@
 
 Crypto::Crypto()
 {
+	mbedtls_cipher_init(&cipherDec);
+	mbedtls_cipher_init(&cipherEnc);
 }
 
 Crypto::Crypto(const void *key, unsigned int key_size, aes_mode_t mode)
@@ -12,15 +14,34 @@ Crypto::Crypto(const void *key, unsigned int key_size, aes_mode_t mode)
     mbedtls_cipher_init(&cipherDec);
     mbedtls_cipher_init(&cipherEnc);
     
-    if (mbedtls_cipher_setup(&cipherDec, mbedtls_cipher_info_from_type(mode)) || mbedtls_cipher_setup(&cipherEnc, mbedtls_cipher_info_from_type(mode)))
+	setMode(mode);
+	setKey(key, key_size);
+}
+
+bool Crypto::setKey(const void *key, unsigned int key_size)
+{
+	if (mbedtls_cipher_setkey(&cipherDec, (const unsigned char*)key, key_size * 8, MBEDTLS_DECRYPT) || mbedtls_cipher_setkey(&cipherEnc, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT))
 	{
-        fatal("Failed to set up AES context!\n");
-    }
-        
-    if (mbedtls_cipher_setkey(&cipherDec, (const unsigned char*)key, key_size * 8, MBEDTLS_DECRYPT) || mbedtls_cipher_setkey(&cipherEnc, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT))
+		fatal("Failed to set key for AES context!\n");
+		return false;
+	}
+	return true;
+}
+
+bool Crypto::setMode(aes_mode_t mode)
+{
+	if (mbedtls_cipher_setup(&cipherDec, mbedtls_cipher_info_from_type(mode)) || mbedtls_cipher_setup(&cipherEnc, mbedtls_cipher_info_from_type(mode)))
 	{
-        fatal("Failed to set key for AES context!\n");
-    }
+		fatal("Failed to set key for AES context!\n");
+		return false;
+	}
+	return true;
+}
+
+bool Crypto::setCounter(const u8* counter)
+{
+	memcpy(this->counter, counter, sizeof(this->counter));
+	return true;
 }
 
 
@@ -36,6 +57,16 @@ void Crypto::setIv(const void *iv, size_t l)
 	{
         fatal("Failed to set IV for AES context!\n");
     }
+}
+
+const u8* Crypto::updateCounter(u64 ofs)
+{
+	ofs >>= 4;
+	for (unsigned int j = 0; j < 0x8; j++) {
+		counter[0x10 - j - 1] = (unsigned char)(ofs & 0xFF);
+		ofs >>= 8;
+	}
+	return counter;
 }
 
 /* Calculate CMAC. */

@@ -1,7 +1,7 @@
 #pragma once
 #include "nut.h"
 #include "nx/crypto.h"
-#include "nx/file.h"
+#include "nx/bufferedfile.h"
 #include "nx/directory.h"
 
 typedef enum {
@@ -16,13 +16,13 @@ typedef enum {
 
 /* NCA FS header. */
 typedef struct {
-	uint8_t _0x0;
-	uint8_t _0x1;
-	uint8_t partition_type;
-	uint8_t fs_type;
-	uint8_t crypt_type;
-	uint8_t _0x5[0x3];
-	uint8_t superblock_data[0x138];
+	u8 _0x0;
+	u8 _0x1;
+	u8 partition_type;
+	u8 fs_type;
+	crypt_type_t crypt_type;
+	u8 _0x5[0x3];
+	u8 superblock_data[0x138];
 	/*union { /* FS-specific superblock. Size = 0x138. *//*
 		pfs0_superblock_t pfs0_superblock;
 		romfs_superblock_t romfs_superblock;
@@ -30,26 +30,28 @@ typedef struct {
 		bktr_superblock_t bktr_superblock;
 	};*/
 	union {
-		uint8_t section_ctr[0x8];
+		u8 section_ctr[0x8];
 		struct {
 			uint32_t section_ctr_low;
 			uint32_t section_ctr_high;
 		};
 	};
-	uint8_t _0x148[0xB8]; /* Padding. */
+	u8 _0x148[0xB8]; /* Padding. */
 } nca_fs_header_t;
 
 typedef struct {
 	uint32_t media_start_offset;
 	uint32_t media_end_offset;
-	uint8_t _0x8[0x8]; /* Padding. */
+	u8 _0x8[0x8]; /* Padding. */
 } nca_section_entry_t;
 
-class Fs : public nca_fs_header_t, public nca_section_entry_t, public File, public Directory
+class Fs : public nca_fs_header_t, public nca_section_entry_t, public BufferedFile, public Directory
 {
 public:
-	Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry);
+	Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer& _key);
 	virtual ~Fs();
+
+	virtual bool init();
 
 	section_fs_type_t& type() { return m_type; }
 private:

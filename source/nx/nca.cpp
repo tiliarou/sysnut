@@ -12,12 +12,16 @@ Nca::~Nca()
 {
 }
 
-Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry)
+Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key)
 {
 	switch (fsHeader.fs_type)
 	{
 		case FS_TYPE_PFS0:
-			return new Pfs0(fsHeader, sectionEntry);
+		{
+			Pfs0* fs = new Pfs0(fsHeader, sectionEntry, _key);
+			fs->setPartition(this, fs->media_start_offset * MEDIA_SIZE, fs->media_end_offset * MEDIA_SIZE);
+			return fs;
+		}
 		default:
 			return NULL;
 	}
@@ -63,7 +67,7 @@ bool Nca::open(string& path, char* mode)
 
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
-		fs[i] = loadFs(fs_headers[i], section_entries[i]);
+		fs[i] = loadFs(fs_headers[i], section_entries[i], key());
 	}
 
 	return true;

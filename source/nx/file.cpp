@@ -29,6 +29,16 @@ bool File::open(string& path, char* mode)
 
 	size(); // just cache the file size
 
+	if (!init())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool File::init()
+{
 	return true;
 }
 
@@ -50,7 +60,7 @@ bool File::setPartition(File* parent, u64 offset, u64 sz)
 	partitionOffset() = offset;
 	partitionSize() = sz;
 
-	return true;
+	return init();
 }
 
 bool File::close()
@@ -149,7 +159,15 @@ u64 File::read(Buffer& buffer, u64 sz)
 
 	buffer.resize(sz);
 
-	return fread(buffer.c_str(), 1, sz, f);
+	if (f)
+	{
+		return fread(buffer.c_str(), 1, sz, f);
+	}
+
+	if (m_parent)
+	{
+		return m_parent->read(buffer, sz);
+	}
 }
 
 bool File::isOpen()

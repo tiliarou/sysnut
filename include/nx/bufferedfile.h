@@ -6,6 +6,8 @@
 
 #define PAGE_ALIGNMENT 0x10000
 
+class BufferedFile;
+
 class Page : public Buffer
 {
 public:
@@ -15,7 +17,7 @@ public:
 
 	bool contains(u64 offset, u64 size);
 	u64 pageOffset() { return id() * PAGE_ALIGNMENT; }
-	bool load(File* f, u64 offset, u64 sz);
+	bool load(BufferedFile* f, u64 offset, u64 sz);
 
 private:
 	bool m_active = false;
@@ -23,9 +25,10 @@ private:
 	bool m_dirty = false;
 };
 
-class FileCrypto
+class FileCrypto : public Crypto
 {
 public:
+	FileCrypto();
 	crypt_type_t& type() { return m_type; }
 	Buffer& key() { return m_key; }
 private:
