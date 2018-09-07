@@ -77,6 +77,8 @@ public:
 
 	virtual bool init();
 
+	File* open(u64 i);
+
 	pfs0_header_t& header() { return *reinterpret_cast<pfs0_header_t*>(m_header.buffer());  }
 	pfs0_superblock_t& superBlock() { return *reinterpret_cast<pfs0_superblock_t*>(&superblock_data); }
 private:

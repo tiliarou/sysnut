@@ -8,7 +8,7 @@ class File
 public:
 	File();
 	virtual ~File();
-	virtual bool open(string& path, char* mode = "rb");
+	bool open(string& path, char* mode = "rb");
 	bool open2(File* f, u64 offset, u64 sz);
 	virtual bool init();
 	virtual bool close();

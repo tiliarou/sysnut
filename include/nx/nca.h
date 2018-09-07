@@ -79,10 +79,13 @@ public:
 	Nca();
 	virtual ~Nca();
 
-	virtual bool open(string& path, char* mode = "rb") override;
+	bool open(string& path, char* mode = "rb") override;
 	virtual bool close() override;
 
 	Buffer& key() { return m_key; }
+
+	Fs* begin();
+	Fs* end();
 
 private:
 	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
