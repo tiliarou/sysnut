@@ -46,14 +46,17 @@ bool BufferedFile::seek(u64 offset, int whence)
 	currentPosition() = offset;
 	if (crypto().type() == CRYPT_CTR)
 	{
-		crypto().updateCounter(currentPosition());
+		crypto().updateCounter(currentPosition() + partitionOffset());
 	}
 	return true;
 }
 
 bool BufferedFile::seekThrough(u64 offset, int whence)
 {
-	File::seek(offset, whence);
+	if (crypto().type() == CRYPT_CTR)
+	{
+		crypto().updateCounter(offset + partitionOffset());
+	}
 
 	return File::seek(offset, whence);
 }
@@ -85,6 +88,10 @@ u64 BufferedFile::read(Buffer& buffer, u64 sz)
 
 u64 BufferedFile::readThrough(Buffer& buffer, u64 sz)
 {
+	if (crypto().type() == CRYPT_CTR)
+	{
+		crypto().updateCounter(currentPosition() + partitionOffset());
+	}
 	return File::read(buffer, sz);
 }
 
@@ -151,7 +158,7 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 			break;
 		case CRYPT_CTR:
 			print("CTR selected\n");
-			//f->crypto().decrypt(this->buffer(), this->buffer(), this->size());
+			f->crypto().decrypt(this->buffer(), this->buffer(), this->size());
 			break;
 		default:
 			error("Unknown crypto: %d\n", f->crypto().type());

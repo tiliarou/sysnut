@@ -87,6 +87,11 @@ u64 File::size()
 		return false;
 	}
 
+	if (isPartition())
+	{
+		return partitionSize();
+	}
+
 	return m_parent->size();
 }
 

@@ -16,7 +16,7 @@ bool Pfs0::init()
 	//print("%d files\n", this->numFiles());
 
 	Buffer t;
-	if (!read(t, 0x100))
+	if (!read(t))
 	{
 		error("Failed to read!\n");
 	}
