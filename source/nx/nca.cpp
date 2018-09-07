@@ -67,6 +67,7 @@ bool Nca::open(string& path, char* mode)
 
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
+		key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
 		fs[i] = loadFs(fs_headers[i], section_entries[i], key());
 	}
 

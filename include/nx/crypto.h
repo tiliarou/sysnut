@@ -22,10 +22,10 @@ public:
 	Crypto(const void *key, unsigned int key_size, aes_mode_t mode);
 	~Crypto();
 
-	void setIv(const void *iv, size_t l);
+	bool setIv(const void *iv, size_t l);
 	bool setKey(const void *key, unsigned int key_size);
 	bool setMode(aes_mode_t mode);
-	bool setCounter(const u8* counter);
+	bool setCounter(const u8* counter, u32 sz);
 
 	void encrypt(void *dst, const void *src, size_t l);
 	void decrypt(void *dst, const void *src, size_t l);
@@ -38,7 +38,7 @@ public:
 	const u8* updateCounter(u64 ofs);
 
 private:
-	u8 counter[0x8];
+	u8 counter[0x10];
 	mbedtls_cipher_context_t cipherEnc;
 	mbedtls_cipher_context_t cipherDec;
 };

@@ -23,10 +23,12 @@ public:
 
 	bool isOpen();
 	bool isPartition() { return m_parent != NULL; }
+	string& path() { return m_path; }
 
 protected:
 	bool setParent(File* parent);
 	FILE* f = NULL;
+	string m_path;
 	File* m_parent = NULL;
 	u64 m_partitionOffset = 0;
 	u64 m_partitionSize = 0;

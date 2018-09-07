@@ -12,7 +12,7 @@ public:
 	Buffer(const Buffer& src);
 	Buffer& operator=(const Buffer& src);
 
-	bool slice(Buffer& out, s64 start, s64 end);
+	bool slice(Buffer& out, s64 start, s64 end) const;
 
 	bool resize(u64 newSize);
 

@@ -12,6 +12,17 @@ string::string(const char* s)
 	c_str()[len - 1] = NULL;
 }
 
+string::string(const string& src)
+{
+	*this = src;
+}
+
+string& string::operator=(const string& src)
+{
+	src.slice(*this, 0, src.size());
+	return *this;
+}
+
 bool string::set(const void* src, u64 sz)
 {
 	if (sz == 0)

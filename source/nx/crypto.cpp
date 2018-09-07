@@ -38,10 +38,11 @@ bool Crypto::setMode(aes_mode_t mode)
 	return true;
 }
 
-bool Crypto::setCounter(const u8* counter)
+bool Crypto::setCounter(const u8* counter, u32 sz)
 {
-	memcpy(this->counter, counter, sizeof(this->counter));
-	return true;
+	memset(this->counter, 0, sizeof(this->counter));
+	memcpy(this->counter, counter, sz);
+	return setIv(this->counter, sizeof(this->counter));
 }
 
 
@@ -51,12 +52,15 @@ Crypto::~Crypto()
     mbedtls_cipher_free(&cipherEnc);
 }
 
-void Crypto::setIv(const void *iv, size_t l)
+bool Crypto::setIv(const void *iv, size_t l)
 {
-    if (mbedtls_cipher_set_iv(&cipherDec, (const unsigned char*)iv, l) || mbedtls_cipher_set_iv(&cipherEnc, (const unsigned char*)iv, l))
+	int r1=0, r2 = 0;
+    if ((r1=mbedtls_cipher_set_iv(&cipherDec, (const unsigned char*)iv, l)) || (r2=mbedtls_cipher_set_iv(&cipherEnc, (const unsigned char*)iv, l)))
 	{
-        fatal("Failed to set IV for AES context!\n");
+		fatal("Failed to set IV for AES context! %d, %d, %x, %d, %x, %x\n", r1, r2, iv, l, &cipherEnc, cipherEnc.cipher_info->iv_size);
+		return false;
     }
+	return true;
 }
 
 const u8* Crypto::updateCounter(u64 ofs)
@@ -66,6 +70,7 @@ const u8* Crypto::updateCounter(u64 ofs)
 		counter[0x10 - j - 1] = (unsigned char)(ofs & 0xFF);
 		ofs >>= 8;
 	}
+	setIv(counter, sizeof(counter));
 	return counter;
 }
 

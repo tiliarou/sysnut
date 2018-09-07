@@ -1,4 +1,5 @@
 #include "nx/fs.h"
+#include "log.h"
 
 Fs::Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer& _key) : BufferedFile(), Directory()
 {
@@ -15,10 +16,9 @@ bool Fs::init()
 		return false;
 	}
 
-	/*setCrypto(this->crypt_type, crypto().key());
-
-	crypto().setIv(section_ctr, sizeof(section_ctr));
-	crypto().setCounter(section_ctr);*/
+	setCrypto(this->crypt_type, crypto().key());
+	print("setting iv: %d\n", sizeof(section_ctr));
+	crypto().setCounter(section_ctr, sizeof(section_ctr));
 
 	return true;
 }

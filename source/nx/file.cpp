@@ -34,6 +34,8 @@ bool File::open(string& path, char* mode)
 		return false;
 	}
 
+	this->path() = path;
+
 	return true;
 }
 
@@ -108,7 +110,16 @@ bool File::seek(u64 offset, int whence)
 		error("tried to seek on closed file\n");
 		return false;
 	}
-	return fseek(f, partitionOffset() + offset, whence) == 0;
+
+	if (f)
+	{
+		return fseek(f, partitionOffset() + offset, whence) == 0;
+	}
+
+	if (m_parent)
+	{
+		return m_parent->seek(partitionOffset() + offset, whence);
+	}
 }
 
 bool File::rewind()

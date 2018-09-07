@@ -17,6 +17,7 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
 	switch (crypto().type())
 	{
 		case CRYPT_CTR:
+			print("Crypt_ctr\n");
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_CTR);
 			crypto().setKey(key.buffer(), key.size());
 			break;
@@ -24,6 +25,8 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_XTS);
 			crypto().setKey(key.buffer(), key.size());
 			break;
+		default:
+			error("Unknown crypto type: %x\n", crypto().type());
 	}
 	return true;
 }
@@ -41,7 +44,18 @@ bool BufferedFile::close()
 bool BufferedFile::seek(u64 offset, int whence)
 {
 	currentPosition() = offset;
+	if (crypto().type() == CRYPT_CTR)
+	{
+		crypto().updateCounter(currentPosition());
+	}
 	return true;
+}
+
+bool BufferedFile::seekThrough(u64 offset, int whence)
+{
+	seek(offset, whence);
+
+	return File::seek(offset + partitionOffset(), whence);
 }
 
 bool BufferedFile::rewind()
@@ -72,6 +86,11 @@ u64 BufferedFile::read(Buffer& buffer, u64 sz)
 u64 BufferedFile::readThrough(Buffer& buffer, u64 sz)
 {
 	return File::read(buffer, sz);
+}
+
+u64 BufferedFile::tell()
+{
+	return currentPosition();
 }
 
 FileCrypto::FileCrypto() : Crypto()
@@ -115,6 +134,9 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 	{
 		pageSize = size() - pageOffset();
 	}
+
+	print("tell: %x, pageOffset = %x, partitionOffset = %x\n", (u32)f->tell(), (u32)pageOffset(), f->partitionOffset());
+	f->seekThrough(pageOffset());
 	u64 r = f->readThrough(*this, pageSize);
 
 	if (!r)
@@ -128,6 +150,8 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 		case CRYPT_NONE:
 			break;
 		case CRYPT_CTR:
+			print("CTR selected\n");
+			//f->crypto().decrypt(this->buffer(), this->buffer(), this->size());
 			break;
 		default:
 			error("Unknown crypto: %d\n", f->crypto().type());

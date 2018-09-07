@@ -28,7 +28,7 @@ Buffer& Buffer::operator=(const Buffer& src)
 	return *this;
 }
 
-bool Buffer::slice(Buffer& out, s64 start, s64 end)
+bool Buffer::slice(Buffer& out, s64 start, s64 end) const
 {
 	print("slicing %d, %d\n", (s32)start, (s32)end);
 	u64 sz = end - start;
