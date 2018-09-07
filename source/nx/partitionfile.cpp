@@ -7,21 +7,27 @@ PartitionFile::PartitionFile() : File()
 
 PartitionFile::PartitionFile(File* parent, u64 offset, u64 sz) : File()
 {
+	open(parent, offset, sz);
+}
+
+bool PartitionFile::open(File* f, u64 offset, u64 sz)
+{
 	if (!sz)
 	{
-		print("setting part size... %x %x\n", offset, parent->size());
-		sz = parent->size() - offset;
+		print("setting part size... %x %x\n", offset, f->size());
+		sz = f->size() - offset;
 	}
 	else
 	{
 		print("parition %x, %x\n", (u32)offset, (u32)sz);
 	}
 
-	setParent(parent);
+	setParent(f);
 	partitionOffset() = offset;
 	partitionSize() = sz;
 
 	print("created partition %x, %x\n", offset, sz);
+	return init();
 }
 
 PartitionFile::~PartitionFile()

@@ -32,8 +32,6 @@ bool File::open(string& path, char* mode)
 
 	setParent(f);
 
-	size(); // just cache the file size
-
 	if (!init())
 	{
 		delete f;

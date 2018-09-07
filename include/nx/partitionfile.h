@@ -17,6 +17,8 @@ public:
 	virtual u64 tell() override;
 	virtual bool seek(u64 offset, int whence) override;
 
+	bool open(File* f, u64 offset, u64 sz);
+
 	u64& partitionOffset() { return m_partitionOffset; }
 	u64& partitionSize() { return m_partitionSize; }
 

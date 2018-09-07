@@ -20,6 +20,8 @@ public:
 	bool isOpen();
 	string& path() { return m_path; }
 
+	File*& parent() { return m_parent; }
+
 	bool setParent(File* parent);
 
 protected:

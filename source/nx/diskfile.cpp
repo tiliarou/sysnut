@@ -29,11 +29,6 @@ bool DiskFile::open(string& path, char* mode)
 
 	size(); // just cache the file size
 
-	if (!init())
-	{
-		return false;
-	}
-
 	this->path() = path;
 
 	return true;
