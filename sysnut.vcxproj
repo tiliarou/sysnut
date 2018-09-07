@@ -112,6 +112,7 @@
     <ClCompile Include="source\nx\buffer.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
+    <ClCompile Include="source\nx\diskfile.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
     <ClCompile Include="source\nx\fs.cpp" />
     <ClCompile Include="source\nx\install.cpp" />
@@ -137,6 +138,7 @@
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
     <ClInclude Include="include\nx\directory.h" />
+    <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />
     <ClInclude Include="include\nx\fs.hpp" />
     <ClInclude Include="include\nx\install.h" />

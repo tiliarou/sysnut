@@ -107,7 +107,7 @@ bool Buffer::set(const void* src, u64 sz)
 	return true;
 }
 
-void Buffer::dump(int sz, int offset)
+void Buffer::dump(int sz, int offset) const
 {
 	if (!sz)
 	{

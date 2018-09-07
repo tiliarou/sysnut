@@ -79,8 +79,8 @@ public:
 	Nca();
 	virtual ~Nca();
 
-	virtual bool open(string& path, char* mode = "rb");
-	virtual bool close();
+	virtual bool open(string& path, char* mode = "rb") override;
+	virtual bool close() override;
 
 	Buffer& key() { return m_key; }
 

@@ -14,12 +14,13 @@ Nca::~Nca()
 
 Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key)
 {
+	return NULL;
 	switch (fsHeader.fs_type)
 	{
 		case FS_TYPE_PFS0:
 		{
 			Pfs0* fs = new Pfs0(fsHeader, sectionEntry, _key);
-			fs->setPartition(this, fs->media_start_offset * MEDIA_SIZE, (fs->media_end_offset * MEDIA_SIZE) - (fs->media_start_offset * MEDIA_SIZE));
+			//fs->setPartition(this, fs->media_start_offset * MEDIA_SIZE, (fs->media_end_offset * MEDIA_SIZE) - (fs->media_start_offset * MEDIA_SIZE));
 			return fs;
 		}
 		default:

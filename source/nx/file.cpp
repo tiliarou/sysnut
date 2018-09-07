@@ -1,6 +1,7 @@
 #include "nut.h"
 #include "log.h"
 #include "nx/file.h"
+#include "nx/diskfile.h"
 
 File::File()
 {
@@ -19,92 +20,29 @@ bool File::open(string& path, char* mode)
 		close();
 	}
 
-	f = fopen(path, mode);
+	DiskFile* f = new DiskFile();
 
-	if (!f)
+
+	if (!f->open(path, mode))
 	{
 		error("failed to open file %s\n", path);
+		delete f;
 		return false;
 	}
+
+	setParent(f);
 
 	size(); // just cache the file size
 
 	if (!init())
 	{
+		delete f;
 		return false;
 	}
 
 	this->path() = path;
 
 	return true;
-}
-
-bool File::init()
-{
-	return true;
-}
-
-bool File::close()
-{
-	if (!f)
-	{
-		return false;
-	}
-
-
-	fclose(f);
-	f = NULL;
-	return true;
-}
-
-bool File::seek(u64 offset, int whence)
-{
-	if (!isOpen())
-	{
-		error("tried to seek on closed file\n");
-		return false;
-	}
-
-	return fseek(f, offset, whence) == 0;
-}
-
-bool File::rewind()
-{
-	return seek(0);
-}
-
-u64 File::tell()
-{
-	if (!isOpen())
-	{
-		error("tried to tell on closed file\n");
-		return false;
-	}
-
-	u64 pos = ftell(f);
-
-	return pos;
-}
-
-u64 File::size()
-{
-	if (m_size)
-	{
-		return m_size;
-	}
-
-	u64 currentPosition = tell();
-
-	if (!seek(0, SEEK_END))
-	{
-		return 0;
-	}
-
-	m_size = tell();
-
-	seek(currentPosition, SEEK_SET);
-
-	return m_size;
 }
 
 u64 File::read(Buffer& buffer, u64 sz)
@@ -115,21 +53,78 @@ u64 File::read(Buffer& buffer, u64 sz)
 		return 0;
 	}
 
-	if (!sz)
-	{
-		sz = size();
-	}
-
-	buffer.resize(sz);
-
-	u64 r;
-
-
-	r = fread(buffer.c_str(), 1, sz, f);
-	return r;
+	return m_parent->read(buffer, sz);
 }
 
 bool File::isOpen()
 {
-	return f != NULL;
+	return m_parent != NULL;
+}
+
+u64 File::size()
+{
+	if (!isOpen())
+	{
+		error("tried to size on closed file\n");
+		return false;
+	}
+
+	return m_parent->size();
+}
+
+u64 File::tell()
+{
+	if (!isOpen())
+	{
+		error("tried to tell on closed file\n");
+		return false;
+	}
+
+	return m_parent->tell();
+}
+
+bool File::seek(u64 offset, int whence)
+{
+	if (!isOpen())
+	{
+		error("tried to seek on closed file\n");
+		return false;
+	}
+
+	return m_parent->seek(offset, whence);
+}
+
+bool File::close()
+{
+	if (!isOpen())
+	{
+		return false;
+	}
+
+	m_parent->close();
+	m_parent = NULL;
+
+	return true;
+}
+
+bool File::init()
+{
+	if (!isOpen())
+	{
+		return false;
+	}
+
+	return m_parent->init();
+}
+
+bool File::setParent(File* parent)
+{
+	if (isOpen())
+	{
+		close();
+	}
+
+	// todo notify parent
+	m_parent = parent;
+	return true;
 }

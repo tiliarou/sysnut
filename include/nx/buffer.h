@@ -30,7 +30,7 @@ public:
 
 	char* c_str() const;
 
-	void dump(int sz = 0, int offset = 0);
+	void dump(int sz = 0, int offset = 0) const;
 
 private:
 
