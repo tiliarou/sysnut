@@ -1,6 +1,7 @@
 #pragma once
 #include "nx/string.h"
 #include "nx/buffer.h"
+#include "nx/sptr.h"
 #include <stdio.h>
 
 #define MAX_FILE_CHILDREN 0x10
@@ -11,7 +12,7 @@ public:
 	File();
 	virtual ~File();
 	bool open(string& path, char* mode = "rb");
-	bool open2(File* f, u64 offset = 0, u64 sz = 0);
+	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
 	virtual bool init();
 	virtual bool close();
 	virtual bool seek(u64 offset, int whence = 0);
@@ -23,9 +24,9 @@ public:
 	bool isOpen();
 	string& path() { return m_path; }
 
-	File*& parent() { return m_parent; }
+	sptr<File>& parent() { return m_parent; }
 
-	bool setParent(File* parent);
+	bool setParent(sptr<File> parent);
 	bool isPartition() { return partitionSize() != 0; }
 
 	u64& partitionOffset() { return m_partitionOffset; }
@@ -38,8 +39,10 @@ public:
 
 protected:
 	string m_path;
-	File* m_parent = NULL;
+	sptr<File> m_parent;
 	u64 m_partitionOffset = 0;
 	u64 m_partitionSize = 0;
 	File* m_children[MAX_FILE_CHILDREN];
+
+	sptr<File> ptr;
 };

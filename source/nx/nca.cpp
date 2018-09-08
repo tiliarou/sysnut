@@ -12,14 +12,15 @@ Nca::~Nca()
 {
 }
 
-Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key)
+sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key)
 {
 	switch (fsHeader.fs_type)
 	{
 		case FS_TYPE_PFS0:
 		{
-			Pfs0* fs = new Pfs0(fsHeader, sectionEntry, _key);
-			fs->open2(this, fs->media_start_offset * MEDIA_SIZE + fs->superBlock().pfs0_offset, (fs->media_end_offset * MEDIA_SIZE) - (fs->media_start_offset * MEDIA_SIZE) - fs->superBlock().pfs0_offset);
+			Pfs0* p = NULL;
+			sptr<Fs> fs((p = new Pfs0(fsHeader, sectionEntry, _key)));
+			fs->open2(ptr, p->media_start_offset * MEDIA_SIZE + p->superBlock().pfs0_offset, (p->media_end_offset * MEDIA_SIZE) - (p->media_start_offset * MEDIA_SIZE) - p->superBlock().pfs0_offset);
 			return fs;
 		}
 		default:
@@ -27,12 +28,12 @@ Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Bu
 	}
 }
 
-Fs** Nca::begin()
+sptr<Fs>* Nca::begin()
 {
 	return &fs[0];
 }
 
-Fs** Nca::end()
+sptr<Fs>* Nca::end()
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -97,7 +98,6 @@ bool Nca::close()
 	{
 		if (fs[i])
 		{
-			delete fs[i];
 			fs[i] = NULL;
 		}
 	}

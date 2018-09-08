@@ -3,7 +3,9 @@
 #include "nx/file.h"
 #include "nx/diskfile.h"
 
-File::File()
+void nullDeleter(File*) {}
+
+File::File() : ptr(this, &nullDeleter)
 {
 	memset(m_children, 0, sizeof(m_children));
 }
@@ -21,21 +23,19 @@ bool File::open(string& path, char* mode)
 		close();
 	}
 
-	DiskFile* f = new DiskFile();
+	sptr<DiskFile> f(new DiskFile());
 
 
 	if (!f->open(path, mode))
 	{
 		error("failed to open file %s\n", path);
-		delete f;
 		return false;
 	}
 
-	setParent(f);
+	setParent(reinterpret_cast<sptr<File>&>(f));
 
 	if (!init())
 	{
-		delete f;
 		return false;
 	}
 
@@ -44,7 +44,7 @@ bool File::open(string& path, char* mode)
 	return true;
 }
 
-bool File::open2(File* f, u64 offset, u64 sz)
+bool File::open2(sptr<File>& f, u64 offset, u64 sz)
 {
 	if (!sz)
 	{
@@ -72,7 +72,7 @@ u64 File::read(Buffer& buffer, u64 sz)
 
 bool File::isOpen()
 {
-	return m_parent != NULL;
+	return (bool)m_parent;
 }
 
 u64 File::size()
@@ -142,13 +142,13 @@ bool File::close()
 		return false;
 	}
 
-	m_parent->unregisterChild(this);
+	//m_parent->unregisterChild(this);
 
 	/*if (m_parent->childrenCount() == 0)
 	{
 		m_parent->close();
 	}*/
-	m_parent = NULL;
+	//m_parent.reset();
 
 	return true;
 }
@@ -163,7 +163,7 @@ bool File::init()
 	return true;
 }
 
-bool File::setParent(File* parent)
+bool File::setParent(sptr<File> parent)
 {
 	if (isOpen())
 	{
@@ -172,7 +172,7 @@ bool File::setParent(File* parent)
 
 	// todo notify parent
 	m_parent = parent;
-	m_parent->registerChild(this);
+	//m_parent->registerChild(this);
 	return true;
 }
 

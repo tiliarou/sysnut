@@ -84,11 +84,11 @@ public:
 
 	Buffer& key() { return m_key; }
 
-	Fs** begin();
-	Fs** end();
+	sptr<Fs>* begin();
+	sptr<Fs>* end();
 
 private:
-	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
-	Fs* fs[4];
+	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
+	sptr<Fs> fs[4];
 	Buffer m_key;
 };
