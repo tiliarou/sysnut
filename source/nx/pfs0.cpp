@@ -37,8 +37,8 @@ bool Pfs0::init()
 
 	for (unsigned long i = 0; i < header().numFiles(); i++)
 	{
-		string n = header().fileName(i);
-		print("file: %s\n", n.c_str());
+		sptr<FileEntry> f(new Pfs0FileEntry(header().fileName(i), *header().fileEntry(i)));
+		files().push(f);
 	}
 
 	return true;

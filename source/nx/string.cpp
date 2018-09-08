@@ -66,7 +66,7 @@ bool string::endsWith(string& s)
 		return false;
 	}
 
-	for (int i = 0, j=size() - s.size(); i < s.size(); i++, j++)
+	for (u64 i = 0, j=size() - s.size(); i < s.size(); i++, j++)
 	{
 		if (*c_str(j) != *s.c_str(i))
 		{

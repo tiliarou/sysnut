@@ -69,6 +69,28 @@ typedef struct {
     u8 _0x48[0xF0];
 } pfs0_superblock_t;
 
+class Pfs0FileEntry : public FileEntry
+{
+public:
+	Pfs0FileEntry() : FileEntry()
+	{
+	}
+
+	Pfs0FileEntry(string fileName, pfs0_file_entry_t& fileEntry) : FileEntry(), m_entry(fileEntry)
+	{
+		name() = fileName;
+		size() = fileEntry.size;
+	}
+
+	virtual sptr<File> open()
+	{
+		return NULL;
+	}
+
+private:
+	pfs0_file_entry_t m_entry;
+};
+
 class Pfs0 : public Fs
 {
 public:
