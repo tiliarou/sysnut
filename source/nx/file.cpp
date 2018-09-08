@@ -47,12 +47,7 @@ bool File::open2(File* f, u64 offset, u64 sz)
 {
 	if (!sz)
 	{
-		print("setting part size... %x %x\n", offset, f->size());
 		sz = f->size() - offset;
-	}
-	else
-	{
-		print("parition %x, %x\n", (u32)offset, (u32)sz);
 	}
 
 	setParent(f);

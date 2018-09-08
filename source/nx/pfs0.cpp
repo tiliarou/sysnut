@@ -35,8 +35,6 @@ bool Pfs0::init()
 		return false;
 	}
 
-	print("header size: %x\n", this->size());
-
 	for (int i = 0; i < header().numFiles(); i++)
 	{
 		string n = header().fileName(i);

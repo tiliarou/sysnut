@@ -21,11 +21,13 @@ int main()
 		Pfs0* p = reinterpret_cast<Pfs0*>(fs);
 		print("fs\n");
 		File* f = p->open(0);
-		f->rewind();
-		f->read(data);
+		Cnmt c;
+		c.open2(f);
+		//f->rewind();
+		//f->read(data);
 		//p->rewind();
 		//p->read(data);
-		data.dump();
+		//data.dump();
 	}
 	//File* f = cnmt.open(0);
 

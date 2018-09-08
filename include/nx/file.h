@@ -9,7 +9,7 @@ public:
 	File();
 	virtual ~File();
 	bool open(string& path, char* mode = "rb");
-	bool open2(File* f, u64 offset, u64 sz);
+	bool open2(File* f, u64 offset = 0, u64 sz = 0);
 	virtual bool init();
 	virtual bool close();
 	virtual bool seek(u64 offset, int whence = 0);

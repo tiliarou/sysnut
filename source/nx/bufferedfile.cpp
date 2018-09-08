@@ -17,7 +17,6 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
 	switch (crypto().type())
 	{
 		case CRYPT_CTR:
-			print("Crypt_ctr\n");
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_CTR);
 			crypto().setKey(key.buffer(), key.size());
 			break;
@@ -142,7 +141,6 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 		pageSize = size() - pageOffset();
 	}
 
-	print("tell: %x, pageOffset = %x\n", (u32)f->tell(), (u32)pageOffset());
 	f->seekThrough(pageOffset());
 	u64 r = f->readThrough(*this, pageSize);
 
@@ -157,7 +155,6 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 		case CRYPT_NONE:
 			break;
 		case CRYPT_CTR:
-			print("CTR selected\n");
 			f->crypto().decrypt(this->buffer(), this->buffer(), this->size());
 			break;
 		default:

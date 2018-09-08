@@ -4,7 +4,7 @@
 #include "log.h"
 #include <string.h>
 
-Cnmt::Cnmt() : Nca()
+Cnmt::Cnmt() : File()
 {
 }
 
@@ -12,36 +12,26 @@ Cnmt::~Cnmt()
 {
 }
 
-bool Cnmt::open(string& path, char* mode)
+bool Cnmt::init()
 {
-	if (!Nca::open(path, mode))
+	if (!File::init())
 	{
 		return false;
 	}
 
-	if (!size())
-	{
-		print("No file size %s\n", path.c_str());
-		close();
-		return false;
-	}
+	rewind();
 
 	if (!read(buffer()))
 	{
-		print("Failed to read file %s\n", path.c_str());
+		print("Failed to read file %s\n", path().c_str());
 		close();
 		return false;
 	}
 
-	Crypto crypto(keys().headerKey, sizeof(keys().headerKey), MBEDTLS_CIPHER_AES_128_XTS);
-	crypto.xtsDecrypt(buffer().buffer(), buffer().buffer(), 0x400, 0, 0x200);
-
-	if (buffer().size() < sizeof(ContentMetaHeader))
+	for (auto& content : *this)
 	{
-		print("Data size is too small! 0x%lx\n", buffer().size());
-		return false;
+		print("content %x\n", content.record.contentType);
 	}
-	print("success\n");
 
 	/*
 	for (unsigned int i = 0; i < contentMetaHeader()->contentCount; i++)
