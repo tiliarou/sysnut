@@ -5,6 +5,7 @@
 #include "nx/ivfc.h"
 #include "nx/bktr.h"
 #include "nx/bufferedfile.h"
+#include "nx/directory.h"
 #include "nx/fs.h"
 
 #define MEDIA_SIZE 0x200
@@ -73,7 +74,7 @@ private:
 	u8 m_buffer[0x10];
 };
 
-class Nca : public BufferedFile, public nca_header_t
+class Nca : public BufferedFile, public nca_header_t, public Directory
 {
 public:
 	Nca();
@@ -84,11 +85,8 @@ public:
 
 	Buffer<u8>& key() { return m_key; }
 
-	sptr<Fs>* begin();
-	sptr<Fs>* end();
-
 private:
 	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
-	sptr<Fs> fs[4];
+	//sptr<Fs> fs[4];
 	Buffer<u8> m_key;
 };

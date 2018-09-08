@@ -5,7 +5,6 @@
 
 Nca::Nca() : BufferedFile()
 {
-	memset(&fs, 0, sizeof(fs));
 }
 
 Nca::~Nca()
@@ -26,23 +25,6 @@ sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntr
 		default:
 			return NULL;
 	}
-}
-
-sptr<Fs>* Nca::begin()
-{
-	return &fs[0];
-}
-
-sptr<Fs>* Nca::end()
-{
-	for (int i = 0; i < 4; i++)
-	{
-		if (!fs[i])
-		{
-			return &fs[i];
-		}
-	}
-	return &fs[4];
 }
 
 bool Nca::open(string& path, char* mode)
@@ -86,7 +68,12 @@ bool Nca::open(string& path, char* mode)
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
 		key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
-		fs[i] = loadFs(fs_headers[i], section_entries[i], key());
+		auto d = loadFs(fs_headers[i], section_entries[i], key());
+
+		if (d)
+		{
+			directories().push(d);
+		}
 	}
 
 	return true;
@@ -94,13 +81,5 @@ bool Nca::open(string& path, char* mode)
 
 bool Nca::close()
 {
-	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
-	{
-		if (fs[i])
-		{
-			fs[i] = NULL;
-		}
-	}
-
 	return File::close();
 }

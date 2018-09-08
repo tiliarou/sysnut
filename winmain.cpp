@@ -15,8 +15,7 @@ int main()
 	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
 	Buffer<u8> data;
 
-
-	for (const auto& fs : cnmt)
+	for (const auto& fs : cnmt.directories())
 	{
 		auto fe = fs->files().first();
 		sptr<File>& f = fe->open();

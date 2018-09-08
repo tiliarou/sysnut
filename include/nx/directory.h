@@ -5,8 +5,6 @@
 
 class File;
 
-#define MAX_FILE_ENTRIES 0x10
-
 class FileEntry
 {
 public:
@@ -56,6 +54,10 @@ public:
 
 	virtual const Array<sptr<FileEntry>>& files() const { return m_files; };
 	virtual Array<sptr<FileEntry>>& files() { return m_files; };
+
+	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
+	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 protected:
 	Array<sptr<FileEntry>> m_files;
+	Array<sptr<Directory>> m_directories;
 };
