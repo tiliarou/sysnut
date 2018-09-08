@@ -165,5 +165,7 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 			return false;
 	}
 
+	active() = true;
+
 	return true;
 }

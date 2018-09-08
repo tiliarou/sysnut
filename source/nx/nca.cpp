@@ -27,6 +27,23 @@ Fs* Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Bu
 	}
 }
 
+Fs** Nca::begin()
+{
+	return &fs[0];
+}
+
+Fs** Nca::end()
+{
+	for (int i = 0; i < 4; i++)
+	{
+		if (!fs[i])
+		{
+			return &fs[i];
+		}
+	}
+	return &fs[4];
+}
+
 bool Nca::open(string& path, char* mode)
 {
 	Buffer header;

@@ -13,6 +13,21 @@ int main()
 {
 	Nca cnmt;
 	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
+	Buffer data;
+
+
+	for (auto fs : cnmt)
+	{
+		Pfs0* p = reinterpret_cast<Pfs0*>(fs);
+		print("fs\n");
+		File* f = p->open(0);
+		f->rewind();
+		f->read(data);
+		//p->rewind();
+		//p->read(data);
+		data.dump();
+	}
+	//File* f = cnmt.open(0);
 
 	//for (HashedContentRecord record : cnmt)
 	//print("%x, %d records\n", cnmt.contentMetaHeader()->titleId, cnmt.contentMetaHeader()->contentCount);

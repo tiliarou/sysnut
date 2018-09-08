@@ -134,6 +134,11 @@ bool File::seek(u64 offset, int whence)
 	return false;
 }
 
+bool File::rewind()
+{
+	return seek(0);
+}
+
 bool File::close()
 {
 	if (!isOpen())
@@ -154,7 +159,7 @@ bool File::init()
 		return false;
 	}
 
-	return m_parent->init();
+	return true;
 }
 
 bool File::setParent(File* parent)

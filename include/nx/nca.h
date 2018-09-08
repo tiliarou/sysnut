@@ -84,8 +84,8 @@ public:
 
 	Buffer& key() { return m_key; }
 
-	Fs* begin();
-	Fs* end();
+	Fs** begin();
+	Fs** end();
 
 private:
 	Fs* loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
