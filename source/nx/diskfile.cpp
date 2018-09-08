@@ -128,3 +128,9 @@ bool DiskFile::isOpen()
 {
 	return f != NULL;
 }
+
+void DiskFile::onChildless()
+{
+	close();
+}
+

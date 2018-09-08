@@ -18,6 +18,8 @@ public:
 	u64 size();
 	virtual u64 read(Buffer& buffer, u64 sz = 0);
 
+	virtual void onChildless() override;
+
 	bool isOpen();
 	string& path() { return m_path; }
 

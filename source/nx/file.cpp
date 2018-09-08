@@ -5,6 +5,7 @@
 
 File::File()
 {
+	memset(m_children, 0, sizeof(m_children));
 }
 
 File::~File()
@@ -141,7 +142,12 @@ bool File::close()
 		return false;
 	}
 
-	m_parent->close();
+	m_parent->unregisterChild(this);
+
+	/*if (m_parent->childrenCount() == 0)
+	{
+		m_parent->close();
+	}*/
 	m_parent = NULL;
 
 	return true;
@@ -166,5 +172,55 @@ bool File::setParent(File* parent)
 
 	// todo notify parent
 	m_parent = parent;
+	m_parent->registerChild(this);
 	return true;
+}
+
+u64 File::childrenCount()
+{
+	u64 c = 0;
+
+	for (int i = 0; i < MAX_FILE_CHILDREN; i++)
+	{
+		if (m_children[i])
+		{
+			c++;
+		}
+	}
+	return c;
+}
+
+bool File::registerChild(File* child)
+{
+	for (int i = 0; i < MAX_FILE_CHILDREN; i++)
+	{
+		if (!m_children[i])
+		{
+			m_children[i] = child;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool File::unregisterChild(File* child)
+{
+	for (int i = 0; i < MAX_FILE_CHILDREN; i++)
+	{
+		if (m_children[i] == child)
+		{
+			m_children[i] = NULL;
+
+			if (childrenCount() == 0)
+			{
+				onChildless();
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+void File::onChildless()
+{
 }
