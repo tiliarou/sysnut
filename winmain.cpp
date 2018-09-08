@@ -18,8 +18,7 @@ int main()
 
 	for (const auto& fs : cnmt)
 	{
-		Pfs0* p = reinterpret_cast<Pfs0*>(fs.get());
-		auto fe = p->files().first();
+		auto fe = fs->files().first();
 		sptr<File>& f = fe->open();
 		Cnmt c;
 		c.open2(f);

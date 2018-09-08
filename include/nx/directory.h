@@ -29,6 +29,14 @@ public:
 	{
 		return NULL;
 	}
+	/*
+	template<class K = File>
+	sptr<K> open()
+	{
+		sptr<File>& f = open();
+		return f;
+	}
+	*/
 
 	const string& name() const { return m_name; }
 	string& name() { return m_name; }
