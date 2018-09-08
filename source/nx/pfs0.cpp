@@ -55,7 +55,7 @@ sptr<File> Pfs0::open(u64 i)
 	
 	sptr<File> f(new File());
 	u64 sz = header().size();
-	f->open2(sptr<File>(this), entry->offset + sz, entry->size);
+	f->open2(ptr, entry->offset + sz, entry->size);
 	f->path() = header().fileName(i);
 	return f;
 }

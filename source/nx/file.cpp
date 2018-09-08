@@ -142,13 +142,9 @@ bool File::close()
 		return false;
 	}
 
-	//m_parent->unregisterChild(this);
+	m_parent->unregisterChild(this);
 
-	/*if (m_parent->childrenCount() == 0)
-	{
-		m_parent->close();
-	}*/
-	//m_parent.reset();
+	m_parent.reset();
 
 	return true;
 }
@@ -172,7 +168,7 @@ bool File::setParent(sptr<File> parent)
 
 	// todo notify parent
 	m_parent = parent;
-	//m_parent->registerChild(this);
+	m_parent->registerChild(this);
 	return true;
 }
 
