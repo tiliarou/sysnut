@@ -20,7 +20,7 @@ sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntr
 		{
 			Pfs0* p = NULL;
 			sptr<Fs> fs((p = new Pfs0(fsHeader, sectionEntry, _key)));
-			fs->open2(ptr, p->media_start_offset * MEDIA_SIZE + p->superBlock().pfs0_offset, (p->media_end_offset * MEDIA_SIZE) - (p->media_start_offset * MEDIA_SIZE) - p->superBlock().pfs0_offset);
+			fs->open2(ptr(), p->media_start_offset * MEDIA_SIZE + p->superBlock().pfs0_offset, (p->media_end_offset * MEDIA_SIZE) - (p->media_start_offset * MEDIA_SIZE) - p->superBlock().pfs0_offset);
 			return fs;
 		}
 		default:

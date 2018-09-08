@@ -37,6 +37,8 @@ public:
 	virtual void onChildless();
 	u64 childrenCount();
 
+	sptr<File>& ptr() { return m_ptr; }
+
 protected:
 	string m_path;
 	sptr<File> m_parent;
@@ -44,5 +46,5 @@ protected:
 	u64 m_partitionSize = 0;
 	File* m_children[MAX_FILE_CHILDREN];
 
-	sptr<File> ptr;
+	sptr<File> m_ptr;
 };

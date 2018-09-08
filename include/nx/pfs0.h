@@ -69,28 +69,6 @@ typedef struct {
     u8 _0x48[0xF0];
 } pfs0_superblock_t;
 
-class Pfs0FileEntry : public FileEntry
-{
-public:
-	Pfs0FileEntry() : FileEntry()
-	{
-	}
-
-	Pfs0FileEntry(string fileName, pfs0_file_entry_t& fileEntry) : FileEntry(), m_entry(fileEntry)
-	{
-		name() = fileName;
-		size() = fileEntry.size;
-	}
-
-	virtual sptr<File> open()
-	{
-		return NULL;
-	}
-
-private:
-	pfs0_file_entry_t m_entry;
-};
-
 class Pfs0 : public Fs
 {
 public:
@@ -105,4 +83,35 @@ public:
 	pfs0_superblock_t& superBlock() { return *reinterpret_cast<pfs0_superblock_t*>(&superblock_data); }
 private:
 	Buffer<u8> m_header;
+};
+
+class Pfs0FileEntry : public FileEntry
+{
+public:
+	Pfs0FileEntry() : FileEntry()
+	{
+	}
+
+	Pfs0FileEntry(string fileName, pfs0_file_entry_t& fileEntry, Pfs0* pfs0) : FileEntry(), m_entry(fileEntry)
+	{
+		name() = fileName;
+		size() = fileEntry.size;
+		parent() = pfs0;
+	}
+
+	virtual sptr<File> open()
+	{
+		sptr<File> f(new File());
+		u64 headerSize = parent()->header().size();
+		f->open2(parent()->ptr(), entry().offset + headerSize, entry().size);
+		f->path() = name();
+		return f;
+	}
+
+	const pfs0_file_entry_t& entry() const { return m_entry; }
+	Pfs0*& parent() { return m_parent; }
+
+private:
+	pfs0_file_entry_t m_entry;
+	Pfs0* m_parent;
 };

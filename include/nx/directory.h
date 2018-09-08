@@ -47,7 +47,7 @@ public:
 	virtual ~Directory();
 
 	virtual const Array<sptr<FileEntry>>& files() const { return m_files; };
-protected:
 	virtual Array<sptr<FileEntry>>& files() { return m_files; };
+protected:
 	Array<sptr<FileEntry>> m_files;
 };

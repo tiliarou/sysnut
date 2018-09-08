@@ -37,7 +37,7 @@ bool Pfs0::init()
 
 	for (unsigned long i = 0; i < header().numFiles(); i++)
 	{
-		sptr<FileEntry> f(new Pfs0FileEntry(header().fileName(i), *header().fileEntry(i)));
+		sptr<FileEntry> f(new Pfs0FileEntry(header().fileName(i), *header().fileEntry(i), this));
 		files().push(f);
 	}
 
@@ -55,7 +55,7 @@ sptr<File> Pfs0::open(u64 i)
 	
 	sptr<File> f(new File());
 	u64 sz = header().size();
-	f->open2(ptr, entry->offset + sz, entry->size);
+	f->open2(ptr(), entry->offset + sz, entry->size);
 	f->path() = header().fileName((u32)i);
 	return f;
 }

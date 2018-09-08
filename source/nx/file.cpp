@@ -5,7 +5,7 @@
 
 void nullDeleter(File*) {}
 
-File::File() : ptr(this, &nullDeleter)
+File::File() : m_ptr(this, &nullDeleter)
 {
 	memset(m_children, 0, sizeof(m_children));
 }

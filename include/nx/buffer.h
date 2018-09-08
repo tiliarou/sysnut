@@ -52,6 +52,20 @@ public:
 		return m_buffer[i];
 	}
 
+	T& first()
+	{
+		return m_buffer[0];
+	}
+
+	T& last()
+	{
+		if (!size())
+		{
+			return m_buffer[0];
+		}
+		return m_buffer[size()-1]
+	}
+
 	T& push(T n)
 	{
 		u64 sz = size();
