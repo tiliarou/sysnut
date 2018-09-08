@@ -1,7 +1,7 @@
 #include "nx/pfs0.h"
 #include "log.h"
 
-Pfs0::Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer& _key) : Fs(header, sectionEntry, _key)
+Pfs0::Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key) : Fs(header, sectionEntry, _key)
 {
 }
 
@@ -35,7 +35,7 @@ bool Pfs0::init()
 		return false;
 	}
 
-	for (int i = 0; i < header().numFiles(); i++)
+	for (unsigned long i = 0; i < header().numFiles(); i++)
 	{
 		string n = header().fileName(i);
 		print("file: %s\n", n.c_str());
@@ -51,11 +51,11 @@ Pfs0::~Pfs0()
 
 sptr<File> Pfs0::open(u64 i)
 {
-	pfs0_file_entry_t* entry = header().fileEntry(i);
+	pfs0_file_entry_t* entry = header().fileEntry((u32)i);
 	
 	sptr<File> f(new File());
 	u64 sz = header().size();
 	f->open2(ptr, entry->offset + sz, entry->size);
-	f->path() = header().fileName(i);
+	f->path() = header().fileName((u32)i);
 	return f;
 }

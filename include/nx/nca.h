@@ -82,13 +82,13 @@ public:
 	bool open(string& path, char* mode = "rb") override;
 	virtual bool close() override;
 
-	Buffer& key() { return m_key; }
+	Buffer<u8>& key() { return m_key; }
 
 	sptr<Fs>* begin();
 	sptr<Fs>* end();
 
 private:
-	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key);
+	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
 	sptr<Fs> fs[4];
-	Buffer m_key;
+	Buffer<u8> m_key;
 };

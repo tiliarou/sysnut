@@ -9,7 +9,7 @@ BufferedFile::~BufferedFile()
 {
 }
 
-bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer& key)
+bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer<u8>& key)
 {
 	crypto().type() = cryptoType;
 	crypto().key() = key;
@@ -65,7 +65,7 @@ bool BufferedFile::rewind()
 	return seek(0);
 }
 
-u64 BufferedFile::read(Buffer& buffer, u64 sz)
+u64 BufferedFile::read(Buffer<u8>& buffer, u64 sz)
 {
 	if (!sz || currentPosition() + sz > size())
 	{
@@ -85,7 +85,7 @@ u64 BufferedFile::read(Buffer& buffer, u64 sz)
 	return sz;
 }
 
-u64 BufferedFile::readThrough(Buffer& buffer, u64 sz)
+u64 BufferedFile::readThrough(Buffer<u8>& buffer, u64 sz)
 {
 	if (crypto().type() == CRYPT_CTR)
 	{

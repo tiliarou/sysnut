@@ -60,7 +60,7 @@ bool DiskFile::seek(u64 offset, int whence)
 		return false;
 	}
 
-	return fseek(f, offset, whence) == 0;
+	return fseek(f, (long)offset, whence) == 0;
 }
 
 bool DiskFile::rewind()
@@ -102,7 +102,7 @@ u64 DiskFile::size()
 	return m_size;
 }
 
-u64 DiskFile::read(Buffer& buffer, u64 sz)
+u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 {
 	if (!isOpen())
 	{
@@ -118,7 +118,7 @@ u64 DiskFile::read(Buffer& buffer, u64 sz)
 	buffer.resize(sz);
 
 	u64 r;
-	r = fread(buffer.c_str(), 1, sz, f);
+	r = fread(buffer.c_str(), 1, (size_t)sz, f);
 	return r;
 }
 

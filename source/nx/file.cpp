@@ -59,7 +59,7 @@ bool File::open2(sptr<File>& f, u64 offset, u64 sz)
 	return init();
 }
 
-u64 File::read(Buffer& buffer, u64 sz)
+u64 File::read(Buffer<u8>& buffer, u64 sz)
 {
 	if (!isOpen())
 	{

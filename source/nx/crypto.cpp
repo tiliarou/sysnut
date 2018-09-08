@@ -18,7 +18,7 @@ Crypto::Crypto(const void *key, unsigned int key_size, aes_mode_t mode)
 	setKey(key, key_size);
 }
 
-bool Crypto::setKey(const void *key, unsigned int key_size)
+bool Crypto::setKey(const void *key, u64 key_size)
 {
 	if (mbedtls_cipher_setkey(&cipherDec, (const unsigned char*)key, key_size * 8, MBEDTLS_DECRYPT) || mbedtls_cipher_setkey(&cipherEnc, (const unsigned char*)key, key_size * 8, MBEDTLS_ENCRYPT))
 	{

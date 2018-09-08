@@ -121,7 +121,7 @@ static char hextoi(char c) {
 	return 0;
 }
 
-u8* uhx(u8* key, const char* hex, int len)
+u8* uhx(u8* key, const char* hex, u64 len)
 {
 
 	if (len)
@@ -148,7 +148,7 @@ u8* uhx(u8* key, const char* hex, int len)
 		}
 	}
 
-	memset(key, 0, len >> 1);
+	memset(key, 0, (size_t)(len >> 1));
 
 	for (unsigned int i = 0; i < len; i++) {
 		char val = hextoi(hex[i]);
@@ -162,9 +162,9 @@ u8* uhx(u8* key, const char* hex, int len)
 	return key;
 }
 
-Buffer uhx(const char* hex, int len)
+Buffer<u8> uhx(const char* hex, u64 len)
 {
-	Buffer buf;
+	Buffer<u8> buf;
 
 	if (len)
 	{
@@ -195,7 +195,7 @@ Buffer uhx(const char* hex, int len)
 	}
 
 	u8* key = (u8*)buf.buffer();
-	memset(key, 0, len >> 1);
+	memset(key, 0, (size_t)(len >> 1));
 
 	for (unsigned int i = 0; i < len; i++) {
 		char val = hextoi(hex[i]);

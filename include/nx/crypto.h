@@ -8,8 +8,7 @@ typedef enum : u8 {
 	CRYPT_NONE = 1,
 	CRYPT_XTS = 2,
 	CRYPT_CTR = 3,
-	CRYPT_BKTR = 4,
-	CRYPT_NCA0 = 0x3041434E //MAGIC_NCA0
+	CRYPT_BKTR = 4
 } crypt_type_t;
 
 typedef mbedtls_cipher_type_t aes_mode_t;
@@ -23,7 +22,7 @@ public:
 	~Crypto();
 
 	bool setIv(const void *iv, size_t l);
-	bool setKey(const void *key, unsigned int key_size);
+	bool setKey(const void *key, u64 key_size);
 	bool setMode(aes_mode_t mode);
 	bool setCounter(const u8* counter, u32 sz);
 

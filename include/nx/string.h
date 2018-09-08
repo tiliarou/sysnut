@@ -1,7 +1,7 @@
 #pragma once
 #include "nx/buffer.h"
 
-class string : public Buffer
+class string : public Buffer<u8>
 {
 public:
 	string();

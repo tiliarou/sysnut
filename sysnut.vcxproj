@@ -109,7 +109,6 @@
     <ClCompile Include="source\mbedtls\platform_util.c" />
     <ClCompile Include="source\nx\bufferedfile.cpp" />
     <ClCompile Include="source\nx\crypto.cpp" />
-    <ClCompile Include="source\nx\buffer.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
     <ClCompile Include="source\nx\diskfile.cpp" />

@@ -90,7 +90,7 @@ public:
 	~Cnmt();
 
 	bool init() override;
-	Buffer& buffer() { return m_buffer; }
+	Buffer<u8>& buffer() { return m_buffer; }
 
 	ContentMetaHeader* contentMetaHeader() { return reinterpret_cast<ContentMetaHeader*>(buffer().buffer());  }
 	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().c_str() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
@@ -98,5 +98,5 @@ public:
 	HashedContentRecord* begin() { return hashedContentRecord(0); }
 	HashedContentRecord* end() { return hashedContentRecord(contentMetaHeader()->contentCount); }
 private:
-	Buffer m_buffer;
+	Buffer<u8> m_buffer;
 };

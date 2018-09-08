@@ -12,7 +12,7 @@ Nca::~Nca()
 {
 }
 
-sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer& _key)
+sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer<u8>& _key)
 {
 	switch (fsHeader.fs_type)
 	{
@@ -47,7 +47,7 @@ sptr<Fs>* Nca::end()
 
 bool Nca::open(string& path, char* mode)
 {
-	Buffer header;
+	Buffer<u8> header;
 
 	if (!File::open(path))
 	{

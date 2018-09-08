@@ -13,7 +13,7 @@ int main()
 {
 	Nca cnmt;
 	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
-	Buffer data;
+	Buffer<u8> data;
 
 
 	for (const auto& fs : cnmt)

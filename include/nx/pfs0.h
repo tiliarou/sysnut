@@ -72,7 +72,7 @@ typedef struct {
 class Pfs0 : public Fs
 {
 public:
-	Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer& _key);
+	Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
 	virtual ~Pfs0();
 
 	virtual bool init();
@@ -82,5 +82,5 @@ public:
 	pfs0_header_t& header() { return *reinterpret_cast<pfs0_header_t*>(m_header.buffer());  }
 	pfs0_superblock_t& superBlock() { return *reinterpret_cast<pfs0_superblock_t*>(&superblock_data); }
 private:
-	Buffer m_header;
+	Buffer<u8> m_header;
 };
