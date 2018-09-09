@@ -20,7 +20,7 @@ bool Fs::init()
 		return false;
 	}
 
-	if (crypto().key().size())
+	if (crypto().key() != integer<128>(0))
 	{
 		setCrypto(this->crypt_type, crypto().key());
 		//print("setting iv: %d\n", sizeof(section_ctr));

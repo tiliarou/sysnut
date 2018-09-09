@@ -11,7 +11,6 @@ Pfs0::Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, integer<1
 
 bool Pfs0::init()
 {
-	print("pfs0\n");
 	if (!Fs::init())
 	{
 		return false;
@@ -29,8 +28,6 @@ bool Pfs0::init()
 		close();
 		return false;
 	}
-
-	m_header.dump();
 
 	rewind();
 	if (!read(m_header, header().size()))
@@ -50,5 +47,4 @@ bool Pfs0::init()
 
 Pfs0::~Pfs0()
 {
-	print("~pfs0\n");
 }

@@ -28,9 +28,16 @@ bool Cnmt::init()
 		return false;
 	}
 
+	if (contentMetaHeader()->contentCount > 0x10)
+	{
+		error("Too many content records, perhaps bad cnmt file?\n");
+		close();
+		return false;
+	}
+
 	for (auto& content : *this)
 	{
-		print("content %x\n", content.record.contentType);
+		//print("content %x\n", content.record.contentType);
 	}
 
 	/*

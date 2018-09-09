@@ -27,26 +27,14 @@ sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntr
 	}
 }
 
-bool Nca::open(string& path, char* mode)
+bool Nca::init()
 {
 	Buffer<u8> header;
-
-	if (!File::open(path))
-	{
-		return false;
-	}
-
-	if (!size())
-	{
-		print("No file size %s\n", path.c_str());
-		close();
-		return false;
-	}
-
+	rewind();
 
 	if (!read(header, 0xC00))
 	{
-		print("Failed to read file %s\n", path.c_str());
+		print("Failed to read file %s\n", path().c_str());
 		close();
 		return false;
 	}
@@ -67,7 +55,7 @@ bool Nca::open(string& path, char* mode)
 
 	if (rightsId() == integer<128>(0))
 	{
-		print("standard crypto\n");
+		// standard crypto
 		auto& k = keys().keyAreaKey(masterKeyRev(), kaekIndex());
 		Crypto crypto(k, sizeof(k), MBEDTLS_CIPHER_AES_128_ECB);
 		crypto.decrypt(&m_keys, &m_keys, sizeof(m_keys));
@@ -80,7 +68,6 @@ bool Nca::open(string& path, char* mode)
 
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
-		//key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
 		auto d = loadFs(fs_headers[i], section_entries[i], key());
 
 		if (d)

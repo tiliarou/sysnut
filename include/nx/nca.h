@@ -99,7 +99,7 @@ public:
 	Nca();
 	virtual ~Nca();
 
-	bool open(string& path, char* mode = "rb") override;
+	bool init() override;
 	virtual bool close() override;
 
 	integer<128>& key() { return m_key; }
