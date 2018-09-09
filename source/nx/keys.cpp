@@ -1,6 +1,7 @@
 #include "nx/keys.h"
 #include <string.h>
 #include <stdio.h>
+#include "nx/crypto.h"
 #include "log.h"
 
 Keys g_keys("keys.txt");
@@ -8,6 +9,32 @@ Keys g_keys("keys.txt");
 Keys& keys()
 {
 	return g_keys;
+}
+
+void generateKek(integer<128>& dst, const integer<128> src, const integer<128> masterKey, const integer<128> kekSeed, const integer<128> keySeed)
+{
+	integer<128> kek;
+	integer<128> srcKek;
+
+	{
+		Crypto crypto(&masterKey, sizeof(masterKey), MBEDTLS_CIPHER_AES_128_ECB);
+		crypto.decrypt(&kek, &kekSeed, sizeof(kekSeed));
+	}
+
+	{
+		Crypto crypto(&kek, sizeof(kek), MBEDTLS_CIPHER_AES_128_ECB);
+		crypto.decrypt(&srcKek, &src, sizeof(src));
+	}
+
+	if (keySeed == integer<128>(0))
+	{
+		memcpy(&dst, &srcKek, sizeof(srcKek));
+	}
+	else
+	{
+		Crypto crypto(&srcKek, sizeof(srcKek), MBEDTLS_CIPHER_AES_128_ECB);
+		crypto.decrypt(&dst, &keySeed, sizeof(keySeed));
+	}
 }
 
 static int getKv(FILE *f, char **key, char **value)
@@ -121,7 +148,8 @@ static char hextoi(char c) {
 	return 0;
 }
 
-u8* uhx(u8* key, const char* hex, u64 len)
+template<class T>
+T* uhx(T& key, const char* hex, u64 len)
 {
 
 	if (len)
@@ -130,7 +158,7 @@ u8* uhx(u8* key, const char* hex, u64 len)
 	}
 	else
 	{
-		len = strlen(hex);
+		len = sizeof(key);
 	}
 
 	if (len % 2)
@@ -149,6 +177,7 @@ u8* uhx(u8* key, const char* hex, u64 len)
 	}
 
 	memset(key, 0, (size_t)(len >> 1));
+	u8* ptr = reinterpret_cast<u8*>(&key);
 
 	for (unsigned int i = 0; i < len; i++) {
 		char val = hextoi(hex[i]);
@@ -156,10 +185,10 @@ u8* uhx(u8* key, const char* hex, u64 len)
 		if ((i & 1) == 0) {
 			val <<= 4;
 		}
-		key[i >> 1] |= val;
+		ptr[i >> 1] |= val;
 	}
 
-	return key;
+	return (T*)&key;
 }
 
 Buffer<u8> uhx(const char* hex, u64 len)
@@ -380,21 +409,21 @@ bool Keys::open(const char* file)
 
 					snprintf(testName, sizeof(testName), "key_area_key_application_%02x", i);
 					if (strcmp(key, testName) == 0) {
-						uhx(keyAreaKeys[i][0], value, sizeof(keyAreaKeys[i][0]));
+						uhx(m_keyAreaKeys[i][0], value, sizeof(m_keyAreaKeys[i][0]));
 						matchedKey = 1;
 						break;
 					}
 
 					snprintf(testName, sizeof(testName), "key_area_key_ocean_%02x", i);
 					if (strcmp(key, testName) == 0) {
-						uhx(keyAreaKeys[i][1], value, sizeof(keyAreaKeys[i][1]));
+						uhx(m_keyAreaKeys[i][1], value, sizeof(m_keyAreaKeys[i][1]));
 						matchedKey = 1;
 						break;
 					}
 
 					snprintf(testName, sizeof(testName), "key_area_key_system_%02x", i);
 					if (strcmp(key, testName) == 0) {
-						uhx(keyAreaKeys[i][2], value, sizeof(keyAreaKeys[i][2]));
+						uhx(m_keyAreaKeys[i][2], value, sizeof(m_keyAreaKeys[i][2]));
 						matchedKey = 1;
 						break;
 					}

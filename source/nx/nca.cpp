@@ -68,10 +68,9 @@ bool Nca::open(string& path, char* mode)
 	if (rightsId() == integer<128>(0))
 	{
 		print("standard crypto\n");
-		auto& k = keys().keyAreaKeys[masterKeyRev()][kaekIndex()];
+		auto& k = keys().keyAreaKey(masterKeyRev(), kaekIndex());
 		Crypto crypto(k, sizeof(k), MBEDTLS_CIPHER_AES_128_ECB);
 		crypto.decrypt(&m_keys, &m_keys, sizeof(m_keys));
-		//crypto = aes128.AESECB(Keys.keyAreaKey(masterKeyRev(), self.keyIndex));
 	}
 	else
 	{
