@@ -69,3 +69,6 @@ protected:
 
 	sptr<File> m_ptr;
 };
+
+
+

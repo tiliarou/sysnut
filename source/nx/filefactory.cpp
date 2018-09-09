@@ -2,6 +2,11 @@
 #include "nx/nca.h"
 #include "nx/pfs0.h"
 #include "nx/cnmt.h"
+#include "nx/primitives.h"
+
+template < > const char* mapTypeExtension<Nca>() { return ".nca"; }
+template < > const char* mapTypeExtension<Pfs0>() { return ".nsp"; }
+template < > const char* mapTypeExtension<Cnmt>() { return ".cnmt"; }
 
 File* fileFactoryCreate(string& path)
 {

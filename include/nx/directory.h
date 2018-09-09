@@ -73,6 +73,19 @@ public:
 		return false;
 	}
 
+	sptr<Array<sptr<FileEntry>>> find(const char* ext)
+	{
+		auto result = new Array<sptr<FileEntry>>();
+		for (auto& f : *this)
+		{
+			if (f->name().endsWith(string(ext)))
+			{
+				result->push(f);
+			}
+		}
+		return sptr<Array<sptr<FileEntry>>>(result);
+	}
+
 private:
 };
 
@@ -84,6 +97,16 @@ public:
 
 	virtual const DirectoryFiles& files() const { return m_files; };
 	virtual DirectoryFiles& files() { return m_files; };
+
+	template<class T>
+	sptr<Array<sptr<FileEntry>>> files2()
+	{
+		return files().where(
+			[](sptr<FileEntry>& f) -> bool
+			{
+				return f->name().endsWith(string(mapTypeExtension<T>()));
+			});
+	}
 
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };

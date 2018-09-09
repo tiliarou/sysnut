@@ -194,7 +194,7 @@ public:
 		return true;
 	}
 
-	sptr< Buffer<T> > where(bool(*callback)(T& s))
+	sptr<Buffer<T>> where(bool(*callback)(T& s))
 	{
 		sptr<Buffer<T>> results(new Buffer<T>());
 

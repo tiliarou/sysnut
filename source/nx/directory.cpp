@@ -11,7 +11,8 @@ Directory::~Directory()
 
 bool Directory::install()
 {
-	auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
+	//auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
+	auto& cnmts = files().find(".cnmt.nca");
 
 	for (auto& i : *cnmts)
 	{
@@ -33,7 +34,8 @@ bool Directory::install()
 						print("content %x, %s\n", content.record.contentType, ncaFile.c_str());
 						if (!files().contains(ncaFile))
 						{
-							print("could not find file! %s\n", ncaFile);
+							error("could not find file! %s\n", ncaFile);
+							goto skip;
 						}
 					}
 				}
@@ -47,6 +49,7 @@ bool Directory::install()
 		{
 			error("Could not open cnmt nca\n");
 		}
+	skip:;
 	}
 	return true;
 }
