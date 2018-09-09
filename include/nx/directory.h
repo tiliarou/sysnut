@@ -57,6 +57,8 @@ public:
 
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
+
+	bool install();
 protected:
 	Array<sptr<FileEntry>> m_files;
 	Array<sptr<Directory>> m_directories;

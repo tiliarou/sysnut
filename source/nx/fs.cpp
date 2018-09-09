@@ -20,9 +20,12 @@ bool Fs::init()
 		return false;
 	}
 
-	setCrypto(this->crypt_type, crypto().key());
-	//print("setting iv: %d\n", sizeof(section_ctr));
-	crypto().setCounter(section_ctr, sizeof(section_ctr));
+	if (crypto().key().size())
+	{
+		setCrypto(this->crypt_type, crypto().key());
+		//print("setting iv: %d\n", sizeof(section_ctr));
+		crypto().setCounter(section_ctr, sizeof(section_ctr));
+	}
 
 	return true;
 }

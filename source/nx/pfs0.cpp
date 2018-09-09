@@ -52,14 +52,3 @@ Pfs0::~Pfs0()
 {
 	print("~pfs0\n");
 }
-
-sptr<File> Pfs0::open(u64 i)
-{
-	pfs0_file_entry_t* entry = header().fileEntry((u32)i);
-	
-	sptr<File> f(new File());
-	u64 sz = header().size();
-	f->open2(ptr(), entry->offset + sz, entry->size);
-	f->path() = header().fileName((u32)i);
-	return f;
-}

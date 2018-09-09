@@ -114,7 +114,6 @@
     <ClCompile Include="source\nx\diskfile.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
     <ClCompile Include="source\nx\fs.cpp" />
-    <ClCompile Include="source\nx\install.cpp" />
     <ClCompile Include="source\nx\keys.cpp" />
     <ClCompile Include="source\nx\nca.cpp" />
     <ClCompile Include="source\nx\nsp.cpp" />
@@ -139,7 +138,6 @@
     <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />
     <ClInclude Include="include\nx\fs.hpp" />
-    <ClInclude Include="include\nx\install.h" />
     <ClInclude Include="include\nx\ipc\es.h" />
     <ClInclude Include="include\nx\ipc\ncm_ext.h" />
     <ClInclude Include="include\nx\ipc\ns_ext.h" />

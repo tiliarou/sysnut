@@ -8,6 +8,7 @@
 */
 
 #include "nut.h"
+#include "nx/sptr.h"
 #include "log.h"
 #include <new>
 
@@ -72,7 +73,8 @@ public:
 		if (!resize(sz + 1))
 		{
 			fatal("failed to resize buffer!\n");
-			return T();
+			T junk;
+			return junk;
 		}
 		m_buffer[sz] = n;
 		return m_buffer[sz];
@@ -180,6 +182,21 @@ public:
 		}
 		memcpy(buffer(), src, (size_t)sz);
 		return true;
+	}
+
+	sptr< Buffer<T> > where(bool(*callback)(T& s))
+	{
+		sptr<Buffer<T>> results(new Buffer<T>());
+
+		for (auto& f : *this)
+		{
+			if (callback(f))
+			{
+				results->push(f);
+			}
+		}
+
+		return results;
 	}
 
 	bool close()

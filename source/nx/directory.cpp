@@ -7,3 +7,8 @@ Directory::Directory()
 Directory::~Directory()
 {
 }
+
+bool Directory::install()
+{
+	return true;
+}

@@ -39,7 +39,12 @@ public:
 		}
 
 		string s;
-		s.set(stringTable() + entry->string_table_offset, sz);
+		const char* cstr = stringTable() + entry->string_table_offset;
+		if (sz && cstr[sz - 1] == NULL)
+		{
+			sz--;
+		}
+		s.set(cstr, sz);
 		return s;
 	}
 
@@ -77,8 +82,6 @@ public:
 	virtual ~Pfs0();
 
 	virtual bool init();
-
-	sptr<File> open(u64 i);
 
 	pfs0_header_t& header() { return *reinterpret_cast<pfs0_header_t*>(m_header.buffer());  }
 	pfs0_superblock_t& superBlock() { return *reinterpret_cast<pfs0_superblock_t*>(&superblock_data); }
