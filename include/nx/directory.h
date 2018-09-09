@@ -53,20 +53,43 @@ protected:
 	u64 m_size;
 };
 
+class DirectoryFiles : public Array<sptr<FileEntry>>
+{
+public:
+	DirectoryFiles() : Array<sptr<FileEntry>>()
+	{
+	}
+
+	bool contains(const string fileName)
+	{
+		for (auto& f : *this)
+		{
+			if (f->name() == fileName)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+private:
+};
+
 class Directory
 {
 public:
 	Directory();
 	virtual ~Directory();
 
-	virtual const Array<sptr<FileEntry>>& files() const { return m_files; };
-	virtual Array<sptr<FileEntry>>& files() { return m_files; };
+	virtual const DirectoryFiles& files() const { return m_files; };
+	virtual DirectoryFiles& files() { return m_files; };
 
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
 	bool install();
 protected:
-	Array<sptr<FileEntry>> m_files;
+	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;
 };

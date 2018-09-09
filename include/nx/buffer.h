@@ -36,6 +36,16 @@ public:
 		set(src.buffer(), src.size());
 	}
 
+	bool operator==(const Buffer<T>& src)
+	{
+		if (size() != src.size())
+		{
+			return false;
+		}
+
+		return memcmp(buffer(), src.buffer(), size()) == 0;
+	}
+
 	Buffer<T>& operator=(const Buffer<T>& src)
 	{
 		resize(src.size());

@@ -31,6 +31,10 @@ bool Directory::install()
 					{
 						string ncaFile = hx(content.record.ncaId) + ".nca";
 						print("content %x, %s\n", content.record.contentType, ncaFile.c_str());
+						if (!files().contains(ncaFile))
+						{
+							print("could not find file! %s\n", ncaFile);
+						}
 					}
 				}
 				else

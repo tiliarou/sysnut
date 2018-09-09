@@ -40,10 +40,12 @@ public:
 
 		string s;
 		const char* cstr = stringTable() + entry->string_table_offset;
-		if (sz && cstr[sz - 1] == NULL)
+
+		while(sz && cstr[sz - 1] == NULL)
 		{
 			sz--;
 		}
+
 		s.set(cstr, sz);
 		return s;
 	}

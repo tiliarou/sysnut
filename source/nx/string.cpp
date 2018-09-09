@@ -29,7 +29,11 @@ string string::operator+(const char* s)
 	result.resize(length() + len + 1);
 
 	memcpy(result.buffer() + length(), s, len);
-	result.last() = NULL;
+
+	if (!result.size() || result.last() != NULL)
+	{
+		push(NULL);
+	}
 	return result;
 }
 
@@ -45,7 +49,10 @@ bool string::set(const void* src, u64 sz)
 		return false;
 	}
 
-	push(NULL);
+	if (!size() || last() != NULL)
+	{
+		push(NULL);
+	}
 
 	return true;
 }
