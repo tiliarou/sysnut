@@ -3,10 +3,12 @@
 
 Pfs0::Pfs0() : Fs()
 {
+	path() = ".pfs0";
 }
 
 Pfs0::Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, integer<128>& _key) : Fs(header, sectionEntry, _key)
 {
+	path() = ".pfs0";
 }
 
 bool Pfs0::init()

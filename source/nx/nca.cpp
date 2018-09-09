@@ -5,6 +5,7 @@
 
 Nca::Nca() : BufferedFile()
 {
+	path() = ".nca";
 }
 
 Nca::~Nca()

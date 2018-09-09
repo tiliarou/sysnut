@@ -34,7 +34,7 @@ bool Directory::install()
 				}
 				else
 				{
-					print("Failed to open cnmt!\n");
+					error("Failed to open cnmt!\n");
 				}
 			}
 		}
