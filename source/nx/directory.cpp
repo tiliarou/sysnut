@@ -15,13 +15,14 @@ bool Directory::install()
 
 	for (auto& i : *cnmts)
 	{
-		Nca nca;
-		if (nca.open2(i->open<File>()))
+		auto nca = i->open<Nca>();
+
+		if (nca)
 		{
-			if (nca.directories().size() && nca.directories().first()->files().size())
+			if (nca->directories().size() && nca->directories().first()->files().size())
 			{
 				// cnmt nca's contain a single partition with a single file
-				auto cnmt = nca.directories().first()->files().first()->open<Cnmt>();
+				auto cnmt = nca->directories().first()->files().first()->open<Cnmt>();
 				if (cnmt)
 				{
 					print("installing cnmt\n");
