@@ -29,7 +29,8 @@ bool Directory::install()
 
 					for (auto& content : *cnmt)
 					{
-						print("content %x, %s\n", content.record.contentType, hx(content.record.ncaId).c_str());
+						string ncaFile = hx(content.record.ncaId) + ".nca";
+						print("content %x, %s\n", content.record.contentType, ncaFile.c_str());
 					}
 				}
 				else

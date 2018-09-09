@@ -21,6 +21,18 @@ string& string::operator=(const string& src)
 	return *this;
 }
 
+string string::operator+(const char* s)
+{
+	string result = *this;
+	size_t len = strlen(s);
+
+	result.resize(length() + len + 1);
+
+	memcpy(result.buffer() + length(), s, len);
+	result.last() = NULL;
+	return result;
+}
+
 bool string::set(const void* src, u64 sz)
 {
 	if (sz == 0)

@@ -13,6 +13,7 @@ public:
 	~string();
 	bool set(const void* src, u64 sz=0);
 	operator char*() const { return c_str(); }
+	string operator+(const char* s);
 
 	const u64 length() const { return _MIN(m_size ? m_size - 1 : 0, strlen((const char*)buffer())); }
 

@@ -64,7 +64,7 @@ public:
 		{
 			return m_buffer[0];
 		}
-		return m_buffer[size()-1]
+		return m_buffer[size() - 1];
 	}
 
 	T& push(T n)
