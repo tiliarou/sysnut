@@ -3,6 +3,7 @@
 #include "nx/cnmt.h"
 #include "nx/crypto.h"
 #include "log.h"
+#include "nx/integer.h"
 
 bool appletMainLoop()
 {
@@ -11,14 +12,26 @@ bool appletMainLoop()
 
 int main()
 {
-	Pfs0 nsp;
-	nsp.open(string("C:\\Users\\bwarner\\Desktop\\switch\\GUNBIRD2 for Nintendo Switch[0100BCB00AE98000][v0].nsp"));
-	
-	auto& fs = nsp.files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".xml")); });
-	for (auto& f : *fs)
+	Nca cnmt;
+	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
+	Buffer<u8> data;
+
+	for (const auto& fs : cnmt.directories())
 	{
-		print("file: %s\n", f->name().c_str());
+		auto fe = fs->files().first();
+		sptr<File>& f = fe->open();
+		Cnmt c;
+		c.open2(f);
+		print("fs\n");
 	}
+
+	/*
+	Pfs0 nsp;
+	if (nsp.open(string("C:\\Users\\bwarner\\Desktop\\switch\\GUNBIRD2 for Nintendo Switch[0100BCB00AE98000][v0].nsp")))
+	{
+		nsp.install();
+	}
+	*/
 
 	return 0;
 }

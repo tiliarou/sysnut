@@ -1,6 +1,7 @@
 #pragma once
 #include "nut.h"
 #include "nx/primitives.h"
+#include "nx/integer.h"
 #include "nx/pfs0.h"
 #include "nx/ivfc.h"
 #include "nx/bktr.h"
@@ -19,16 +20,34 @@ typedef struct {
 #define MAGIC_NCA0 0x3041434E /* "NCA0" */
 
 /* Nintendo content archive header. */
-typedef struct {
-	u8 fixed_key_sig[0x100]; /* RSA-PSS signature over header with fixed key. */
-	u8 npdm_key_sig[0x100]; /* RSA-PSS signature over header with key in NPDM. */
-	uint32_t magic;
+class nca_header_t
+{
+public:
+	u64& titleId() { return m_titleId; }
+	integer<128>& rightsId() { return m_rightsId; }
+	u8& cryptoType() { return m_cryptoType; }
+	u8& cryptoType2() { return m_cryptoType2; }
+	u8& kaekIndex() { return m_kaekIndex; }
+
+	u8 masterKeyRev()
+	{
+		u8 r = MAX(cryptoType(), cryptoType2());
+		if (r)
+		{
+			r--;
+		}
+		return r;
+	}
+
+	integer<2048> fixed_key_sig; /* RSA-PSS signature over header with fixed key. */
+	integer<2048> npdm_key_sig; /* RSA-PSS signature over header with key in NPDM. */
+	u32 magic;
 	u8 distribution; /* System vs gamecard. */
 	u8 content_type;
-	u8 crypto_type; /* Which keyblob (field 1) */
-	u8 kaek_ind; /* Which kaek index? */
+	u8 m_cryptoType; /* Which keyblob (field 1) */
+	u8 m_kaekIndex; /* Which kaek index? */
 	u64 nca_size; /* Entire archive size. */
-	u64 title_id;
+	u64 m_titleId;
 	u8 _0x218[0x4]; /* Padding. */
 	union {
 		uint32_t sdk_version; /* What SDK was this built with? */
@@ -39,15 +58,15 @@ typedef struct {
 			u8 sdk_major;
 		};
 	};
-	u8 crypto_type2; /* Which keyblob (field 2) */
+	u8 m_cryptoType2; /* Which keyblob (field 2) */
 	u8 _0x221[0xF]; /* Padding. */
-	u8 rights_id[0x10]; /* Rights ID (for titlekey crypto). */
+	integer<128> m_rightsId; /* Rights ID (for titlekey crypto). */
 	nca_section_entry_t section_entries[4]; /* Section entry metadata. */
-	u8 section_hashes[4][0x20]; /* SHA-256 hashes for each section header. */
-	u8 encrypted_keys[4][0x10]; /* Encrypted key area. */
+	integer<256> section_hashes[4]; /* SHA-256 hashes for each section header. */
+	integer<128> m_keys[4]; /* Encrypted key area. */
 	u8 _0x340[0xC0]; /* Padding. */
 	nca_fs_header_t fs_headers[4]; /* FS section headers. */
-} nca_header_t;
+};
 
 enum nca_section_type {
 	PFS0,

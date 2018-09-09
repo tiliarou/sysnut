@@ -138,6 +138,7 @@
     <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />
     <ClInclude Include="include\nx\fs.hpp" />
+    <ClInclude Include="include\nx\integer.h" />
     <ClInclude Include="include\nx\ipc\es.h" />
     <ClInclude Include="include\nx\ipc\ncm_ext.h" />
     <ClInclude Include="include\nx\ipc\ns_ext.h" />

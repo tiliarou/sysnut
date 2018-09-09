@@ -65,6 +65,19 @@ bool Nca::open(string& path, char* mode)
 		return false;
 	}
 
+	if (rightsId() == integer<128>(0))
+	{
+		print("standard crypto\n");
+		auto& k = keys().keyAreaKeys[masterKeyRev()][kaekIndex()];
+		Crypto crypto(k, sizeof(k), MBEDTLS_CIPHER_AES_128_ECB);
+		crypto.decrypt(&m_keys, &m_keys, sizeof(m_keys));
+		//crypto = aes128.AESECB(Keys.keyAreaKey(masterKeyRev(), self.keyIndex));
+	}
+	else
+	{
+		// needs ticket
+	}
+
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
 		key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
