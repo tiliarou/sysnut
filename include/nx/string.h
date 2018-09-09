@@ -19,3 +19,32 @@ public:
 	bool endsWith(string& s);
 private:
 };
+
+static char itohex(u8 nibble) {
+	if (nibble < 0xA)
+	{
+		return '0' + nibble;
+	}
+	else if (nibble < 0x10)
+	{
+		return 'a' + (nibble - 0xA);
+	}
+	return NULL;
+}
+
+template<class T>
+string hx(T& data)
+{
+	string result;
+	result.resize(sizeof(data) * 2);
+	result.resize(0);
+
+	u8* p = reinterpret_cast<u8*>(&data);
+	for (u32 i = 0; i < _MIN(sizeof(data), 0x100); i++)
+	{
+		result.push(itohex(p[i] >> 4));
+		result.push(itohex(p[i] & 0xF));
+	}
+	result.push(NULL);
+	return result;
+}

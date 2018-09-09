@@ -37,7 +37,7 @@ bool Cnmt::init()
 
 	for (auto& content : *this)
 	{
-		//print("content %x\n", content.record.contentType);
+		print("content %x, %s\n", content.record.contentType, hx(content.record.ncaId).c_str());
 	}
 
 	/*

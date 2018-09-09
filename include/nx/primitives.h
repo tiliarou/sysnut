@@ -11,6 +11,9 @@ typedef unsigned __int32  uint32_t;
 typedef unsigned __int64  uint64_t;
 */
 
+#define _MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define _MIN(x, y) (((x) < (y)) ? (x) : (y))
+
 typedef uint8_t u8;       ///<   8-bit unsigned integer.
 typedef uint16_t u16;     ///<  16-bit unsigned integer.
 typedef uint32_t u32;     ///<  32-bit unsigned integer.

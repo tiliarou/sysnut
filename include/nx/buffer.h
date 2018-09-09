@@ -123,7 +123,7 @@ public:
 		}
 		else
 		{
-			for (u64 i = end-1; i >= start; i--)
+			for (u64 i = end; i < start; i++)
 			{
 				m_buffer[i].~T();
 			}

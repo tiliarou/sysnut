@@ -148,6 +148,18 @@ static char hextoi(char c) {
 	return 0;
 }
 
+static char itohex(u8 nibble) {
+	if (nibble < 0xA)
+	{
+		return '0' + nibble;
+	}
+	else if (nibble < 0x10)
+	{
+		return 'a' + nibble;
+	}
+	return NULL;
+}
+
 template<class T>
 T* uhx(T& key, const char* hex, u64 len)
 {
