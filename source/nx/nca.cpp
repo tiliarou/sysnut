@@ -11,7 +11,7 @@ Nca::~Nca()
 {
 }
 
-sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer<u8>& _key)
+sptr<Fs> Nca::loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, integer<128>& _key)
 {
 	switch (fsHeader.fs_type)
 	{
@@ -71,6 +71,7 @@ bool Nca::open(string& path, char* mode)
 		auto& k = keys().keyAreaKey(masterKeyRev(), kaekIndex());
 		Crypto crypto(k, sizeof(k), MBEDTLS_CIPHER_AES_128_ECB);
 		crypto.decrypt(&m_keys, &m_keys, sizeof(m_keys));
+		key() = m_keys[2];
 	}
 	else
 	{
@@ -79,7 +80,7 @@ bool Nca::open(string& path, char* mode)
 
 	for (int i = 0; i < sizeof(fs_headers) / sizeof(nca_fs_header_t); i++)
 	{
-		key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
+		//key().set("\xb4\x4e\x36\xd7\xf7\xc4\x44\x81\xf8\x5d\x2b\x5b\x64\x87\xa8\x1f", 0x10);
 		auto d = loadFs(fs_headers[i], section_entries[i], key());
 
 		if (d)

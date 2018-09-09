@@ -3,6 +3,7 @@
 #include "nx/crypto.h"
 #include "nx/bufferedfile.h"
 #include "nx/directory.h"
+#include "nx/integer.h"
 
 typedef enum {
 	PARTITION_ROMFS = 0,
@@ -51,7 +52,7 @@ class Fs : public nca_fs_header_t, public nca_section_entry_t, public BufferedFi
 {
 public:
 	Fs();
-	Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
+	Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, integer<128>& _key);
 	virtual ~Fs();
 
 	virtual bool init();

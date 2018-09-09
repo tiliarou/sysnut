@@ -78,7 +78,7 @@ class Pfs0 : public Fs
 {
 public:
 	Pfs0();
-	Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
+	Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, integer<128>& _key);
 	virtual ~Pfs0();
 
 	virtual bool init();

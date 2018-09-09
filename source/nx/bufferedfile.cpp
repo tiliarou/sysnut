@@ -9,7 +9,7 @@ BufferedFile::~BufferedFile()
 {
 }
 
-bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer<u8>& key)
+bool BufferedFile::setCrypto(crypt_type_t cryptoType, integer<128>& key)
 {
 	crypto().type() = cryptoType;
 	crypto().key() = key;
@@ -18,11 +18,11 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, Buffer<u8>& key)
 	{
 		case CRYPT_CTR:
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_CTR);
-			crypto().setKey(key.buffer(), key.size());
+			crypto().setKey(&key, sizeof(key));
 			break;
 		case CRYPT_XTS:
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_XTS);
-			crypto().setKey(key.buffer(), key.size());
+			crypto().setKey(&key, sizeof(key));
 			break;
 		default:
 			error("Unknown crypto type: %x\n", crypto().type());

@@ -102,10 +102,10 @@ public:
 	bool open(string& path, char* mode = "rb") override;
 	virtual bool close() override;
 
-	Buffer<u8>& key() { return m_key; }
+	integer<128>& key() { return m_key; }
 
 private:
-	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
+	sptr<Fs> loadFs(nca_fs_header_t& fsHeader, nca_section_entry_t& sectionEntry, integer<128>& _key);
 	//sptr<Fs> fs[4];
-	Buffer<u8> m_key;
+	integer<128> m_key;
 };

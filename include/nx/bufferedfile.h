@@ -3,6 +3,7 @@
 #include "nx/file.h"
 #include "nx/buffer.h"
 #include "nx/crypto.h"
+#include "nx/integer.h"
 
 #define PAGE_ALIGNMENT 0x10000
 
@@ -30,10 +31,10 @@ class FileCrypto : public Crypto
 public:
 	FileCrypto();
 	crypt_type_t& type() { return m_type; }
-	Buffer<u8>& key() { return m_key; }
+	integer<128>& key() { return m_key; }
 private:
 	crypt_type_t m_type;
-	Buffer<u8> m_key;
+	integer<128> m_key;
 };
 
 class BufferedFile : public File
@@ -55,7 +56,7 @@ public:
 	u64& currentPosition() { return m_currentPosition; }
 
 	FileCrypto& crypto() { return m_crypto; }
-	bool setCrypto(crypt_type_t cryptoType, Buffer<u8>& key);
+	bool setCrypto(crypt_type_t cryptoType, integer<128>& key);
 	Page& page() { return m_page; }
 private:
 	Page m_page;
