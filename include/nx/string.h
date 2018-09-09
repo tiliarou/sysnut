@@ -1,5 +1,6 @@
 #pragma once
 #include "nx/buffer.h"
+#include "nx/primitives.h"
 
 class string : public Buffer<u8>
 {
@@ -13,21 +14,22 @@ public:
 	bool set(const void* src, u64 sz=0);
 	operator char*() const { return c_str(); }
 
-	const u64 length() const { return m_size ? m_size - 1 : 0; }
+	const u64 length() const { return _MIN(m_size ? m_size - 1 : 0, strlen((const char*)buffer())); }
 
 	bool startsWith(string& s);
 	bool endsWith(string& s);
 private:
 };
 
-static char itohex(u8 nibble) {
+static char itohex(u8 nibble, bool cap = false)
+{
 	if (nibble < 0xA)
 	{
 		return '0' + nibble;
 	}
 	else if (nibble < 0x10)
 	{
-		return 'a' + (nibble - 0xA);
+		return (cap?'A':'a') + (nibble - 0xA);
 	}
 	return NULL;
 }

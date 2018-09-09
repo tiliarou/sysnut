@@ -103,19 +103,16 @@ public:
 		parent() = pfs0;
 	}
 
-	virtual sptr<File> open()
-	{
-		sptr<File> f(new File());
-		u64 headerSize = parent()->header().size();
-		f->open2(parent()->ptr(), entry().offset + headerSize, entry().size);
-		f->path() = name();
-		return f;
-	}
-
 	const pfs0_file_entry_t& entry() const { return m_entry; }
 	Pfs0*& parent() { return m_parent; }
 
-private:
+protected:
+	virtual File* open()
+	{
+		u64 headerSize = parent()->header().size();
+		return File::factoryRawPtr(name(), parent()->ptr(), entry().offset + headerSize, entry().size);
+	}
+
 	pfs0_file_entry_t m_entry;
 	Pfs0* m_parent;
 };

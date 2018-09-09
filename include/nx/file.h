@@ -11,8 +11,28 @@ class File
 public:
 	File();
 	virtual ~File();
+
 	bool open(string& path, char* mode = "rb");
 	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
+
+	static sptr<File> factory(string& path, char* mode = "rb");
+	static sptr<File> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+
+	static File* factoryRawPtr(string& path, char* mode = "rb");
+	static File* factoryRawPtr(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+
+	template<class T = File>
+	static sptr<T> factory(string& path, char* mode = "rb")
+	{
+		return reinterpret_cast<T*>(_factory(path, mode));
+	}
+
+	template<class T = File>
+	static sptr<T> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0)
+	{
+		return reinterpret_cast<T*>(_factory(path, f, offset, sz));
+	}
+
 	virtual bool init();
 	virtual bool close();
 	virtual bool seek(u64 offset, int whence = 0);
@@ -40,6 +60,7 @@ public:
 	sptr<File>& ptr() { return m_ptr; }
 
 protected:
+
 	string m_path;
 	sptr<File> m_parent;
 	u64 m_partitionOffset = 0;

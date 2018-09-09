@@ -16,14 +16,20 @@ bool Directory::install()
 	for (auto& i : *cnmts)
 	{
 		Nca nca;
-		if (nca.open2(i->open()))
+		if (nca.open2(i->open<File>()))
 		{
-			for (const auto& pfs0 : nca.directories())
+			if (nca.directories().size() && nca.directories().first()->files().size())
 			{
-				Cnmt cnmt;
-				if (cnmt.open2(pfs0->files().first()->open()))
+				// cnmt nca's contain a single partition with a single file
+				auto cnmt = nca.directories().first()->files().first()->open<Cnmt>();
+				if (cnmt)
 				{
 					print("installing cnmt\n");
+
+					for (auto& content : *cnmt)
+					{
+						print("content %x, %s\n", content.record.contentType, hx(content.record.ncaId).c_str());
+					}
 				}
 				else
 				{

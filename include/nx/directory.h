@@ -23,9 +23,10 @@ public:
 	{
 	}
 
-	virtual sptr<File> open()
+	template<class T = File>
+	sptr<T> open()
 	{
-		return NULL;
+		return sptr<T>(reinterpret_cast<T*>(open()));
 	}
 	/*
 	template<class K = File>
@@ -42,6 +43,12 @@ public:
 	const u64& size() const { return m_size; }
 	u64& size() { return m_size; }
 protected:
+
+	virtual File* open()
+	{
+		return NULL;
+	}
+
 	string m_name;
 	u64 m_size;
 };

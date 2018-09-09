@@ -113,6 +113,7 @@
     <ClCompile Include="source\nx\directory.cpp" />
     <ClCompile Include="source\nx\diskfile.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
+    <ClCompile Include="source\nx\filefactory.cpp" />
     <ClCompile Include="source\nx\fs.cpp" />
     <ClCompile Include="source\nx\keys.cpp" />
     <ClCompile Include="source\nx\nca.cpp" />

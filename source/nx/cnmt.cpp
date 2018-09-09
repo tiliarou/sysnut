@@ -35,10 +35,10 @@ bool Cnmt::init()
 		return false;
 	}
 
-	for (auto& content : *this)
+	/*for (auto& content : *this)
 	{
 		print("content %x, %s\n", content.record.contentType, hx(content.record.ncaId).c_str());
-	}
+	}*/
 
 	/*
 	for (unsigned int i = 0; i < contentMetaHeader()->contentCount; i++)
