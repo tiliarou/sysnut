@@ -13,11 +13,6 @@ int main()
 {
 	Pfs0 nsp;
 	nsp.open(string("C:\\Users\\bwarner\\Desktop\\switch\\GUNBIRD2 for Nintendo Switch[0100BCB00AE98000][v0].nsp"));
-
-	for (auto& f : nsp.files())
-	{
-		print("file: %s\n", f->name().c_str());
-	}
 	
 	auto& fs = nsp.files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".xml")); });
 	for (auto& f : *fs)
