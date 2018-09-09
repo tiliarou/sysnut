@@ -21,11 +21,6 @@ int main()
 		sptr<File>& f = fe->open();
 		Cnmt c;
 		c.open2(f);
-		//f->rewind();
-		//f->read(data);
-		//p->rewind();
-		//p->read(data);
-		//data.dump();
 		print("fs\n");
 	}
 	//File* f = cnmt.open(0);

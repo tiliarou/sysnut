@@ -1,6 +1,10 @@
 #include "nx/pfs0.h"
 #include "log.h"
 
+Pfs0::Pfs0() : Fs()
+{
+}
+
 Pfs0::Pfs0(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key) : Fs(header, sectionEntry, _key)
 {
 }

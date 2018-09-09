@@ -1,6 +1,10 @@
 #include "nx/fs.h"
 #include "log.h"
 
+Fs::Fs() : BufferedFile(), Directory(), nca_fs_header_t(), nca_section_entry_t()
+{
+}
+
 Fs::Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key) : BufferedFile(), Directory()
 {
 	memcpy(dynamic_cast<nca_fs_header_t*>(this), &header, sizeof(header));

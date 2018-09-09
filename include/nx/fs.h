@@ -14,8 +14,10 @@ typedef enum {
 	FS_TYPE_ROMFS = 3
 } section_fs_type_t;
 
-/* NCA FS header. */
-typedef struct {
+
+class nca_fs_header_t
+{
+public:
 	u8 _0x0;
 	u8 _0x1;
 	u8 partition_type;
@@ -37,7 +39,7 @@ typedef struct {
 		};
 	};
 	u8 _0x148[0xB8]; /* Padding. */
-} nca_fs_header_t;
+};
 
 typedef struct {
 	uint32_t media_start_offset;
@@ -48,6 +50,7 @@ typedef struct {
 class Fs : public nca_fs_header_t, public nca_section_entry_t, public BufferedFile, public Directory
 {
 public:
+	Fs();
 	Fs(nca_fs_header_t& header, nca_section_entry_t& sectionEntry, Buffer<u8>& _key);
 	virtual ~Fs();
 
