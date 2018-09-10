@@ -1,13 +1,15 @@
+#include "nut.h"
 #include "nx/ipc/ncm_ext.h"
 
-#include <string.h>
-#include <switch/arm/atomics.h>
 
 static Service g_ncmSrv;
 static u64 g_ncmRefCnt;
 
 Result ncmextInitialize(void) 
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     Result rc;
     atomicIncrement64(&g_ncmRefCnt);
 
@@ -20,25 +22,31 @@ Result ncmextInitialize(void)
         smAddOverrideHandle(smEncodeName("ncm"), g_ncmSrv.handle);
 
     return rc;
+#endif
 }
 
 void ncmextExit(void) {
+#ifndef _MSC_VER
     if (atomicDecrement64(&g_ncmRefCnt) == 0) 
     {
         serviceClose(&g_ncmSrv);
     }
+#endif
 }
 
-Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId, const NcmNcaId* registeredId, u64 size)
+Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, const NcaId* registeredId, u64 size)
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     IpcCommand c;
     ipcInitialize(&c);
     
     struct {
         u64 magic;
         u64 cmd_id;
-        NcmNcaId placeholder_id;
-        NcmNcaId registered_id;
+        NcaId placeholder_id;
+        NcaId registered_id;
         u64 size;
     } *raw;
     
@@ -46,8 +54,8 @@ Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 1;
     raw->size = size;
-    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcmNcaId));
-    memcpy(&raw->registered_id, registeredId, sizeof(NcmNcaId));
+    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcaId));
+    memcpy(&raw->registered_id, registeredId, sizeof(NcaId));
     
     Result rc = serviceIpcDispatch(&cs->s);
 
@@ -64,23 +72,27 @@ Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId
     }
     
     return rc;
+#endif
 }
 
-Result ncmDeletePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId)
+Result ncmDeletePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId)
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     IpcCommand c;
     ipcInitialize(&c);
     
     struct {
         u64 magic;
         u64 cmd_id;
-        NcmNcaId placeholder_id;
+        NcaId placeholder_id;
     } *raw;
     
     raw = ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 2;
-    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcmNcaId));
+    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcaId));
     
     Result rc = serviceIpcDispatch(&cs->s);
 
@@ -97,10 +109,14 @@ Result ncmDeletePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId
     }
     
     return rc;
+#endif
 }
 
-Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId, u64 offset, void* buffer, size_t bufSize)
+Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, u64 offset, void* buffer, size_t bufSize)
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, buffer, bufSize, BufferType_Normal);
@@ -108,7 +124,7 @@ Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId,
     struct {
         u64 magic;
         u64 cmd_id;
-        NcmNcaId placeholder_id;
+        NcaId placeholder_id;
         u64 offset;
     } *raw;
     
@@ -116,7 +132,7 @@ Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId,
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 4;
     raw->offset = offset;
-    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcmNcaId));
+    memcpy(&raw->placeholder_id, placeholderId, sizeof(NcaId));
     
     Result rc = serviceIpcDispatch(&cs->s);
 
@@ -133,23 +149,27 @@ Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcmNcaId* placeholderId,
     }
     
     return rc;
+#endif
 }
 
-Result ncmDelete(NcmContentStorage* cs, const NcmNcaId* registeredId)
+Result ncmDelete(NcmContentStorage* cs, const NcaId* registeredId)
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     IpcCommand c;
     ipcInitialize(&c);
     
     struct {
         u64 magic;
         u64 cmd_id;
-        NcmNcaId placeholder_id;
+        NcaId placeholder_id;
     } *raw;
     
     raw = ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 6;
-    memcpy(&raw->placeholder_id, registeredId, sizeof(NcmNcaId));
+    memcpy(&raw->placeholder_id, registeredId, sizeof(NcaId));
     
     Result rc = serviceIpcDispatch(&cs->s);
 
@@ -166,10 +186,14 @@ Result ncmDelete(NcmContentStorage* cs, const NcmNcaId* registeredId)
     }
     
     return rc;
+#endif
 }
 
 Result ncmContentMetaDatabaseGetSize(NcmContentMetaDatabase* db, const NcmMetaRecord *record, u64* sizeOut) 
 {
+#ifdef _MSC_VER
+	return 0;
+#else
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -204,4 +228,5 @@ Result ncmContentMetaDatabaseGetSize(NcmContentMetaDatabase* db, const NcmMetaRe
     }
     
     return rc;
+#endif
 }

@@ -42,7 +42,32 @@ typedef void(*VoidFn)(void);       ///< Function without arguments nor return va
 #endif
 
 #define INVALID_HANDLE ((Handle) 0)
+
+enum FsStorageId
+{
+	FsStorageId_None = 0,
+	FsStorageId_Host = 1,
+	FsStorageId_GameCard = 2,
+	FsStorageId_NandSystem = 3,
+	FsStorageId_NandUser = 4,
+	FsStorageId_SdCard = 5
+};
+
+struct NcmMetaRecord
+{
+	u64 titleId;
+	u32 version;
+	u8  type;
+	u8  flags;
+	u8  padding[2];
+};
+
+typedef u32 NcmContentStorage;
+typedef u32 NcmContentMetaDatabase;
+typedef u32 Service;
+
 #else
 #include <switch.h>
+#include <switch/arm/atomics.h>
 #define closesocket close
 #endif

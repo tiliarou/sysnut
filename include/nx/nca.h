@@ -85,14 +85,6 @@ enum nca_version {
 	NCAVERSION_NCA3
 };
 
-class NcaId
-{
-public:
-
-private:
-	u8 m_buffer[0x10];
-};
-
 class Nca : public BufferedFile, public nca_header_t, public Directory
 {
 public:

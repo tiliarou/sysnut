@@ -16,6 +16,7 @@ typedef unsigned __int64  uint64_t;
 
 template <typename T> const char* mapTypeExtension();
 
+#ifdef _MSC_VER
 typedef uint8_t u8;       ///<   8-bit unsigned integer.
 typedef uint16_t u16;     ///<  16-bit unsigned integer.
 typedef uint32_t u32;     ///<  32-bit unsigned integer.
@@ -39,6 +40,9 @@ typedef volatile s16 vs16;   ///<  16-bit volatile signed integer.
 typedef volatile s32 vs32;   ///<  32-bit volatile signed integer.
 typedef volatile s64 vs64;   ///<  64-bit volatile signed integer.
 							 //typedef volatile s128 vs128; ///< 128-bit volatile signed integer.
+#endif
 
 typedef u32 Handle;                 ///< Kernel object handle.
 typedef u32 Result;                 ///< Function error code result type.
+
+#define NcaId integer<128>

@@ -4,6 +4,7 @@
 #include "nx/string.h"
 #include "nx/file.h"
 #include "nx/nca.h"
+#include "nx/primitives.h"
 
 #define MAX_CNMT_SIZE 0x4000
 
