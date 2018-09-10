@@ -1,5 +1,6 @@
 #include "nx/directory.h"
 #include "nx/cnmt.h"
+#include "nx/contentstorage.h"
 
 Directory::Directory()
 {
@@ -9,9 +10,12 @@ Directory::~Directory()
 {
 }
 
+//auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
+
 bool Directory::install()
 {
-	//auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
+	ContentStorage storage(FsStorageId_SdCard);
+
 	auto& cnmts = files().find(".cnmt.nca");
 
 	for (auto& i : *cnmts)
@@ -38,6 +42,15 @@ bool Directory::install()
 							error("could not find file! %s\n", ncaFile);
 							goto skip;
 						}
+
+						storage.deletePlaceholder(content.record.ncaId);
+						//storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size);
+
+						// write stuff
+
+						storage.reg(content.record.ncaId, content.record.ncaId);
+
+						storage.deletePlaceholder(content.record.ncaId);
 					}
 				}
 				else
