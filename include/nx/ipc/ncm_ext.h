@@ -1,5 +1,6 @@
 #pragma once
 
+#include "nut.h"
 #include "nx/primitives.h"
 #include "nx/integer.h"
 

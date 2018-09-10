@@ -36,13 +36,13 @@ static char itohex(u8 nibble, bool cap = false)
 }
 
 template<class T>
-string hx(T& data)
+string hx(const T& data)
 {
 	string result;
 	result.resize(sizeof(data) * 2);
 	result.resize(0);
 
-	u8* p = reinterpret_cast<u8*>(&data);
+	const u8* p = reinterpret_cast<const u8*>(&data);
 	for (u32 i = 0; i < _MIN(sizeof(data), 0x100); i++)
 	{
 		result.push(itohex(p[i] >> 4));
