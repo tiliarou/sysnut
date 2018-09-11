@@ -112,8 +112,8 @@ bool Install::install()
 		}
 
 		//auto& nca = files().open<Nca>(ncaFile);
-		Nca* nca;
-		rightsIds.push(nca->rightsId());
+		//Nca* nca;
+		//rightsIds.push(nca->rightsId());
 	}
 
 	// sanity check, make sure the cert and tik are available for all titleRights enabled NCA's slated to be installed
@@ -140,8 +140,8 @@ bool Install::install()
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
 		//auto& nca = files().open<Nca>(ncaFile);
-		Nca* nca;
-		rightsIds.push(nca->rightsId());
+		//Nca* nca;
+		//rightsIds.push(nca->rightsId());
 
 		storage.deletePlaceholder(content.record.ncaId);
 		//storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size);
