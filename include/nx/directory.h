@@ -89,6 +89,8 @@ public:
 private:
 };
 
+class Cnmt;
+
 class Directory
 {
 public:
@@ -112,6 +114,7 @@ public:
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
 	bool install();
+	bool install(Cnmt* cnmt);
 protected:
 	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;

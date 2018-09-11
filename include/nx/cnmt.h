@@ -21,6 +21,25 @@ enum class ContentMetaType : u8
 	DELTA = 0x83
 };
 
+enum class ContentType : u8
+{
+	META = 0x0,
+	PROGRAM = 0x1,
+	DATA = 0x2,
+	CONTROL = 0x3,
+	HTML_DOCUMENT = 0x4,
+	LEGAL_INFORMATION = 0x5,
+	DELTA_FRAGMENT = 0x6
+};
+
+struct NcmContentMetaHeader
+{
+	u16 extendedHeaderSize;
+	u16 contentCount;
+	u16 contentMetaCount;
+	u16 padding;
+} PACKED;
+
 struct ContentMetaHeader
 {
 	u64 titleId;
@@ -62,9 +81,23 @@ struct AddOnContentMetaExtendedHeader
 
 struct ContentRecord
 {
+public:
+	u64 size()
+	{
+		u64 result = 0;
+		memcpy(&result, &m_size, sizeof(m_size));
+		return result;
+	}
+
+	u64 setSize(u64 val)
+	{
+		memcpy(&m_size, &val, sizeof(m_size));
+		return val;
+	}
+
 	NcaId ncaId;
-	u8 size[0x6];
-	u8 contentType;
+	u8 m_size[0x6];
+	ContentType contentType;
 	u8 unk;
 } PACKED;
 
@@ -94,10 +127,19 @@ public:
 	Buffer<u8>& buffer() { return m_buffer; }
 
 	ContentMetaHeader* contentMetaHeader() { return reinterpret_cast<ContentMetaHeader*>(buffer().buffer());  }
+	Buffer<u8> contentMetaHeaderEx();
 	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().c_str() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
 
 	HashedContentRecord* begin() { return hashedContentRecord(0); }
 	HashedContentRecord* end() { return hashedContentRecord(contentMetaHeader()->contentCount); }
+
+	Buffer<u8> ncmContentMeta();
+
+	template<class T = u8>
+	T* contentMetaHeaderEx()
+	{
+		return reinterpret_cast<T*>(buffer().buffer(sizeof(ContentMetaHeader)));
+	}
 private:
 	Buffer<u8> m_buffer;
 };

@@ -91,8 +91,14 @@ public:
 
 	operator const word*() const { return buffer; }
 	operator word*() { return buffer; }
+
+	/*
 	const word* operator &() const { return buffer; }
 	word* operator &() { return buffer; }
+
+	const integer<BITS>* operator &() const { return this; }
+	integer<BITS>* operator &() { return this; }
+	*/
 
 	const constexpr word& first() const { return *buffer; }
 	word& first() { return *buffer; }

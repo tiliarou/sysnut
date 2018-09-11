@@ -36,6 +36,11 @@ public:
 		set(src.buffer(), src.size());
 	}
 
+	Buffer(const void* src, u64 sz)
+	{
+		set(src, sz);
+	}
+
 	bool operator==(const Buffer<T>& src)
 	{
 		if (size() != src.size())
@@ -61,6 +66,34 @@ public:
 	T& operator[](u32 i)
 	{
 		return m_buffer[i];
+	}
+
+	template<class K>
+	Buffer<T>& operator+=(const K& v)
+	{
+		write<K>(v);
+		return *this;
+	}
+
+	template<class K>
+	u64 write(const Buffer<K>& v)
+	{		
+		const K* p = v.buffer();
+		for (size_t i = 0; i < v.size(); i++)
+		{
+			push(p[i]);
+		}
+	}
+
+	template<class K>
+	u64 write(const K& v)
+	{
+		const u8* p = reinterpret_cast<const u8*>(&v);
+		for (size_t i = 0; i < sizeof(v); i++)
+		{
+			push(p[i]);
+		}
+		return sizeof(v);
 	}
 
 	T& first()
@@ -173,6 +206,11 @@ public:
 
 		initializeItems(originalSize, newSize);
 		return true;
+	}
+
+	const T* buffer(u64 i)
+	{
+		return (T*)buffer() + i;
 	}
 
 	const T* buffer() const { return m_buffer; }
