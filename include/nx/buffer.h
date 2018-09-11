@@ -302,6 +302,16 @@ public:
 		debug("\n");
 	}
 
+	const T* begin() const
+	{
+		return &m_buffer[0];
+	}
+
+	const T* end() const
+	{
+		return &m_buffer[size()];
+	}
+
 	T* begin()
 	{
 		return &m_buffer[0];
