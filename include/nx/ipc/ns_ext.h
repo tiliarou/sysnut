@@ -1,7 +1,9 @@
 #pragma once
 
-#include <switch.h>
+#include "nut.h"
+#ifndef _MSC_VER
 #include <switch/services/ncm.h>
+#endif
 
 typedef struct {
     u64 titleID;

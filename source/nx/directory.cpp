@@ -1,5 +1,6 @@
 #include "nx/directory.h"
 #include "nx/cnmt.h"
+#include "nx/ipc/ns_ext.h"
 #include "nx/contentstorage.h"
 
 Directory::Directory()
@@ -8,6 +9,61 @@ Directory::Directory()
 
 Directory::~Directory()
 {
+}
+
+bool Directory::installApplicationRecord(const ContentStorage* storage, const Cnmt* cnmt)
+{
+	TitleId baseId = cnmt->contentMetaHeader()->titleId.baseId();
+	Result rc = 0;
+	Buffer<ContentStorageRecord> storageRecords;
+	u32 contentMetaCount = 0;
+
+	// 0x410: The record doesn't already exist
+
+	if ((rc = nsCountApplicationContentMeta(baseId, &contentMetaCount)) && rc != 0x410)
+	{
+		error("Failed to count application content meta\n");
+		return false;
+	}
+
+	rc = 0;
+
+	if (contentMetaCount > 0)
+	{
+		storageRecords.resize(contentMetaCount);
+
+		size_t contentStorageBufSize = contentMetaCount * sizeof(ContentStorageRecord);
+		u32 entriesRead;
+
+		if (nsListApplicationRecordContentMeta(0, baseId, storageRecords.buffer(), storageRecords.sizeBytes(), &entriesRead))
+		{
+			error("Failed to list application record content meta\n");
+			return false;
+		}
+
+		if (entriesRead != storageRecords.size())
+		{
+			error("Mismatch between entries read and content meta count\n");
+			return false;
+		}
+	}
+
+	ContentStorageRecord storageRecord;
+	storageRecord.metaRecord = cnmt->contentMetaKey();
+	storageRecord.storageId = storage->storageId();
+
+	storageRecords.push(storageRecord);
+
+
+	nsDeleteApplicationRecord(baseId);
+
+	if (nsPushApplicationRecord(baseId, 0x3, storageRecords.buffer(), storageRecords.sizeBytes()))
+	{
+		error("Failed to push application record\n");
+		return false;
+	}
+
+	return true;
 }
 
 bool Directory::installContentMetaRecords(const Cnmt* cnmt, Buffer<u8>& installContentMetaBuf)

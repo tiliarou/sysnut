@@ -42,7 +42,7 @@ struct NcmContentMetaHeader
 
 struct ContentMetaHeader
 {
-	u64 titleId;
+	TitleId titleId;
 	u32 titleVersion;
 	ContentMetaType type;
 	u8 padding0;
@@ -59,7 +59,7 @@ static_assert(sizeof(ContentMetaHeader) == 0x20, "ContentMetaHeader must be 0x20
 
 struct ApplicationMetaExtendedHeader
 {
-	u64 patchTitleId;
+	TitleId patchTitleId;
 	u32 requiredSystemVersion;
 	u32 padding;
 } PACKED;

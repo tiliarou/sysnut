@@ -23,4 +23,9 @@ class ContentStorage final
         bool reg(const NcaId& placeholderId, const NcaId &registeredId);
         bool del(const NcaId& registeredId);
         string getPath(const NcaId &registeredId);
+
+		const FsStorageId& storageId() const { return m_storageId; }
+		FsStorageId& storageId() { return m_storageId; }
+private:
+	FsStorageId m_storageId;
 };

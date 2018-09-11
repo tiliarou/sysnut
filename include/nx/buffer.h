@@ -219,6 +219,8 @@ public:
 	const u64 size() const { return m_size; }
 	u64& size() { return m_size;  }
 
+	const u64 sizeBytes() const { return size() * sizeof(T); }
+
 	const u64& bufferSize() const { return m_bufferSize; }
 	u64& bufferSize() { return m_bufferSize; }
 

@@ -1,8 +1,9 @@
 #include "nx/ipc/ns_ext.h"
 
-#include <stdio.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <switch/arm/atomics.h>
+#endif
 
 static Service g_nsAppManSrv, g_nsGetterSrv;
 static u64 g_nsRefCnt;
@@ -13,6 +14,7 @@ Result nsextInitialize(void)
 {
     Result rc=0;
 
+#ifndef _MSC_VER
     atomicIncrement64(&g_nsRefCnt);
 
     if (serviceIsActive(&g_nsGetterSrv) || serviceIsActive(&g_nsAppManSrv))
@@ -27,21 +29,25 @@ Result nsextInitialize(void)
     rc = _nsGetInterface(&g_nsAppManSrv, 7996);
 
     if (R_FAILED(rc)) serviceClose(&g_nsGetterSrv);
-
+#endif
     return rc;
 }
 
-void nsextExit(void)
+void nsextExit()
 {
+#ifndef _MSC_VER
     if (atomicDecrement64(&g_nsRefCnt) == 0) {
         serviceClose(&g_nsAppManSrv);
         if(!kernelAbove300()) return;
 
         serviceClose(&g_nsGetterSrv);
     }
+#endif
 }
 
-static Result _nsGetInterface(Service* srv_out, u64 cmd_id) {
+static Result _nsGetInterface(Service* srv_out, u64 cmd_id)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -74,10 +80,14 @@ static Result _nsGetInterface(Service* srv_out, u64 cmd_id) {
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsListApplicationRecord(u64 offset, void *out_buf, size_t out_buf_size, u32 *entries_read_out)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, out_buf, out_buf_size, 0);
@@ -114,10 +124,14 @@ Result nsListApplicationRecord(u64 offset, void *out_buf, size_t out_buf_size, u
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsPushApplicationRecord(u64 title_id, u8 last_modified_event, ContentStorageRecord *content_records_buf, size_t buf_size)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, content_records_buf, buf_size, 0);
@@ -151,10 +165,14 @@ Result nsPushApplicationRecord(u64 title_id, u8 last_modified_event, ContentStor
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsCalculateApplicationOccupiedSize(u64 titleID, void *out_buf)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -189,10 +207,14 @@ Result nsCalculateApplicationOccupiedSize(u64 titleID, void *out_buf)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsListApplicationRecordContentMeta(u64 offset, u64 titleID, void *out_buf, size_t out_buf_size, u32 *entries_read_out)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, out_buf, out_buf_size, 0);
@@ -231,10 +253,14 @@ Result nsListApplicationRecordContentMeta(u64 offset, u64 titleID, void *out_buf
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsTouchApplication(u64 titleID)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -265,10 +291,14 @@ Result nsTouchApplication(u64 titleID)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsDeleteApplicationRecord(u64 titleID)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -299,10 +329,14 @@ Result nsDeleteApplicationRecord(u64 titleID)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsLaunchApplication(u64 titleID)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -332,10 +366,14 @@ Result nsLaunchApplication(u64 titleID)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsPushLaunchVersion(u64 titleID, u32 version)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -368,10 +406,14 @@ Result nsPushLaunchVersion(u64 titleID, u32 version)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsCheckApplicationLaunchVersion(u64 titleID)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -401,10 +443,14 @@ Result nsCheckApplicationLaunchVersion(u64 titleID)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsCountApplicationContentMeta(u64 titleId, u32* countOut)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -439,10 +485,14 @@ Result nsCountApplicationContentMeta(u64 titleId, u32* countOut)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsGetContentMetaStorage(const NcmMetaRecord *record, u8 *out)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -477,9 +527,14 @@ Result nsGetContentMetaStorage(const NcmMetaRecord *record, u8 *out)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId) {
+Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -514,9 +569,14 @@ Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId) {
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result nsInvalidateAllApplicationControlCache(void) {
+Result nsInvalidateAllApplicationControlCache(void)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -545,9 +605,14 @@ Result nsInvalidateAllApplicationControlCache(void) {
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result nsInvalidateApplicationControlCache(u64 tid) {
+Result nsInvalidateApplicationControlCache(u64 tid)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -578,10 +643,14 @@ Result nsInvalidateApplicationControlCache(u64 tid) {
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsCheckApplicationLaunchRights(u64 tid)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -612,9 +681,13 @@ Result nsCheckApplicationLaunchRights(u64 tid)
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsGetApplicationContentPath(u64 tid, u8 type, char *out, size_t buf_size) {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, out, buf_size, 0);
@@ -649,10 +722,14 @@ Result nsGetApplicationContentPath(u64 tid, u8 type, char *out, size_t buf_size)
     }
 
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsDisableApplicationAutoUpdate(u64 titleID)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -682,10 +759,14 @@ Result nsDisableApplicationAutoUpdate(u64 titleID)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result nsWithdrawApplicationUpdateRequest(u64 titleId)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -715,4 +796,7 @@ Result nsWithdrawApplicationUpdateRequest(u64 titleId)
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }

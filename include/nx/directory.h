@@ -90,6 +90,7 @@ private:
 };
 
 class Cnmt;
+class ContentStorage;
 
 class Directory
 {
@@ -116,6 +117,7 @@ public:
 	bool install();
 	bool install(Cnmt* cnmt);
 	bool installContentMetaRecords(const Cnmt* cnmt, Buffer<u8>& installContentMetaBuf);
+	bool installApplicationRecord(const ContentStorage* storage, const Cnmt* cnmt);
 protected:
 	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;

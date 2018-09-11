@@ -46,3 +46,41 @@ typedef u32 Handle;                 ///< Kernel object handle.
 typedef u32 Result;                 ///< Function error code result type.
 
 #define NcaId integer<128>
+
+class TitleId
+{
+public:
+	TitleId() : id(0)
+	{
+	}
+
+	TitleId(const u64 src) : id(src)
+	{
+	}
+
+	operator u64() const
+	{
+		return id;
+	}
+
+	TitleId baseId() const
+	{
+		return id & 0xFFFFFFFFFFFFE000;
+	}
+
+	TitleId updateId() const
+	{
+		if (isDlc())
+		{
+			return 0;
+		}
+		return (id & 0xFFFFFFFFFFFFF000) + 0x800;
+	}
+
+	bool isDlc() const
+	{
+		return (id & 0xFFFFFFFFFFFFEFFF) != id;
+	}
+
+	u64 id;
+};

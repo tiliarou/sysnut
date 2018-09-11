@@ -3,10 +3,11 @@
 #include "log.h"
 
 
-ContentStorage::ContentStorage(FsStorageId storageId) 
+ContentStorage::ContentStorage(FsStorageId _storageId) 
 {
+	storageId() = _storageId;
 #ifndef _MSC_VER
-	if (ncmOpenContentStorage(storageId, &m_contentStorage))
+	if (ncmOpenContentStorage(_storageId, &m_contentStorage))
 	{
 		error("Failed to open NCM ContentStorage\n");
 	}
