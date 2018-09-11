@@ -55,6 +55,11 @@ enum FsStorageId
 
 struct NcmMetaRecord
 {
+public:
+	NcmMetaRecord() : titleId(0), version(0), type(0), flags(0)
+	{
+		padding[0] = padding[1] = 0;
+	}
 	u64 titleId;
 	u32 version;
 	u8  type;

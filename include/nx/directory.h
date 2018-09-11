@@ -115,6 +115,7 @@ public:
 
 	bool install();
 	bool install(Cnmt* cnmt);
+	bool installContentMetaRecords(const Cnmt* cnmt, Buffer<u8>& installContentMetaBuf);
 protected:
 	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;

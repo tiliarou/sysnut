@@ -124,8 +124,11 @@ public:
 	~Cnmt();
 
 	bool init() override;
+
+	const Buffer<u8>& buffer() const { return m_buffer; }
 	Buffer<u8>& buffer() { return m_buffer; }
 
+	const ContentMetaHeader* contentMetaHeader() const { return reinterpret_cast<const ContentMetaHeader*>(buffer().buffer()); }
 	ContentMetaHeader* contentMetaHeader() { return reinterpret_cast<ContentMetaHeader*>(buffer().buffer());  }
 	Buffer<u8> contentMetaHeaderEx();
 	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().c_str() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
@@ -134,6 +137,8 @@ public:
 	HashedContentRecord* end() { return hashedContentRecord(contentMetaHeader()->contentCount); }
 
 	Buffer<u8> ncmContentMeta();
+
+	NcmMetaRecord contentMetaKey() const;
 
 	template<class T = u8>
 	T* contentMetaHeaderEx()

@@ -59,6 +59,15 @@ Buffer<u8> Cnmt::contentMetaHeaderEx()
 	return Buffer<u8>(reinterpret_cast<u8*>(buffer().buffer() + sizeof(ContentMetaHeader)), contentMetaHeader()->extendedHeaderSize);
 }
 
+NcmMetaRecord Cnmt::contentMetaKey() const
+{
+	NcmMetaRecord r;
+	r.titleId = contentMetaHeader()->titleId;
+	r.version = contentMetaHeader()->titleVersion;
+	r.type = (u8)contentMetaHeader()->type;
+	return r;
+}
+
 Buffer<u8> Cnmt::ncmContentMeta()
 {
 	Buffer<u8> buf;

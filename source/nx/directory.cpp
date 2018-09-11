@@ -10,6 +10,36 @@ Directory::~Directory()
 {
 }
 
+bool Directory::installContentMetaRecords(const Cnmt* cnmt, Buffer<u8>& installContentMetaBuf)
+{
+	NcmContentMetaDatabase contentMetaDatabase;
+	NcmMetaRecord contentMetaKey = cnmt->contentMetaKey();
+
+#ifndef _MSC_VER
+	if (ncmOpenContentMetaDatabase(m_destStorageId, &contentMetaDatabase))
+	{
+		error"Failed to open content meta database\n");
+		return false;
+	}
+
+	if (ncmContentMetaDatabaseSet(&contentMetaDatabase, &contentMetaKey, installContentMetaBuf.GetSize(), (NcmContentMetaRecordsHeader*)installContentMetaBuf.GetData()))
+	{
+		error("Failed to set content records\n");
+		serviceClose(&contentMetaDatabase.s);
+		return false;
+	}
+
+	if (ncmContentMetaDatabaseCommit(&contentMetaDatabase))
+	{
+		error("Failed to commit content records");
+		serviceClose(&contentMetaDatabase.s);
+		return false;
+	}
+#endif
+	return true;
+
+}
+
 //auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
 
 bool Directory::install(Cnmt* cnmt)
@@ -71,15 +101,15 @@ bool Directory::install(Cnmt* cnmt)
 		storage.deletePlaceholder(content.record.ncaId);
 	}
 
-	/*
-	m_contentMeta.GetInstallContentMeta(installContentMetaBuf, cnmtContentRecord, m_ignoreReqFirmVersion);
+	if (!installContentMetaRecords(cnmt, cnmt->ncmContentMeta()))
+	{
+		error("Failed to install content meta records!\n");
+		return false;
+	}
 
-	InstallContentMetaRecords(installContentMetaBuf);
-	InstallApplicationRecord();
+	//InstallApplicationRecord();
 
-	InstallTicketCert();
-	*/
-
+	//InstallTicketCert();
 
 	return true;
 }
