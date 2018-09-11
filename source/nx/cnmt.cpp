@@ -35,22 +35,6 @@ bool Cnmt::init()
 		return false;
 	}
 
-	/*for (auto& content : *this)
-	{
-		print("content %x, %s\n", content.record.contentType, hx(content.record.ncaId).c_str());
-	}*/
-
-	/*
-	for (unsigned int i = 0; i < contentMetaHeader()->contentCount; i++)
-	{
-		HashedContentRecord* record = this->hashedContentRecord(i);
-
-		// Don't install delta fragments. Even patches don't seem to install them.
-		if (record->record.contentType <= 5)
-			m_contentRecords.push_back(hashedContentRecord.record);
-	}
-	*/
-
 	return true;
 }
 

@@ -92,8 +92,6 @@ bool Install::installContentMetaRecords(Buffer<u8>& installContentMetaBuf)
 
 }
 
-//auto& cnmts = files().where([](sptr<FileEntry>& f) -> bool {return f->name().endsWith(string(".cnmt.nca")); });
-
 bool Install::install()
 {
 	Array<integer<128>> rightsIds;
@@ -112,11 +110,9 @@ bool Install::install()
 		}
 
 		//auto& nca = files().open<Nca>(ncaFile);
-		//Nca* nca;
 		//rightsIds.push(nca->rightsId());
 	}
 
-	// sanity check, make sure the cert and tik are available for all titleRights enabled NCA's slated to be installed
 	for (auto& rightsId : rightsIds)
 	{
 		string ticketFile = hx(rightsId) + ".tik";
@@ -140,7 +136,6 @@ bool Install::install()
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
 		//auto& nca = files().open<Nca>(ncaFile);
-		//Nca* nca;
 		//rightsIds.push(nca->rightsId());
 
 		storage.deletePlaceholder(content.record.ncaId);
