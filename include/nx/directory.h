@@ -111,6 +111,19 @@ public:
 			});
 	}
 
+	template<class T>
+	sptr<T> openFile(string name)
+	{
+		for (auto& f : files())
+		{
+			if (f->name() == name)
+			{
+				return f->open<T>();
+			}
+		}
+		return NULL;
+	}
+
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 

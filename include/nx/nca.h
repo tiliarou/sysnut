@@ -24,7 +24,7 @@ class nca_header_t
 {
 public:
 	u64& titleId() { return m_titleId; }
-	integer<128>& rightsId() { return m_rightsId; }
+	RightsId& rightsId() { return m_rightsId; }
 	u8& cryptoType() { return m_cryptoType; }
 	u8& cryptoType2() { return m_cryptoType2; }
 	u8& kaekIndex() { return m_kaekIndex; }
@@ -60,7 +60,7 @@ public:
 	};
 	u8 m_cryptoType2; /* Which keyblob (field 2) */
 	u8 _0x221[0xF]; /* Padding. */
-	integer<128> m_rightsId; /* Rights ID (for titlekey crypto). */
+	RightsId m_rightsId; /* Rights ID (for titlekey crypto). */
 	nca_section_entry_t section_entries[4]; /* Section entry metadata. */
 	integer<256> section_hashes[4]; /* SHA-256 hashes for each section header. */
 	integer<128> m_keys[4]; /* Encrypted key area. */

@@ -54,7 +54,7 @@ bool Nca::init()
 		return false;
 	}
 
-	if (rightsId() == integer<128>(0))
+	if (rightsId().titleId() == 0)
 	{
 		// standard crypto
 		auto& k = keys().keyAreaKey(masterKeyRev(), kaekIndex());

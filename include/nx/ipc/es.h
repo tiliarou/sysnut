@@ -1,10 +1,7 @@
 #pragma once
 
-#include <switch.h>
-
-typedef struct {
-    u8 c[0x10];
-} RightsId;
+#include "nut.h"
+#include "nx/primitives.h"
 
 Result esInitialize();
 void esExit();

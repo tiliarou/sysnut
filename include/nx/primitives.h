@@ -84,3 +84,21 @@ public:
 
 	u64 id;
 };
+
+class RightsId
+{
+public:
+	RightsId() : m_titleId(0), m_masterKeyRev(0)
+	{
+	}
+
+	const TitleId& titleId() const { return m_titleId; }
+	TitleId& titleId() { return m_titleId; }
+
+	const u64& masterKeyRev() const { return m_masterKeyRev; }
+	u64& masterKeyRev() { return m_masterKeyRev; }
+
+private:
+	TitleId m_titleId;
+	u64 m_masterKeyRev;
+};
