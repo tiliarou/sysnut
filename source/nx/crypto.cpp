@@ -38,11 +38,10 @@ bool Crypto::setMode(aes_mode_t mode)
 	return true;
 }
 
-bool Crypto::setCounter(const u8* counter, u32 sz)
+bool Crypto::setCounter(const AesCtr ctr)
 {
-	memset(this->counter, 0, sizeof(this->counter));
-	memcpy(this->counter, counter, sz);
-	return setIv(this->counter, sizeof(this->counter));
+	counter = ctr;
+	return setIv(&counter, sizeof(counter));
 }
 
 
@@ -62,15 +61,23 @@ bool Crypto::setIv(const void *iv, size_t l)
     }
 	return true;
 }
-
-const u8* Crypto::updateCounter(u64 ofs)
+/*
+u64 swapEndian(u64 s)
 {
-	ofs >>= 4;
-	for (unsigned int j = 0; j < 0x8; j++) {
-		counter[0x10 - j - 1] = (unsigned char)(ofs & 0xFF);
-		ofs >>= 8;
+	u64 result;
+	u8* dest = (u8*)&result;
+	u8* src = (u8*)&s;
+	for (unsigned int i = 0; i < sizeof(s); i++)
+	{
+		dest[i] = src[sizeof(s) - i - 1];
 	}
-	setIv(counter, sizeof(counter));
+	return result;
+}*/
+
+const AesCtr& Crypto::updateCounter(u64 ofs)
+{
+	counter.low() = swapEndian(ofs >> 4);
+	setIv(&counter, sizeof(counter));
 	return counter;
 }
 

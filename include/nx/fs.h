@@ -33,7 +33,7 @@ public:
 		bktr_superblock_t bktr_superblock;
 	};*/
 	union {
-		u8 section_ctr[0x8];
+		u64 section_ctr;
 		struct {
 			uint32_t section_ctr_low;
 			uint32_t section_ctr_high;

@@ -14,6 +14,19 @@
 
 #define Array Buffer
 
+template<class T>
+T swapEndian(T s)
+{
+	T result;
+	u8* dest = (u8*)&result;
+	u8* src = (u8*)&s;
+	for (unsigned int i = 0; i < sizeof(s); i++)
+	{
+		dest[i] = src[sizeof(s) - i - 1];
+	}
+	return result;
+}
+
 template<class T=u8, unsigned int BUFFER_ALIGN = 0xFF>
 class Buffer
 {
