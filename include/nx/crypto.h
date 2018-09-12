@@ -20,7 +20,7 @@ public:
 	{
 	}
 
-	AesCtr(u64 iv) : m_high(iv), m_low(0)
+	AesCtr(u64 iv) : m_high(swapEndian(iv)), m_low(0)
 	{
 	}
 
