@@ -20,9 +20,9 @@ bool Fs::init()
 		return false;
 	}
 
-	if (crypto().key() != integer<128>(0))
+	if (crypt_type != CRYPT_NONE && crypto().key() != integer<128>(0))
 	{
-		setCrypto(this->crypt_type, crypto().key());
+		setCrypto(crypt_type, crypto().key());
 		//print("setting iv: %d\n", sizeof(section_ctr));
 		crypto().setCounter(section_ctr, sizeof(section_ctr));
 	}

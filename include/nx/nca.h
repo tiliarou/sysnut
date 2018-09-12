@@ -23,7 +23,7 @@ typedef struct {
 class nca_header_t
 {
 public:
-	u64& titleId() { return m_titleId; }
+	TitleId& titleId() { return m_titleId; }
 	RightsId& rightsId() { return m_rightsId; }
 	u8& cryptoType() { return m_cryptoType; }
 	u8& cryptoType2() { return m_cryptoType2; }
@@ -47,7 +47,7 @@ public:
 	u8 m_cryptoType; /* Which keyblob (field 1) */
 	u8 m_kaekIndex; /* Which kaek index? */
 	u64 nca_size; /* Entire archive size. */
-	u64 m_titleId;
+	TitleId m_titleId;
 	u8 _0x218[0x4]; /* Padding. */
 	union {
 		uint32_t sdk_version; /* What SDK was this built with? */

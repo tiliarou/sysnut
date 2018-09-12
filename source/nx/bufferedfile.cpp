@@ -24,6 +24,8 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, integer<128>& key)
 			crypto().setMode(MBEDTLS_CIPHER_AES_128_XTS);
 			crypto().setKey(&key, sizeof(key));
 			break;
+		case CRYPT_NONE:
+			break;
 		default:
 			error("Unknown crypto type: %x\n", crypto().type());
 	}

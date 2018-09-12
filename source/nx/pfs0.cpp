@@ -17,6 +17,7 @@ bool Pfs0::init()
 	{
 		return false;
 	}
+	rewind();
 
 	if (!read(m_header, sizeof(pfs0_header_t)))
 	{

@@ -109,8 +109,11 @@ bool Install::install()
 			return false;
 		}
 
-		//auto& nca = dir->openFile<Nca>(ncaFile);
-		//rightsIds.push(nca->rightsId());
+		auto& nca = dir->openFile<Nca>(ncaFile);
+		if (nca->rightsId().titleId() || nca->rightsId().masterKeyRev())
+		{
+			rightsIds.push(nca->rightsId());
+		}
 	}
 
 	for (auto& rightsId : rightsIds)
