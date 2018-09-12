@@ -136,10 +136,11 @@ bool Page::load(BufferedFile* f, u64 offset, u64 sz)
 	id() = offset / PAGE_ALIGNMENT;
 	u64 lastPage = (offset + sz) / PAGE_ALIGNMENT + 1;
 	u64 pageSize = (lastPage - id()) * PAGE_ALIGNMENT;
-	if (pageOffset() + pageSize > size())
+
+	/*if (pageOffset() + pageSize > size())
 	{
 		pageSize = size() - pageOffset();
-	}
+	}*/
 
 	f->seekThrough(pageOffset());
 	u64 r = f->readThrough(*this, pageSize);

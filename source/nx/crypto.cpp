@@ -57,7 +57,7 @@ bool Crypto::setIv(const void *iv, size_t l)
 	int r1=0, r2 = 0;
     if ((r1=mbedtls_cipher_set_iv(&cipherDec, (const unsigned char*)iv, l)) || (r2=mbedtls_cipher_set_iv(&cipherEnc, (const unsigned char*)iv, l)))
 	{
-		fatal("Failed to set IV for AES context! %d, %d, %x, %d, %x, %x\n", r1, r2, iv, l, &cipherEnc, cipherEnc.cipher_info->iv_size);
+		fatal("Failed to set IV for AES context! %d, %d, %x, %d, %x, %x\n", r1, r2, iv, l, &cipherEnc, cipherEnc.cipher_info ? cipherEnc.cipher_info->iv_size : 0);
 		return false;
     }
 	return true;
