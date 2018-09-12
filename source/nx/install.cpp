@@ -138,9 +138,6 @@ bool Install::install()
 	{
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
-		//auto& nca = dir->openFile<Nca>(ncaFile);
-		//rightsIds.push(nca->rightsId());
-
 		storage.deletePlaceholder(content.record.ncaId);
 		//storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size);
 
