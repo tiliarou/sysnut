@@ -1,6 +1,6 @@
 #include "nx/sddirectory.h"
 #ifdef _MSC_VER
-#include "dirent.h"
+#include "win_dirent.h"
 #else
 #include <dirent.h>
 #endif
@@ -32,7 +32,8 @@ DirectoryFiles& SdDirectory::files()
 		{
 			continue;
 		}
-		print("file %s\n", de->d_name);
+		sptr<FileEntry> fe(new FileEntry(de->d_name, 0));
+		m_files.push(fe);
 	}
 	closedir(dr);
 	return m_files;

@@ -13,7 +13,10 @@
 #include "nx/string.h"
 #include "nx/pfs0.h"
 #include "log.h"
+#include "nx/sddirectory.h"
 #include "CustomUI.h"
+
+SdDirectory dir("/");
 
 extern "C" {
 	void userAppInit(void);
@@ -135,17 +138,23 @@ void guiThread(void* p = NULL)
 }
 
 
-static CustomUI::Page page1("Page 1");
-static CustomUI::Page page2("Page 2");
+static CustomUI::Page page1("SD");
+static CustomUI::Page page2("NUT");
+static CustomUI::Page page3("CDN");
 
 static string text1 = "Sample";
 
-void page1render()
+void page2render()
 {
-	page1.renderText(text1, 20, 20, { 0, 0, 255, 255 }, 50);
+	u32 i = 0;
+	auto nsps = dir.files().find(".nsp");
+	for (auto& f : *nsps)
+	{
+		page1.renderText(f->name(), 20, 20 + i++ * 50, { 0, 0, 255, 255 }, 50);
+	}
 }
 
-void page2render()
+void page1render()
 {
 	page1.renderText("Text 2!", 30, 30, { 255, 0, 255, 255 }, 50);
 }
@@ -155,7 +164,7 @@ int main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 
-	CustomUI::init("Sample title", "Test footer", CustomUI::HorizonDark());
+	CustomUI::init("Deez Title Installer", "Lorem Ipsum", CustomUI::HorizonDark());
 
 	page1.onRender(page1render);
 	page2.onRender(page2render);
@@ -187,9 +196,8 @@ int main(int argc, char **argv)
 	while(appletMainLoop())
     {
 		CustomUI::flushGraphics();
-        hidScanInput();
 
-        u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
+        u64 kDown = CustomUI::PressedInput;
 
         if (kDown & KEY_PLUS)
 		{

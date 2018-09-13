@@ -226,12 +226,12 @@ namespace CustomUI
         HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
         PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
         ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
-        if(PressedInput & KEY_LSTICK_UP)
+        if(PressedInput & (KEY_LSTICK_UP | KEY_DUP))
         {
             if(spage > 0) spage--;
             else spage = pages.size() - 1;
         }
-        else if(PressedInput & KEY_LSTICK_DOWN)
+        else if(PressedInput & (KEY_LSTICK_DOWN | KEY_DDOWN))
         {
             if(spage < pages.size() - 1) spage++;
             else spage = 0;
