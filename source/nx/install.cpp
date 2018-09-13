@@ -95,7 +95,6 @@ bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 bool Install::install()
 {
 	Array<RightsId> rightsIds;
-	ContentStorage storage(FsStorageId_SdCard);
 	print("installing cnmt\n");
 
 	for (auto& content : *cnmt)

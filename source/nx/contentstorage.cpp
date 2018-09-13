@@ -9,7 +9,11 @@ ContentStorage::ContentStorage(FsStorageId _storageId)
 #ifndef _MSC_VER
 	if (ncmOpenContentStorage(_storageId, &m_contentStorage))
 	{
-		error("Failed to open NCM ContentStorage\n");
+		error("Failed to open NCM ContentStorage %d\n", storageId());
+	}
+	else
+	{
+		debug("Opened NCM ContentStorage %d\n", storageId());
 	}
 #endif
 }

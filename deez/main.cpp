@@ -14,13 +14,15 @@
 #include "nx/pfs0.h"
 #include "log.h"
 
+void userAppInit(void);
+void userAppExit(void);
+
 
 #define SOCK_BUFFERSIZE 16384
 
-void __appInit(void)
+void userAppInit(void)
 {
 	Result rc;
-	svcSleepThread(10000000000L);
 
 	rc = smInitialize();
 	if (R_FAILED(rc))
@@ -69,7 +71,7 @@ void __appInit(void)
 		fatalSimple(0xBEE6);
 }
 
-void __appExit(void)
+void userAppExit(void)
 {
 	nifmExit();
 	ncmextExit();
@@ -134,7 +136,7 @@ int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
-	
+
 	gfxInitDefault();
 	consoleInit(NULL);
 	print("Deez initializing\n");
