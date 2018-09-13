@@ -2,6 +2,7 @@
 #include "nx/string.h"
 #include "nx/buffer.h"
 #include "nx/sptr.h"
+#include "nx/integer.h"
 #include <stdio.h>
 
 #define MAX_FILE_CHILDREN 0x10
@@ -20,6 +21,8 @@ public:
 
 	static File* factoryRawPtr(string& path, const char* mode = "rb");
 	static File* factoryRawPtr(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+
+	integer<256> sha256();
 
 	template<class T = File>
 	static sptr<T> factory(string& path, char* mode = "rb")

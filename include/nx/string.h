@@ -22,18 +22,9 @@ public:
 private:
 };
 
-static char itohex(u8 nibble, bool cap = false)
-{
-	if (nibble < 0xA)
-	{
-		return '0' + nibble;
-	}
-	else if (nibble < 0x10)
-	{
-		return (cap?'A':'a') + (nibble - 0xA);
-	}
-	return '\0';
-}
+int ishex(char c);
+char hextoi(char c);
+char itohex(u8 nibble, bool cap = false);
 
 template<class T>
 string hx(const T& data)
@@ -51,3 +42,5 @@ string hx(const T& data)
 	result.push('\0');
 	return result;
 }
+
+Buffer<u8> uhx(string hex);

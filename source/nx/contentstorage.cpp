@@ -90,6 +90,20 @@ bool ContentStorage::del(const NcaId &registeredId)
 	return true;
 }
 
+bool ContentStorage::has(const NcaId &registeredId)
+{
+#ifndef _MSC_VER
+	bool hasNCA = false;
+	if (ncmContentStorageHas(&m_contentStorage, (const NcmNcaId*)&registeredId, &hasNCA))
+	{
+		error("Failed to check if NCA is present");
+	}
+	return hasNCA;
+#else
+	return false;
+#endif
+}
+
 string ContentStorage::getPath(const NcaId& registeredId)
 {
 #ifndef _MSC_VER

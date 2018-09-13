@@ -6,15 +6,18 @@
 class cnmt;
 class storage;
 class dir;
+class Nca;
 
 class Install
 {
 public:
-	Install(Directory* dir, Cnmt* cnmt);
+	Install(Directory* dir, Nca* cnmtNca, Cnmt* cnmt);
 	bool install();
+	bool installNca(File* nca, NcaId ncaId);
 	bool installContentMetaRecords(Buffer<u8> installContentMetaBuf);
 	bool installApplicationRecord();
 private:
+	Nca* cnmtNca;
 	Cnmt* cnmt;
 	ContentStorage storage;
 	Directory* dir;

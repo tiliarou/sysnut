@@ -96,3 +96,74 @@ bool string::endsWith(string s)
 
 	return true;
 }
+
+int ishex(char c)
+{
+	if ('a' <= c && c <= 'f') return 1;
+	if ('A' <= c && c <= 'F') return 1;
+	if ('0' <= c && c <= '9') return 1;
+	return 0;
+}
+
+char hextoi(char c)
+{
+	if ('a' <= c && c <= 'f') return c - 'a' + 0xA;
+	if ('A' <= c && c <= 'F') return c - 'A' + 0xA;
+	if ('0' <= c && c <= '9') return c - '0';
+	return 0;
+}
+
+char itohex(u8 nibble, bool cap)
+{
+	if (nibble < 0xA)
+	{
+		return '0' + nibble;
+	}
+	else if (nibble < 0x10)
+	{
+		return (cap ? 'A' : 'a') + (nibble - 0xA);
+	}
+	return '\0';
+}
+
+Buffer<u8> uhx(string hex)
+{
+	Buffer<u8> key;
+	u32 len = 0;
+
+	for (u32 i = 0; i < hex.size(); i++)
+	{
+		if (!ishex(hex[i]))
+		{
+			break;
+		}
+		len++;
+	}
+
+	if (!len)
+	{
+		return key;
+	}
+
+	if (len % 2)
+	{
+		error("Hex string (%s) must be an even number of characters!\n", hex, len);
+		return key;
+	}
+	key.resize(len >> 1);
+	memset(key.buffer(), 0, (size_t)key.size());
+	u8* ptr = key.buffer();
+
+	for (unsigned int i = 0; i < len; i++)
+	{
+		char val = hextoi(hex[i]);
+
+		if ((i & 1) == 0)
+		{
+			val <<= 4;
+		}
+		ptr[i >> 1] |= val;
+	}
+
+	return key;
+}

@@ -62,8 +62,16 @@ Buffer<u8> Cnmt::ncmContentMeta()
 	header.contentMetaCount = contentMetaHeader()->contentMetaCount;
 	header.padding = 0;
 
+	Buffer<u8> sep;
+	sep.push(0xFE);
+	sep.push(0xFE);
+	sep.push(0xFE);
+	sep.push(0xFE);
+
 	buf += header;
+	buf += sep;
 	buf += contentMetaHeaderEx();
+	buf += sep;
 
 	ContentRecord cnmtContentRecord;
 	cnmtContentRecord.contentType = ContentType::META;
@@ -72,10 +80,12 @@ Buffer<u8> Cnmt::ncmContentMeta()
 	cnmtContentRecord.unk = 0;
 
 	buf += cnmtContentRecord;
+	buf += sep;
 
 	for (auto& record : *this)
 	{
 		buf += record.record;
+		buf += sep;
 	}
 
 	if (contentMetaHeader()->type == ContentMetaType::PATCH)

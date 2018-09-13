@@ -22,6 +22,7 @@ class ContentStorage final
         bool writePlaceholder(const NcaId &placeholderId, u64 offset, void *buffer, size_t bufSize);
         bool reg(const NcaId& placeholderId, const NcaId &registeredId);
         bool del(const NcaId& registeredId);
+		bool has(const NcaId &registeredId);
         string getPath(const NcaId &registeredId);
 
 		const FsStorageId& storageId() const { return m_storageId; }

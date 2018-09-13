@@ -106,6 +106,7 @@
     <ClCompile Include="source\mbedtls\cipher.c" />
     <ClCompile Include="source\mbedtls\cipher_wrap.c" />
     <ClCompile Include="source\mbedtls\platform_util.c" />
+    <ClCompile Include="source\mbedtls\sha256.c" />
     <ClCompile Include="source\nx\bufferedfile.cpp" />
     <ClCompile Include="source\nx\crypto.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />

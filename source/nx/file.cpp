@@ -2,6 +2,7 @@
 #include "log.h"
 #include "nx/file.h"
 #include "nx/diskfile.h"
+#include "mbedtls/sha256.h"
 
 void nullDeleter(File*) {}
 
@@ -219,4 +220,33 @@ bool File::unregisterChild(File* child)
 
 void File::onChildless()
 {
+}
+
+integer<256> File::sha256()
+{
+	integer<256> result(0);
+
+	if (!isOpen())
+	{
+		return result;
+	}
+
+	mbedtls_sha256_context ctx;
+	mbedtls_sha256_init(&ctx);
+
+	Buffer<u8> buffer;
+
+	rewind();
+
+	const u64 chunkSize = 0x100000;
+
+	while (read(buffer, chunkSize))
+	{
+		mbedtls_sha256_update(&ctx, buffer.buffer(), buffer.size());
+	}
+
+	mbedtls_sha256_finish(&ctx, (u8*)&result);
+
+	mbedtls_sha256_free(&ctx);
+	return result;
 }

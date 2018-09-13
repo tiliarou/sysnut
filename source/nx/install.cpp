@@ -2,10 +2,11 @@
 #include "nx/directory.h"
 #include "nx/ipc/es.h"
 
-Install::Install(Directory* dir, Cnmt* cnmt)
+Install::Install(Directory* dir, Nca* cnmtNca, Cnmt* cnmt)
 {
 	this->dir = dir;
 	this->cnmt = cnmt;
+	this->cnmtNca = cnmtNca;
 }
 
 bool Install::installApplicationRecord()
@@ -87,9 +88,51 @@ bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 		serviceClose(&contentMetaDatabase.s);
 		return false;
 	}
+#else
+	FILE* f = fopen("installContentMeta.bin", "wb+");
+	if (f)
+	{
+		fwrite(installContentMetaBuf.buffer(), 1, installContentMetaBuf.size(), f);
+		fclose(f);
+	}
 #endif
 	return true;
 
+}
+
+bool Install::installNca(File* nca, NcaId ncaId)
+{
+	Buffer<u8> buffer;
+	const u64 chunkSize = 0x100000;
+	string ncaFile = hx(ncaId) + ".nca";
+
+	storage.deletePlaceholder(ncaId);
+	storage.createPlaceholder(ncaId, ncaId, nca->size());
+
+	print("writing %s ", nca->path().c_str());
+	u64 i = 0;
+
+	nca->rewind();
+
+	while (nca->read(buffer, chunkSize))
+	{
+		print(".");
+		storage.writePlaceholder(ncaId, i, buffer.buffer(), buffer.size());
+		i += buffer.size();
+	}
+	print("fin\n");
+
+	if (!storage.reg(ncaId, ncaId))
+	{
+		error("Failed to register %s\n", ncaFile.c_str());
+		return false;
+	}
+
+#ifndef _MSC_VER
+	storage.deletePlaceholder(ncaId);
+#endif
+
+	return true;
 }
 
 bool Install::install()
@@ -137,29 +180,28 @@ bool Install::install()
 	{
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
-		storage.deletePlaceholder(content.record.ncaId);
-		storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size());
-
 		const u64 chunkSize = 0x100000;
 		auto nca = dir->openFile<File>(ncaFile);
 		Buffer<u8> buffer;
 
-		nca->rewind();
-		print("writing %s ", ncaFile.c_str());
-		u64 i = 0;
-		while (nca->read(buffer, chunkSize))
+		if (storage.has(content.record.ncaId))
 		{
-			print(".");
-			storage.writePlaceholder(content.record.ncaId, i, buffer.buffer(), buffer.size());
-			i += buffer.size();
+			print("already installed, skipping %s\n", ncaFile.c_str());
 		}
-		print("fin\n");
+		else
+		{
+			if (!installNca(nca.get(), content.record.ncaId))
+			{
+				return false;
+			}
+		}
+	}
 
-		storage.reg(content.record.ncaId, content.record.ncaId);
+	auto hash = uhx(cnmtNca->path());
 
-#ifndef _MSC_VER
-		storage.deletePlaceholder(content.record.ncaId);
-#endif
+	if (!installNca((File*)cnmtNca, *reinterpret_cast<integer<128>*>(hash.buffer())))
+	{
+		error("Failed to install cnmt!\n");
 	}
 
 	if (!installContentMetaRecords(cnmt->ncmContentMeta()))

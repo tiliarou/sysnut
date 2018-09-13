@@ -85,22 +85,27 @@ public:
 		return m_buffer[i];
 	}
 
-	template<class K>
-	Buffer<T>& operator+=(const K& v)
+	u64 writeBuffer(const Buffer<T>& v)
 	{
-		write<K>(v);
-		return *this;
-	}
-
-	template<class K>
-	u64 write(const Buffer<K>& v)
-	{		
-		const K* p = v.buffer();
+		const T* p = v.buffer();
 		for (size_t i = 0; i < v.size(); i++)
 		{
 			push(p[i]);
 		}
 		return v.size();
+	}
+
+	Buffer<T>& operator+=(const Buffer<T>& v)
+	{
+		writeBuffer(v);
+		return *this;
+	}
+
+	template<class K>
+	Buffer<T>& operator+=(const K& v)
+	{
+		write<K>(v);
+		return *this;
 	}
 
 	template<class K>

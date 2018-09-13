@@ -139,20 +139,6 @@ static int getKv(FILE *f, char **key, char **value)
 #undef SKIP_SPACE
 }
 
-static int ishex(char c) {
-	if ('a' <= c && c <= 'f') return 1;
-	if ('A' <= c && c <= 'F') return 1;
-	if ('0' <= c && c <= '9') return 1;
-	return 0;
-}
-
-static char hextoi(char c) {
-	if ('a' <= c && c <= 'f') return c - 'a' + 0xA;
-	if ('A' <= c && c <= 'F') return c - 'A' + 0xA;
-	if ('0' <= c && c <= '9') return c - '0';
-	return 0;
-}
-
 template<class T>
 T* uhx(T& key, const char* hex, u64 len)
 {

@@ -29,7 +29,7 @@ bool Directory::install()
 				auto cnmt = nca->directories().first()->files().first()->open<Cnmt>();
 				if (cnmt)
 				{
-					Install install(this, cnmt.get());
+					Install install(this, nca.get(), cnmt.get());
 					install.install();
 				}
 				else
