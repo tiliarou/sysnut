@@ -149,7 +149,6 @@ bool Install::install()
 	for (auto& content : *cnmt)
 	{
 		string ncaFile = hx(content.record.ncaId) + ".nca";
-		print("content %x, %s\n", content.record.contentType, ncaFile.c_str());
 
 		if (!dir->files().contains(ncaFile))
 		{

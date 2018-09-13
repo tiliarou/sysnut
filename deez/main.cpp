@@ -124,7 +124,6 @@ void network_post_exit(void)
 void guiThread(void* p = NULL)
 {
 	(void)p;
-	print("Gui Thread created\n");
 
 	Pfs0 nsp;
 	string name("/gunbird.nsp");
