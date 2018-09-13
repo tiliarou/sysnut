@@ -131,22 +131,7 @@ bool Install::install()
 			error("could not find cert! %s\n", ticketFile);
 			return false;
 		}
-
-		auto ticket = dir->openFile<File>(ticketFile);
-		auto cert = dir->openFile<File>(certFile);
-
-		Buffer<u8> ticketBuffer, certBuffer;
-		ticket->read(ticketBuffer);
-		cert->read(certBuffer);
-
-		/*if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
-		{
-			error("Failed to import ticket\n");
-			return false;
-		}*/
 	}
-
-	return true;
 
 	for (auto& content : *cnmt)
 	{
@@ -155,11 +140,26 @@ bool Install::install()
 		storage.deletePlaceholder(content.record.ncaId);
 		storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size());
 
-		// write stuff
+		const u64 chunkSize = 0x100000;
+		auto nca = dir->openFile<File>(ncaFile);
+		Buffer<u8> buffer;
+
+		nca->rewind();
+		print("writing %s ", ncaFile.c_str());
+		u64 i = 0;
+		while (nca->read(buffer, chunkSize))
+		{
+			print(".");
+			storage.writePlaceholder(content.record.ncaId, i, buffer.buffer(), buffer.size());
+			i += buffer.size();
+		}
+		print("fin\n");
 
 		storage.reg(content.record.ncaId, content.record.ncaId);
 
+#ifndef _MSC_VER
 		storage.deletePlaceholder(content.record.ncaId);
+#endif
 	}
 
 	if (!installContentMetaRecords(cnmt->ncmContentMeta()))
@@ -168,9 +168,34 @@ bool Install::install()
 		return false;
 	}
 
-	installApplicationRecord();
+	if (!installApplicationRecord())
+	{
+		error("Failed to install application record\n");
+		return false;
+	}
 
-	//InstallTicketCert();
+	for (auto& rightsId : rightsIds)
+	{
+		string ticketFile = hx(rightsId) + ".tik";
+		string certFile = hx(rightsId) + ".cert";
+
+		auto ticket = dir->openFile<File>(ticketFile);
+		auto cert = dir->openFile<File>(certFile);
+
+		Buffer<u8> ticketBuffer, certBuffer;
+		ticket->read(ticketBuffer);
+		cert->read(certBuffer);
+
+		if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
+		{
+			error("Failed to import ticket %s\n", ticketFile.c_str());
+			return false;
+		}
+		else
+		{
+			print("Imported %s\n", ticketFile.c_str());
+		}
+	}
 
 	return true;
 }

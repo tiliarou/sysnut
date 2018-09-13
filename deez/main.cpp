@@ -14,8 +14,10 @@
 #include "nx/pfs0.h"
 #include "log.h"
 
-void userAppInit(void);
-void userAppExit(void);
+extern "C" {
+	void userAppInit(void);
+	void userAppExit(void);
+}
 
 
 #define SOCK_BUFFERSIZE 16384

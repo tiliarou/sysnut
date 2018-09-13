@@ -11,10 +11,6 @@ ContentStorage::ContentStorage(FsStorageId _storageId)
 	{
 		error("Failed to open NCM ContentStorage %d\n", storageId());
 	}
-	else
-	{
-		debug("Opened NCM ContentStorage %d\n", storageId());
-	}
 #endif
 }
 
@@ -45,6 +41,9 @@ bool ContentStorage::deletePlaceholder(const NcaId &placeholderId)
 		error("Failed to delete placeholder\n");
 		return false;
 	}
+#else
+	string ncaFile = hx(placeholderId) + ".nca";
+	unlink(ncaFile.c_str());
 #endif
 	return true;
 }
@@ -57,6 +56,12 @@ bool ContentStorage::writePlaceholder(const NcaId &placeholderId, u64 offset, vo
 		error("Failed to write to placeholder\n");
 		return false;
 	}
+#else
+	string ncaFile = hx(placeholderId) + ".nca";
+	FILE* f = fopen(ncaFile.c_str(), "ab");
+	fseek(f, offset, 0);
+	fwrite(buffer, 1, bufSize, f);
+	fclose(f);
 #endif
 	return true;
 }
