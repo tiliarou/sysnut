@@ -123,12 +123,14 @@
     <ClCompile Include="source\nx\nca.cpp" />
     <ClCompile Include="source\nx\contentstorage.cpp" />
     <ClCompile Include="source\nx\pfs0.cpp" />
+    <ClCompile Include="source\nx\sddirectory.cpp" />
     <ClCompile Include="source\nx\string.cpp" />
     <ClCompile Include="source\server.cpp" />
     <ClCompile Include="source\socket.cpp" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\CustomUI.h" />
     <ClInclude Include="include\debug.h" />
     <ClInclude Include="include\log.h" />
     <ClInclude Include="include\mbedtls\config.h" />
@@ -155,6 +157,7 @@
     <ClInclude Include="include\nx\fs.h" />
     <ClInclude Include="include\nx\pfs0.h" />
     <ClInclude Include="include\nx\primitives.h" />
+    <ClInclude Include="include\nx\sddirectory.h" />
     <ClInclude Include="include\nx\sptr.h" />
     <ClInclude Include="include\nx\uptr.h" />
     <ClInclude Include="include\nx\string.h" />

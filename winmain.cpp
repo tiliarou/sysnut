@@ -4,6 +4,7 @@
 #include "nx/crypto.h"
 #include "log.h"
 #include "nx/integer.h"
+#include "nx/sddirectory.h"
 
 bool appletMainLoop()
 {
@@ -12,6 +13,10 @@ bool appletMainLoop()
 
 int main()
 {
+	SdDirectory dir(".");
+	for (auto& f : dir.files())
+	{
+	}
 	/*Nca cnmt;
 	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
 	Buffer<u8> data;

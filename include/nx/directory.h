@@ -99,7 +99,7 @@ public:
 	Directory();
 	virtual ~Directory();
 
-	virtual const DirectoryFiles& files() const { return m_files; };
+	//virtual const DirectoryFiles& files() const { return m_files; };
 	virtual DirectoryFiles& files() { return m_files; };
 
 	template<class T>
@@ -129,8 +129,11 @@ public:
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
+	string& dirPath() { return m_dirPath; }
+
 	bool install();
 protected:
+	string m_dirPath;
 	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;
 };

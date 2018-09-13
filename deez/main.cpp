@@ -13,6 +13,7 @@
 #include "nx/string.h"
 #include "nx/pfs0.h"
 #include "log.h"
+#include "CustomUI.h"
 
 extern "C" {
 	void userAppInit(void);
@@ -133,13 +134,35 @@ void guiThread(void* p = NULL)
 	}
 }
 
+
+static CustomUI::Page page1("Page 1");
+static CustomUI::Page page2("Page 2");
+
+static string text1 = "Sample";
+
+void page1render()
+{
+	page1.renderText(text1, 20, 20, { 0, 0, 255, 255 }, 50);
+}
+
+void page2render()
+{
+	page1.renderText("Text 2!", 30, 30, { 255, 0, 255, 255 }, 50);
+}
+
 int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
 
-	gfxInitDefault();
-	consoleInit(NULL);
+	CustomUI::init("Sample title", "Test footer", CustomUI::HorizonDark());
+
+	page1.onRender(page1render);
+	page2.onRender(page2render);
+
+	CustomUI::addPage(page1);
+	CustomUI::addPage(page2);
+
 	print("Deez initializing\n");
 
 	network_pre_init();
@@ -163,6 +186,7 @@ int main(int argc, char **argv)
 	
 	while(appletMainLoop())
     {
+		CustomUI::flushGraphics();
         hidScanInput();
 
         u64 kDown = hidKeysDown(CONTROLLER_P1_AUTO);
@@ -172,15 +196,16 @@ int main(int argc, char **argv)
 			break;
 		}
 
-        gfxFlushBuffers();
-        gfxSwapBuffers();
+		if (kDown & KEY_A)
+		{
+			text1 = "A pressed!";
+			CustomUI::renderGraphics();
+		}
     }
 
 	print("fin\n");
-
-    gfxExit();
 	
 	network_post_exit();
 
-	return 0;
+	CustomUI::exitApp();
 }
