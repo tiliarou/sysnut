@@ -106,6 +106,12 @@ bool Install::installNca(File* nca, NcaId ncaId)
 	const u64 chunkSize = 0x100000;
 	string ncaFile = hx(ncaId) + ".nca";
 
+	if (storage.has(ncaId))
+	{
+		print("already installed, skipping %s\n", ncaFile.c_str());
+		return true;
+	}
+
 	storage.deletePlaceholder(ncaId);
 	storage.createPlaceholder(ncaId, ncaId, nca->size());
 
@@ -180,21 +186,13 @@ bool Install::install()
 	{
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
-		const u64 chunkSize = 0x100000;
 		auto nca = dir->openFile<File>(ncaFile);
-		Buffer<u8> buffer;
 
-		if (storage.has(content.record.ncaId))
+		if (!installNca(nca.get(), content.record.ncaId))
 		{
-			print("already installed, skipping %s\n", ncaFile.c_str());
+			return false;
 		}
-		else
-		{
-			if (!installNca(nca.get(), content.record.ncaId))
-			{
-				return false;
-			}
-		}
+
 	}
 
 	auto hash = uhx(cnmtNca->path());
