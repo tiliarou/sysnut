@@ -100,6 +100,7 @@ public:
 		{
 			push(p[i]);
 		}
+		return v.size();
 	}
 
 	template<class K>
@@ -244,10 +245,10 @@ public:
 	const T* buffer() const { return m_buffer; }
 	T*& buffer() { return m_buffer; }
 
-	const u64 size() const { return m_size; }
+	u64 size() const { return m_size; }
 	u64& size() { return m_size;  }
 
-	const u64 sizeBytes() const { return size() * sizeof(T); }
+	u64 sizeBytes() const { return size() * sizeof(T); }
 
 	const u64& bufferSize() const { return m_bufferSize; }
 	u64& bufferSize() { return m_bufferSize; }
@@ -284,14 +285,14 @@ public:
 			return false;
 		}
 
-		free(buffer());
+		free((void*)buffer());
 		size() = 0;
 		bufferSize() = 0;
 		buffer() = NULL;
 		return true;
 	}
 
-	char* c_str(u64 i = 0) const
+	const char* c_str(u64 i = 0) const
 	{
 		if (!buffer())
 		{

@@ -1258,6 +1258,7 @@ public:
 	word buffer[BITS / 8 / sizeof(word)];
 } PACKED;
 
+/*
 template<size_t BITS, class T, class HT>
 class primitive
 {
@@ -1285,11 +1286,6 @@ public:
 		return swap > t;
 	}
 
-	/*bool addWithCarry(const integer<BITS>& n)
-	{
-		return false;
-	}*/
-
 	//operator const word*() const { return (const word*)&t; }
 	//operator word*() { return (word*)&t; }
 
@@ -1301,36 +1297,6 @@ public:
 	integer<BITS * 2> operator*(const T& s) const
 	{
 		return multiply(s);
-	}
-
-	integer<BITS * 2> multiplyOld(const T& s) const
-	{
-		integer<BITS * 2> result;
-		//HT* temp = (HT*)result.buffer;
-		/*HT* a = (HT*)&t;
-		HT* b = (HT*)&s;*/
-
-		const HT(&a)[2] = reinterpret_cast<const HT(&)[2]>(t);
-		const HT(&b)[2] = reinterpret_cast<const HT(&)[2]>(s);
-
-		for (int i = 0; i < 2; ++i)
-		{
-			for (int j = 0; j < 2; ++j)
-			{
-				T c = T(a[i]) * T(b[j]) + RB[i + j];
-
-				RB[i + j] = integer<BITS>(c).low();
-
-				HT swap = RB[i + j + 1];
-				RB[i + j + 1] += integer<BITS>(c).high();
-
-				if (swap > RB[i + j + 1])
-				{
-					RB[i + j + 2]++;
-				}
-			}
-		}
-		return result;
 	}
 
 	integer<BITS * 2> operator*(const integer<BITS>& b) const
@@ -1487,8 +1453,9 @@ public:
 
 	T t;
 } PACKED;
+*/
 
-
+/*
 template<>
 class integer<64> : public primitive<64, uint64, uint32>
 {
@@ -1532,7 +1499,7 @@ public:
 	operator uint8& () { return t; }
 	constexpr operator const uint8& () const { return t; }
 };
-
+*/
 template <size_t BITS, size_t PBITS>
 integer<PBITS> powmod(integer<BITS>& b, long exp, const integer<PBITS>& modulus)
 {

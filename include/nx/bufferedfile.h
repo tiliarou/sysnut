@@ -43,7 +43,7 @@ public:
 	BufferedFile();
 	virtual ~BufferedFile();
 
-	virtual bool open(string& path, char* mode = "rb");
+	virtual bool open(string& path, const char* mode = "rb");
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);
 	bool seekThrough(u64 offset, int whence = 0);

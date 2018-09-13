@@ -131,7 +131,7 @@ public:
 	const ContentMetaHeader* contentMetaHeader() const { return reinterpret_cast<const ContentMetaHeader*>(buffer().buffer()); }
 	ContentMetaHeader* contentMetaHeader() { return reinterpret_cast<ContentMetaHeader*>(buffer().buffer());  }
 	Buffer<u8> contentMetaHeaderEx();
-	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().c_str() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
+	HashedContentRecord* hashedContentRecord(u64 i) { return &(reinterpret_cast<HashedContentRecord*>(buffer().buffer() + sizeof(ContentMetaHeader) + contentMetaHeader()->extendedHeaderSize)[i]);  }
 
 	HashedContentRecord* begin() { return hashedContentRecord(0); }
 	HashedContentRecord* end() { return hashedContentRecord(contentMetaHeader()->contentCount); }

@@ -108,7 +108,8 @@ public:
 		return files().where(
 			[](sptr<FileEntry>& f) -> bool
 			{
-				return f->name().endsWith(string(mapTypeExtension<T>()));
+				string ext(mapTypeExtension<T>());
+				return f->name().endsWith(ext);
 			});
 	}
 

@@ -118,7 +118,7 @@ u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 	buffer.resize(sz);
 
 	u64 r;
-	r = fread(buffer.c_str(), 1, (size_t)sz, f);
+	r = fread(buffer.buffer(), 1, (size_t)sz, f);
 	return r;
 }
 

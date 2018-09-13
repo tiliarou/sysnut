@@ -11,6 +11,10 @@ typedef unsigned __int32  uint32_t;
 typedef unsigned __int64  uint64_t;
 */
 
+#ifdef _MSC_VER
+#define PACKED
+#endif
+
 #define _MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define _MIN(x, y) (((x) < (y)) ? (x) : (y))
 
@@ -83,7 +87,7 @@ public:
 	}
 
 	u64 id;
-};
+} PACKED;
 
 class RightsId
 {
@@ -95,10 +99,10 @@ public:
 	const TitleId& titleId() const { return m_titleId; }
 	TitleId& titleId() { return m_titleId; }
 
-	const u64& masterKeyRev() const { return m_masterKeyRev; }
-	u64& masterKeyRev() { return m_masterKeyRev; }
+	u64 masterKeyRev() const { return m_masterKeyRev; }
+	void setMasterKeyRev(u64 val) { m_masterKeyRev = val; }
 
 private:
 	TitleId m_titleId;
 	u64 m_masterKeyRev;
-};
+}  PACKED;

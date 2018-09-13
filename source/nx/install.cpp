@@ -29,7 +29,6 @@ bool Install::installApplicationRecord()
 	{
 		storageRecords.resize(contentMetaCount);
 
-		size_t contentStorageBufSize = contentMetaCount * sizeof(ContentStorageRecord);
 		u32 entriesRead;
 
 		if (nsListApplicationRecordContentMeta(0, baseId, storageRecords.buffer(), storageRecords.sizeBytes(), &entriesRead))
@@ -63,19 +62,19 @@ bool Install::installApplicationRecord()
 	return true;
 }
 
-bool Install::installContentMetaRecords(Buffer<u8>& installContentMetaBuf)
+bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 {
 	NcmContentMetaDatabase contentMetaDatabase;
 	NcmMetaRecord contentMetaKey = cnmt->contentMetaKey();
 
 #ifndef _MSC_VER
-	if (ncmOpenContentMetaDatabase(m_destStorageId, &contentMetaDatabase))
+	if (ncmOpenContentMetaDatabase(storage.storageId(), &contentMetaDatabase))
 	{
-		error"Failed to open content meta database\n");
+		error("Failed to open content meta database\n");
 		return false;
 	}
 
-	if (ncmContentMetaDatabaseSet(&contentMetaDatabase, &contentMetaKey, installContentMetaBuf.GetSize(), (NcmContentMetaRecordsHeader*)installContentMetaBuf.GetData()))
+	if (ncmContentMetaDatabaseSet(&contentMetaDatabase, &contentMetaKey, installContentMetaBuf.size(), (NcmContentMetaRecordsHeader*)installContentMetaBuf.buffer()))
 	{
 		error("Failed to set content records\n");
 		serviceClose(&contentMetaDatabase.s);
@@ -110,7 +109,7 @@ bool Install::install()
 			return false;
 		}
 
-		auto& nca = dir->openFile<Nca>(ncaFile);
+		auto nca = dir->openFile<Nca>(ncaFile);
 		if (nca->rightsId().titleId() || nca->rightsId().masterKeyRev())
 		{
 			rightsIds.push(nca->rightsId());

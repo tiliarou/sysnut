@@ -12,7 +12,7 @@ class Install
 public:
 	Install(Directory* dir, Cnmt* cnmt);
 	bool install();
-	bool installContentMetaRecords(Buffer<u8>& installContentMetaBuf);
+	bool installContentMetaRecords(Buffer<u8> installContentMetaBuf);
 	bool installApplicationRecord();
 private:
 	Cnmt* cnmt;

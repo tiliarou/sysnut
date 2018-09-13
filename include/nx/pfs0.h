@@ -41,7 +41,7 @@ public:
 		string s;
 		const char* cstr = stringTable() + entry->string_table_offset;
 
-		while(sz && cstr[sz - 1] == NULL)
+		while(sz && cstr[sz - 1] == '\0')
 		{
 			sz--;
 		}

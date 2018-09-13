@@ -12,10 +12,10 @@ public:
 
 	~string();
 	bool set(const void* src, u64 sz=0);
-	operator char*() const { return c_str(); }
+	operator const char*() const { return c_str(); }
 	string operator+(const char* s);
 
-	const u64 length() const { return _MIN(m_size ? m_size - 1 : 0, strlen((const char*)buffer())); }
+	u64 length() const { return _MIN(m_size ? m_size - 1 : 0, strlen((const char*)buffer())); }
 
 	bool startsWith(string& s);
 	bool endsWith(string& s);
@@ -48,6 +48,6 @@ string hx(const T& data)
 		result.push(itohex(p[i] >> 4));
 		result.push(itohex(p[i] & 0xF));
 	}
-	result.push(NULL);
+	result.push('\0');
 	return result;
 }

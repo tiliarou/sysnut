@@ -32,7 +32,7 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, integer<128>& key)
 	return true;
 }
 
-bool BufferedFile::open(string& path, char* mode)
+bool BufferedFile::open(string& path, const char* mode)
 {
 	return File::open(path, mode);
 }
@@ -44,7 +44,18 @@ bool BufferedFile::close()
 
 bool BufferedFile::seek(u64 offset, int whence)
 {
-	currentPosition() = offset;
+	switch (whence)
+	{
+		case SEEK_SET:
+			currentPosition() = offset;
+		case SEEK_CUR:
+			currentPosition() += offset;
+		case SEEK_END:
+			currentPosition() = size() - offset;
+		default:
+			return false;
+	}
+
 	if (crypto().type() == CRYPT_CTR)
 	{
 		crypto().updateCounter(currentPosition() + partitionOffset());
