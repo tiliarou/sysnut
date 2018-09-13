@@ -81,18 +81,6 @@ const AesCtr& Crypto::updateCounter(u64 ofs)
 	return counter;
 }
 
-/* Calculate CMAC. */
-void Crypto::calculateCmac(void *dst, void *src, size_t size, const void *key) {
-    /*mbedtls_cipher_context_t m_ctx;
-    mbedtls_cipher_init(&m_ctx);
-
-    if (mbedtls_cipher_setup(&m_ctx, mbedtls_cipher_info_from_type(MBEDTLS_CIPHER_AES_128_ECB)) || mbedtls_cipher_cmac_starts(&m_ctx, key, 0x80) || mbedtls_cipher_cmac_update(&m_ctx, src, size) || mbedtls_cipher_cmac_finish(&m_ctx, dst))
-	{
-            fatal("Failed to calculate CMAC!\n");
-    }*/
-}
-
-
 /* Encrypt with context. */
 void Crypto::encrypt(void *dst, const void *src, size_t l)
 {

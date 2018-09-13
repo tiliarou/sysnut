@@ -44,10 +44,13 @@ typedef volatile s16 vs16;   ///<  16-bit volatile signed integer.
 typedef volatile s32 vs32;   ///<  32-bit volatile signed integer.
 typedef volatile s64 vs64;   ///<  64-bit volatile signed integer.
 							 //typedef volatile s128 vs128; ///< 128-bit volatile signed integer.
+
+#define Handle u32
+#define Result u32
+#else
+#include <switch/types.h>
 #endif
 
-typedef u32 Handle;                 ///< Kernel object handle.
-typedef u32 Result;                 ///< Function error code result type.
 
 #define NcaId integer<128>
 

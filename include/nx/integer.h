@@ -1,8 +1,10 @@
 #pragma once
-
+#include <stdio.h>
 #include <limits>
 #ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <type_traits>
 #endif
 
 #ifdef __SWITCH__

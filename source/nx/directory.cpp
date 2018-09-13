@@ -15,7 +15,7 @@ Directory::~Directory()
 
 bool Directory::install()
 {
-	auto& cnmts = files().find(".cnmt.nca");
+	auto cnmts = files().find(".cnmt.nca");
 
 	for (auto& i : *cnmts)
 	{

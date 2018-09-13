@@ -47,8 +47,6 @@ public:
 	void encrypt(void *dst, const void *src, size_t l);
 	void decrypt(void *dst, const void *src, size_t l);
 
-	void calculateCmac(void *dst, void *src, size_t size, const void *key);
-
 	void xtsEncrypt(void *dst, const void *src, size_t l, size_t sector, size_t sector_size);
 	void xtsDecrypt(void *dst, const void *src, size_t l, size_t sector, size_t sector_size);
 
