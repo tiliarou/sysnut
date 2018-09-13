@@ -38,12 +38,12 @@ Result esImportTicket(void const *tikBuf, size_t tikSize, void const *certBuf, s
     ipcAddSendBuffer(&c, tikBuf, tikSize, BufferType_Normal);
     ipcAddSendBuffer(&c, certBuf, certSize, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 1;
     
@@ -53,10 +53,10 @@ Result esImportTicket(void const *tikBuf, size_t tikSize, void const *certBuf, s
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -74,12 +74,12 @@ Result esDeleteTicket(const RightsId *rightsIdBuf, size_t bufSize)
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, rightsIdBuf, bufSize, BufferType_Normal);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 3;
     
@@ -89,10 +89,10 @@ Result esDeleteTicket(const RightsId *rightsIdBuf, size_t bufSize)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -110,14 +110,14 @@ Result esGetTitleKey(const RightsId *rightsId, u8 *outBuf, size_t bufSize)
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         RightsId rights_id;
         u32 key_generation;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 8;
     raw->key_generation = 0;
@@ -129,10 +129,10 @@ Result esGetTitleKey(const RightsId *rightsId, u8 *outBuf, size_t bufSize)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -149,12 +149,12 @@ Result esCountCommonTicket(u32 *numTickets)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 9;
     
@@ -164,11 +164,11 @@ Result esCountCommonTicket(u32 *numTickets)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 num_tickets;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -189,12 +189,12 @@ Result esCountPersonalizedTicket(u32 *numTickets)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 10;
     
@@ -204,11 +204,11 @@ Result esCountPersonalizedTicket(u32 *numTickets)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 num_tickets;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -230,12 +230,12 @@ Result esListCommonTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t buf
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 11;
     
@@ -245,11 +245,11 @@ Result esListCommonTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t buf
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 num_rights_ids_written;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -271,12 +271,12 @@ Result esListPersonalizedTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 12;
     
@@ -286,11 +286,11 @@ Result esListPersonalizedTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 num_rights_ids_written;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -312,13 +312,13 @@ Result esGetCommonTicketData(u64 *unkOut, void *outBuf1, size_t bufSize1, const 
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf1, bufSize1, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         RightsId rights_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 16;
     memcpy(&raw->rights_id, rightsId, sizeof(RightsId));
@@ -329,11 +329,11 @@ Result esGetCommonTicketData(u64 *unkOut, void *outBuf1, size_t bufSize1, const 
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u64 unk;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 

@@ -7,6 +7,9 @@
 #include <stdarg.h>
 #include <unistd.h>
 #include <switch.h>
+#include "nx/ipc/es.h"
+#include "nx/ipc/ns_ext.h"
+#include "nx/ipc/ncm_ext.h"
 
 
 #define SOCK_BUFFERSIZE 16384
@@ -25,7 +28,6 @@ void __appInit(void)
 	rc = fsInitialize();
 	if (R_FAILED(rc))
 		fatalSimple(rc);
-	registerFspLr();
 
 	rc = fsdevMountSdmc();
 	if (R_FAILED(rc))

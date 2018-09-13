@@ -51,12 +51,12 @@ static Result _nsGetInterface(Service* srv_out, u64 cmd_id)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = cmd_id;
@@ -67,10 +67,10 @@ static Result _nsGetInterface(Service* srv_out, u64 cmd_id)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -90,15 +90,15 @@ Result nsListApplicationRecord(u64 offset, void *out_buf, size_t out_buf_size, u
 #ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
-    ipcAddRecvBuffer(&c, out_buf, out_buf_size, 0);
+    ipcAddRecvBuffer(&c, out_buf, out_buf_size, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u32 offset;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 0;
@@ -109,11 +109,11 @@ Result nsListApplicationRecord(u64 offset, void *out_buf, size_t out_buf_size, u
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 entries_read;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -134,9 +134,9 @@ Result nsPushApplicationRecord(u64 title_id, u8 last_modified_event, ContentStor
 #ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
-    ipcAddSendBuffer(&c, content_records_buf, buf_size, 0);
+    ipcAddSendBuffer(&c, content_records_buf, buf_size, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u8 last_modified_event;
@@ -144,7 +144,7 @@ Result nsPushApplicationRecord(u64 title_id, u8 last_modified_event, ContentStor
         u64 title_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 16;
@@ -156,10 +156,10 @@ Result nsPushApplicationRecord(u64 title_id, u8 last_modified_event, ContentStor
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -176,13 +176,13 @@ Result nsCalculateApplicationOccupiedSize(u64 titleID, void *out_buf)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 titleID;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 11;
@@ -193,11 +193,11 @@ Result nsCalculateApplicationOccupiedSize(u64 titleID, void *out_buf)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u8 out[0x80];
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -217,16 +217,16 @@ Result nsListApplicationRecordContentMeta(u64 offset, u64 titleID, void *out_buf
 #ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
-    ipcAddRecvBuffer(&c, out_buf, out_buf_size, 0);
+    ipcAddRecvBuffer(&c, out_buf, out_buf_size, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 offset;
         u64 titleID;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 17;
@@ -238,11 +238,11 @@ Result nsListApplicationRecordContentMeta(u64 offset, u64 titleID, void *out_buf
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 entries_read;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -264,13 +264,13 @@ Result nsTouchApplication(u64 titleID)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 titleID;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 904;
@@ -281,11 +281,11 @@ Result nsTouchApplication(u64 titleID)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 entries_read;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -302,13 +302,13 @@ Result nsDeleteApplicationRecord(u64 titleID)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 titleID;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 27;
@@ -319,11 +319,11 @@ Result nsDeleteApplicationRecord(u64 titleID)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 entries_read;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -340,13 +340,13 @@ Result nsLaunchApplication(u64 titleID)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 titleID;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 19;
@@ -357,10 +357,10 @@ Result nsLaunchApplication(u64 titleID)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -377,7 +377,7 @@ Result nsPushLaunchVersion(u64 titleID, u32 version)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 title_id;
@@ -385,7 +385,7 @@ Result nsPushLaunchVersion(u64 titleID, u32 version)
         u32 padding;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 36;
@@ -397,10 +397,10 @@ Result nsPushLaunchVersion(u64 titleID, u32 version)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -417,13 +417,13 @@ Result nsCheckApplicationLaunchVersion(u64 titleID)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 title_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 38;
@@ -434,10 +434,10 @@ Result nsCheckApplicationLaunchVersion(u64 titleID)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -454,13 +454,13 @@ Result nsCountApplicationContentMeta(u64 titleId, u32* countOut)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 title_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 600;
@@ -471,11 +471,11 @@ Result nsCountApplicationContentMeta(u64 titleId, u32* countOut)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u32 count;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -496,13 +496,13 @@ Result nsGetContentMetaStorage(const NcmMetaRecord *record, u8 *out)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcmMetaRecord metaRecord;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 606;
@@ -513,11 +513,11 @@ Result nsGetContentMetaStorage(const NcmMetaRecord *record, u8 *out)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u8 out;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
@@ -538,7 +538,7 @@ Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u32 storageId;
@@ -546,7 +546,7 @@ Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId)
 		u64 tid;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 26;
@@ -560,10 +560,10 @@ Result nsBeginInstallApplication(u64 tid, u32 unk, u8 storageId)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -580,12 +580,12 @@ Result nsInvalidateAllApplicationControlCache(void)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 401;
@@ -596,10 +596,10 @@ Result nsInvalidateAllApplicationControlCache(void)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -616,13 +616,13 @@ Result nsInvalidateApplicationControlCache(u64 tid)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 tid;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 404;
@@ -634,10 +634,10 @@ Result nsInvalidateApplicationControlCache(u64 tid)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -654,13 +654,13 @@ Result nsCheckApplicationLaunchRights(u64 tid)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 tid;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 39;
@@ -672,10 +672,10 @@ Result nsCheckApplicationLaunchRights(u64 tid)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -690,9 +690,9 @@ Result nsGetApplicationContentPath(u64 tid, u8 type, char *out, size_t buf_size)
 #ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
-    ipcAddRecvBuffer(&c, out, buf_size, 0);
+    ipcAddRecvBuffer(&c, out, buf_size, BufferType_Normal);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u8 padding[0x7];
@@ -700,7 +700,7 @@ Result nsGetApplicationContentPath(u64 tid, u8 type, char *out, size_t buf_size)
         u64 tid;
     } *raw;
 
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
 
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 21;
@@ -713,10 +713,10 @@ Result nsGetApplicationContentPath(u64 tid, u8 type, char *out, size_t buf_size)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -733,13 +733,13 @@ Result nsDisableApplicationAutoUpdate(u64 titleID)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 title_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 903;
@@ -750,10 +750,10 @@ Result nsDisableApplicationAutoUpdate(u64 titleID)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -770,13 +770,13 @@ Result nsWithdrawApplicationUpdateRequest(u64 titleId)
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         u64 title_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 907;
@@ -787,10 +787,10 @@ Result nsWithdrawApplicationUpdateRequest(u64 titleId)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
