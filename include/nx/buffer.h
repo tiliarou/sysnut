@@ -109,6 +109,18 @@ public:
 		return sizeof(v);
 	}
 
+	bool contains(const T& v)
+	{
+		for (u64 i = 0; i < size(); i++)
+		{
+			if (m_buffer[i] == v)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
 	T& first()
 	{
 		return m_buffer[0];

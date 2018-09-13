@@ -116,6 +116,7 @@
     <ClCompile Include="source\nx\filefactory.cpp" />
     <ClCompile Include="source\nx\fs.cpp" />
     <ClCompile Include="source\nx\install.cpp" />
+    <ClCompile Include="source\nx\ipc\es.cpp" />
     <ClCompile Include="source\nx\ipc\ncm_ext.cpp" />
     <ClCompile Include="source\nx\ipc\ns_ext.cpp" />
     <ClCompile Include="source\nx\keys.cpp" />

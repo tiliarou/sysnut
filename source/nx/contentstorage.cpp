@@ -21,7 +21,7 @@ ContentStorage::~ContentStorage()
 #endif
 }
 
-bool ContentStorage::createPlaceholder(const NcaId &placeholderId, const NcaId &registeredId, size_t size)
+bool ContentStorage::createPlaceholder(const NcaId& placeholderId, const NcaId& registeredId, size_t size)
 {
 #ifndef _MSC_VER
 	if (ncmCreatePlaceHolder(&m_contentStorage, &placeholderId, &registeredId, size))

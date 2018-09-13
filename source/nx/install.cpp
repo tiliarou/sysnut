@@ -1,5 +1,6 @@
 #include "nx/install.h"
 #include "nx/directory.h"
+#include "nx/ipc/es.h"
 
 Install::Install(Directory* dir, Cnmt* cnmt)
 {
@@ -132,6 +133,19 @@ bool Install::install()
 			error("could not find cert! %s\n", ticketFile);
 			return false;
 		}
+
+		auto ticket = dir->openFile<File>(ticketFile);
+		auto cert = dir->openFile<File>(certFile);
+
+		Buffer<u8> ticketBuffer, certBuffer;
+		ticket->read(ticketBuffer);
+		cert->read(certBuffer);
+
+		if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
+		{
+			error("Failed to import ticket\n");
+			return false;
+		}
 	}
 
 	for (auto& content : *cnmt)
@@ -139,7 +153,7 @@ bool Install::install()
 		string ncaFile = hx(content.record.ncaId) + ".nca";
 
 		storage.deletePlaceholder(content.record.ncaId);
-		//storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size);
+		storage.createPlaceholder(content.record.ncaId, content.record.ncaId, content.record.size());
 
 		// write stuff
 

@@ -2,26 +2,37 @@
 
 #include <string.h>
 
-#include <switch.h>
+#include "nut.h"
+#ifndef _MSC_VER
 #include <switch/arm/atomics.h>
+#endif
 
 static Service g_esSrv;
 static u64 g_esRefCnt;
 
-Result esInitialize() {
+Result esInitialize()
+{
+#ifndef _MSC_VER
     atomicIncrement64(&g_esRefCnt);
     Result rc = smGetService(&g_esSrv, "es");
     return rc;
+#else
+	return 0;
+#endif
 }
 
-void esExit() {
+void esExit()
+{
+#ifndef _MSC_VER
     if (atomicDecrement64(&g_esRefCnt) == 0) {
         serviceClose(&g_esSrv);
     }
+#endif
 }
 
 Result esImportTicket(void const *tikBuf, size_t tikSize, void const *certBuf, size_t certSize)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, tikBuf, tikSize, BufferType_Normal);
@@ -51,9 +62,14 @@ Result esImportTicket(void const *tikBuf, size_t tikSize, void const *certBuf, s
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result esDeleteTicket(const RightsId *rightsIdBuf, size_t bufSize) {
+Result esDeleteTicket(const RightsId *rightsIdBuf, size_t bufSize)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, rightsIdBuf, bufSize, BufferType_Normal);
@@ -82,9 +98,14 @@ Result esDeleteTicket(const RightsId *rightsIdBuf, size_t bufSize) {
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result esGetTitleKey(const RightsId *rightsId, u8 *outBuf, size_t bufSize) {
+Result esGetTitleKey(const RightsId *rightsId, u8 *outBuf, size_t bufSize)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
@@ -117,10 +138,14 @@ Result esGetTitleKey(const RightsId *rightsId, u8 *outBuf, size_t bufSize) {
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result esCountCommonTicket(u32 *numTickets)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -152,11 +177,15 @@ Result esCountCommonTicket(u32 *numTickets)
         }
     }
     
-    return rc;  
+    return rc;
+#else
+	return 0;
+#endif
 }
 
 Result esCountPersonalizedTicket(u32 *numTickets)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
 
@@ -188,10 +217,15 @@ Result esCountPersonalizedTicket(u32 *numTickets)
         }
     }
     
-    return rc;  
+    return rc;
+#else
+	return 0;
+#endif
 }
 
-Result esListCommonTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t bufSize) {
+Result esListCommonTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t bufSize)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
@@ -225,9 +259,14 @@ Result esListCommonTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t buf
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
-Result esListPersonalizedTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t bufSize) {
+Result esListPersonalizedTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size_t bufSize)
+{
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf, bufSize, BufferType_Normal);
@@ -261,10 +300,14 @@ Result esListPersonalizedTicket(u32 *numRightsIdsWritten, RightsId *outBuf, size
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
 
 Result esGetCommonTicketData(u64 *unkOut, void *outBuf1, size_t bufSize1, const RightsId* rightsId)
 {
+#ifndef _MSC_VER
     IpcCommand c;
     ipcInitialize(&c);
     ipcAddRecvBuffer(&c, outBuf1, bufSize1, BufferType_Normal);
@@ -300,4 +343,7 @@ Result esGetCommonTicketData(u64 *unkOut, void *outBuf1, size_t bufSize1, const 
     }
     
     return rc;
+#else
+	return 0;
+#endif
 }
