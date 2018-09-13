@@ -75,10 +75,11 @@ public:
 
 	sptr<Array<sptr<FileEntry>>> find(const char* ext)
 	{
+		string extension(ext);
 		auto result = new Array<sptr<FileEntry>>();
 		for (auto& f : *this)
 		{
-			if (f->name().endsWith(string(ext)))
+			if (f->name().endsWith(extension))
 			{
 				result->push(f);
 			}

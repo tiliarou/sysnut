@@ -11,10 +11,6 @@
 
 #define MEDIA_SIZE 0x200
 
-typedef struct {
-	u8 c[0x10];
-} NcmNcaId;
-
 #define MAGIC_NCA3 0x3341434E /* "NCA3" */
 #define MAGIC_NCA2 0x3241434E /* "NCA2" */
 #define MAGIC_NCA0 0x3041434E /* "NCA0" */

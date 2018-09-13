@@ -102,7 +102,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="source\log.cpp" />
-    <ClCompile Include="source\mainloop.cpp" />
     <ClCompile Include="source\mbedtls\aes.c" />
     <ClCompile Include="source\mbedtls\cipher.c" />
     <ClCompile Include="source\mbedtls\cipher_wrap.c" />

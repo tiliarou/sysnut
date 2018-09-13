@@ -12,6 +12,10 @@
 #include "log.h"
 #include <new>
 
+#ifdef __SWITCH__
+#include <string.h>
+#endif
+
 #define Array Buffer
 
 template<class T>
@@ -141,8 +145,7 @@ public:
 		if (!resize(sz + 1))
 		{
 			fatal("failed to resize buffer!\n");
-			T junk;
-			return junk;
+			return m_buffer[sz-1];
 		}
 		m_buffer[sz] = n;
 		return m_buffer[sz];

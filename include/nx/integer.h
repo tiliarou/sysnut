@@ -5,6 +5,10 @@
 #include <intrin.h>
 #endif
 
+#ifdef __SWITCH__
+#include <string.h>
+#endif
+
 typedef uint64_t uint64;
 typedef uint32_t uint32;
 typedef uint16_t uint16;
@@ -1252,7 +1256,7 @@ public:
 	}
 	//private:
 	word buffer[BITS / 8 / sizeof(word)];
-};
+} PACKED;
 
 template<size_t BITS, class T, class HT>
 class primitive
@@ -1482,7 +1486,7 @@ public:
 	}
 
 	T t;
-};
+} PACKED;
 
 
 template<>
@@ -1505,7 +1509,7 @@ public:
 	operator uint32& () { return t; }
 	constexpr operator const uint32& () const { return t; }
 
-};
+} PACKED;
 
 template<>
 class integer<16> : public primitive<16, uint16, uint8>
@@ -1516,7 +1520,7 @@ public:
 	constexpr integer(const word t) : primitive(t) {}
 	operator uint16& () { return t; }
 	constexpr operator const uint16& () const { return t; }
-};
+} PACKED;
 
 template<>
 class integer<8> : public primitive<8, uint8, uint8>

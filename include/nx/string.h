@@ -32,7 +32,7 @@ static char itohex(u8 nibble, bool cap = false)
 	{
 		return (cap?'A':'a') + (nibble - 0xA);
 	}
-	return NULL;
+	return '\0';
 }
 
 template<class T>

@@ -53,6 +53,10 @@ enum FsStorageId
 	FsStorageId_SdCard = 5
 };
 
+typedef struct {
+	u8 c[0x10];
+} NcmNcaId;
+
 struct NcmMetaRecord
 {
 public:
@@ -74,5 +78,6 @@ typedef u32 Service;
 #else
 #include <switch.h>
 #include <switch/arm/atomics.h>
+#include "nx/primitives.h"
 #define closesocket close
 #endif

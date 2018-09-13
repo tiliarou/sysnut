@@ -9,7 +9,7 @@ class DiskFile : public File
 public:
 	DiskFile();
 	virtual ~DiskFile();
-	virtual bool open(string& path, char* mode = "rb");
+	virtual bool open(string& path, const char* mode = "rb");
 	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);

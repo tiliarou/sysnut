@@ -26,7 +26,7 @@ File* fileFactoryCreate(string& path)
 	return new File();
 }
 
-sptr<File> File::factory(string& path, char* mode)
+sptr<File> File::factory(string& path, const char* mode)
 {
 	File* f = fileFactoryCreate(path);
 
@@ -52,7 +52,7 @@ sptr<File> File::factory(string& path, sptr<File>& parent, u64 offset, u64 sz)
 	return sptr<File>(f);
 }
 
-File* File::factoryRawPtr(string& path, char* mode)
+File* File::factoryRawPtr(string& path, const char* mode)
 {
 	File* f = fileFactoryCreate(path);
 

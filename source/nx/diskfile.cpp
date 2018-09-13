@@ -11,7 +11,7 @@ DiskFile::~DiskFile()
 	close();
 }
 
-bool DiskFile::open(string& path, char* mode)
+bool DiskFile::open(string& path, const char* mode)
 {
 	if (isOpen())
 	{

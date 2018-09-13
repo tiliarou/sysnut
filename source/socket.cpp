@@ -56,7 +56,11 @@ bool Socket::close()
 {
 	if (isOpen())
 	{
+#ifdef _MSC_VER
 		::closesocket(m_socket);
+#else
+		::close(m_socket);
+#endif
 		m_socket = -1;
 		return true;
 	}
