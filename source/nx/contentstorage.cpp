@@ -60,7 +60,7 @@ bool ContentStorage::writePlaceholder(const NcaId &placeholderId, u64 offset, vo
 bool ContentStorage::reg(const NcaId &placeholderId, const NcaId &registeredId)
 {
 #ifndef _MSC_VER
-	if (ncmContentStorageRegister(&m_contentStorage, &registeredId, &placeholderId))
+	if (ncmContentStorageRegister(&m_contentStorage, (const NcmNcaId*)&registeredId, (const NcmNcaId*)&placeholderId))
 	{
 		error("Failed to register placeholder NCA\n");
 		return false;
@@ -85,7 +85,8 @@ string ContentStorage::getPath(const NcaId& registeredId)
 {
 #ifndef _MSC_VER
 	string result;
-	if (ncmContentStorageGetPath(&m_contentStorage, &registeredId, pathBuf, FS_MAX_PATH))
+	result.resize(FS_MAX_PATH);
+	if (ncmContentStorageGetPath(&m_contentStorage, (const NcmNcaId*)&registeredId, (char*)result.buffer(), FS_MAX_PATH))
 	{
 		error("Failed to get installed NCA path");
 	}

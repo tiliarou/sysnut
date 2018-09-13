@@ -75,6 +75,8 @@ typedef u32 NcmContentStorage;
 typedef u32 NcmContentMetaDatabase;
 typedef u32 Service;
 
+#define FS_MAX_PATH 0x301
+
 #else
 #include <switch.h>
 #include <switch/arm/atomics.h>

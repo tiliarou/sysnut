@@ -61,7 +61,7 @@ string::~string()
 {
 }
 
-bool string::startsWith(string& s)
+bool string::startsWith(string s)
 {
 	if (s.size() > size())
 	{
@@ -79,7 +79,7 @@ bool string::startsWith(string& s)
 	return true;
 }
 
-bool string::endsWith(string& s)
+bool string::endsWith(string s)
 {
 	if (s.size() > size())
 	{

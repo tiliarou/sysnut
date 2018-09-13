@@ -42,7 +42,7 @@ Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, c
     IpcCommand c;
     ipcInitialize(&c);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcaId placeholder_id;
@@ -50,7 +50,7 @@ Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, c
         u64 size;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 1;
     raw->size = size;
@@ -63,10 +63,10 @@ Result ncmCreatePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, c
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -83,13 +83,13 @@ Result ncmDeletePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId)
     IpcCommand c;
     ipcInitialize(&c);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcaId placeholder_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 2;
     memcpy(&raw->placeholder_id, placeholderId, sizeof(NcaId));
@@ -100,10 +100,10 @@ Result ncmDeletePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -121,14 +121,14 @@ Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, u6
     ipcInitialize(&c);
     ipcAddSendBuffer(&c, buffer, bufSize, BufferType_Normal);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcaId placeholder_id;
         u64 offset;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 4;
     raw->offset = offset;
@@ -140,10 +140,10 @@ Result ncmWritePlaceHolder(NcmContentStorage* cs, const NcaId* placeholderId, u6
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -160,13 +160,13 @@ Result ncmDelete(NcmContentStorage* cs, const NcaId* registeredId)
     IpcCommand c;
     ipcInitialize(&c);
     
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcaId placeholder_id;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 6;
     memcpy(&raw->placeholder_id, registeredId, sizeof(NcaId));
@@ -177,10 +177,10 @@ Result ncmDelete(NcmContentStorage* cs, const NcaId* registeredId)
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
     }
@@ -197,13 +197,13 @@ Result ncmContentMetaDatabaseGetSize(NcmContentMetaDatabase* db, const NcmMetaRe
     IpcCommand c;
     ipcInitialize(&c);
 
-    struct {
+    struct Raw {
         u64 magic;
         u64 cmd_id;
         NcmMetaRecord meta_record;
     } *raw;
     
-    raw = ipcPrepareHeader(&c, sizeof(*raw));
+    raw = (Raw*)ipcPrepareHeader(&c, sizeof(*raw));
     
     raw->magic = SFCI_MAGIC;
     raw->cmd_id = 10;
@@ -214,11 +214,11 @@ Result ncmContentMetaDatabaseGetSize(NcmContentMetaDatabase* db, const NcmMetaRe
         IpcParsedCommand r;
         ipcParse(&r);
 
-        struct {
+        struct Resp {
             u64 magic;
             u64 result;
             u64 size_out;
-        } *resp = r.Raw;
+        } *resp = (Resp*)r.Raw;
 
         rc = resp->result;
 
