@@ -21,7 +21,7 @@ bool Pfs0::init()
 
 	if (!read(m_header, sizeof(pfs0_header_t)))
 	{
-		error("Failed to read!\n");
+		error("Failed to read pfs0 header!\n");
 		return false;
 	}
 
@@ -35,7 +35,7 @@ bool Pfs0::init()
 	rewind();
 	if (!read(m_header, header().size()))
 	{
-		error("Failed to read!\n");
+		error("Failed to read complete pfs0 header! %d bytes\n", header().size());
 		return false;
 	}
 

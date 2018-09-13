@@ -2,9 +2,14 @@
 #include <string.h>
 #include <stdio.h>
 #include "nx/crypto.h"
+#include "nx/string.h"
 #include "log.h"
 
+#ifdef _MSC_VER
 Keys g_keys("keys.txt");
+#else
+Keys g_keys("/keys.txt");
+#endif
 
 Keys& keys()
 {
@@ -146,18 +151,6 @@ static char hextoi(char c) {
 	if ('A' <= c && c <= 'F') return c - 'A' + 0xA;
 	if ('0' <= c && c <= '9') return c - '0';
 	return 0;
-}
-
-static char itohex(u8 nibble) {
-	if (nibble < 0xA)
-	{
-		return '0' + nibble;
-	}
-	else if (nibble < 0x10)
-	{
-		return 'a' + nibble;
-	}
-	return NULL;
 }
 
 template<class T>
@@ -313,6 +306,7 @@ bool Keys::open(const char* file)
 			}
 			else if (strcmp(key, "header_key") == 0) {
 				uhx(headerKey, value, sizeof(headerKey));
+				debug("header_key = %s\n", hx(headerKey).buffer());
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "package2_key_source") == 0) {

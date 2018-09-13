@@ -9,7 +9,7 @@ include $(DEVKITPRO)/libnx/switch_rules
 
 TARGET		:=	deez
 BUILD		:=	build
-SOURCES		:=	../source ../source/ipc ../source/nx ../source/nx/ipc ../source/install ../source/util ./
+SOURCES		:=	../source ../source/ipc ../source/nx ../source/nx/ipc ../source/install ../source/util ./ ../source/mbedtls
 DATA		:=	data
 INCLUDES	:=	../include
 EXEFS_SRC	:=	exefs_src

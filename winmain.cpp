@@ -27,7 +27,7 @@ int main()
 
 	
 	Pfs0 nsp;
-	if (nsp.open(string("C:\\Users\\bwarner\\Desktop\\switch\\GUNBIRD2 for Nintendo Switch[0100BCB00AE98000][v0].nsp")))
+	if (nsp.open(string("gunbird.nsp")))
 	{
 		nsp.install();
 	}

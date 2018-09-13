@@ -140,12 +140,14 @@ bool Install::install()
 		ticket->read(ticketBuffer);
 		cert->read(certBuffer);
 
-		if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
+		/*if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
 		{
 			error("Failed to import ticket\n");
 			return false;
-		}
+		}*/
 	}
+
+	return true;
 
 	for (auto& content : *cnmt)
 	{

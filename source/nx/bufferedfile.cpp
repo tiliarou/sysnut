@@ -48,10 +48,13 @@ bool BufferedFile::seek(u64 offset, int whence)
 	{
 		case SEEK_SET:
 			currentPosition() = offset;
+			break;
 		case SEEK_CUR:
 			currentPosition() += offset;
+			break;
 		case SEEK_END:
 			currentPosition() = size() - offset;
+			break;
 		default:
 			return false;
 	}

@@ -10,11 +10,12 @@
 #include "nx/ipc/es.h"
 #include "nx/ipc/ns_ext.h"
 #include "nx/ipc/ncm_ext.h"
+#include "nx/string.h"
+#include "nx/pfs0.h"
+#include "log.h"
 
 
 #define SOCK_BUFFERSIZE 16384
-
-void runMainLoop();
 
 void __appInit(void)
 {
@@ -116,6 +117,18 @@ void network_post_exit(void)
 	socketExit();
 }
 
+void guiThread(void* p = NULL)
+{
+	(void)p;
+	print("Gui Thread created\n");
+
+	Pfs0 nsp;
+	string name("/gunbird.nsp");
+	if (nsp.open(name))
+	{
+		nsp.install();
+	}
+}
 
 int main(int argc, char **argv)
 {
@@ -124,8 +137,26 @@ int main(int argc, char **argv)
 	
 	gfxInitDefault();
 	consoleInit(NULL);
+	print("Deez initializing\n");
 
 	network_pre_init();
+
+	/*
+	Thread t;
+
+	if (threadCreate(&t, &guiThread, NULL, 0x100000, 0x2C, -2))
+	{
+		fatal("Failed to create application thread\n");
+		return -1;
+	}
+
+	if (threadStart(&t))
+	{
+		fatal("Failed to start application thread\n");
+		return -1;
+	}*/
+
+	guiThread();
 	
 	while(appletMainLoop())
     {
@@ -141,6 +172,8 @@ int main(int argc, char **argv)
         gfxFlushBuffers();
         gfxSwapBuffers();
     }
+
+	print("fin\n");
 
     gfxExit();
 	

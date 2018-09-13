@@ -13,7 +13,8 @@ FILE* file()
 #ifdef _MSC_VER
 		f = stdout;
 #else
-		f = fopen("/nutd.log", "a");
+		f = stdout;
+		//f = fopen("/nutd.log", "a");
 #endif
 	}
 
