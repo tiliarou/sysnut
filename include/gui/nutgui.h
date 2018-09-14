@@ -14,6 +14,9 @@
 #include "nx/buffer.h"
 
 string footer;
+class NutGui;
+
+NutGui* nutGui = NULL;
 
 CircularBuffer<string, 0x100>& printLog();
 
@@ -209,18 +212,16 @@ void installThread(void* p = NULL)
 {
 	(void)p;
 
-	footer = string("Installing ") + installPath;
-
 	Pfs0 nsp;
 
 	if (nsp.open(installPath))
 	{
 		nsp.install();
-		footer = string("Installation complete ") + installPath;
+		print(string("Installation complete for ") + installPath);
 	}
 	else
 	{
-		footer = string("Installation failed for ") + installPath;
+		error(string("Installation failed for ") + installPath);
 	}
 }
 
@@ -360,12 +361,16 @@ public:
 	{
 		const int maxLines = 11;
 
-		int offset = printLog().size() >= maxLines ? printLog().size() : 0;
+		//int offset = printLog().size() >= maxLines ? printLog().size() : 0;
+		int end = printLog().size();
+		int i = end > maxLines ? end - maxLines : 0;
 
-		for (int i = offset; i < maxLines && i + offset < printLog().size(); i++)
+		int y = 20;
+		while(i < end)
 		{
-			int y = 20 + ((i - offset) * 50);
 			drawText(20, y, txtcolor, printLog()[i], fntMedium);
+			y += 50;
+			i++;
 		}
 	}
 
@@ -382,6 +387,7 @@ public:
 	NutGui(string Title, string Footer, Theme Theme) : m_focus(0), Window(string("root"), Rect(0, 0, 1280, 720))
 	{
 		Rect panelRect(411, 88, 1249 - 411, 646 - 88);
+		nutGui = this;
 
 		menu = (Menu*)windows().push(sptr<Window>(new Menu(this, string("menu"), Rect(30, 88, 410 - 30, 646 - 88)))).get();
 		body = (Body*)windows().push(sptr<Window>(new Body(this, string("body"), Rect(411, 88, 1249 - 411, 646 - 88 )))).get();
@@ -415,6 +421,8 @@ public:
 		selcolor = { Theme.SelectedTextColor.R, Theme.SelectedTextColor.G, Theme.SelectedTextColor.B, Theme.SelectedTextColor.A };
 		title = Title;
 		footer = Footer;
+
+		registerPrintHook(&printHook);
 	}
 
 	~NutGui()
@@ -426,6 +434,17 @@ public:
 		SDL_DestroyWindow(_window);
 		SDL_Quit();
 		romfsExit();
+	}
+
+	static void printHook()
+	{
+		if (!nutGui)
+		{
+			return;
+		}
+
+		nutGui->invalidate();
+		nutGui->loop();
 	}
 
 	void setFocus(Window* w)
@@ -551,8 +570,10 @@ public:
 			menu->draw();
 		}
 
-
-		drawText(footerX, footerY, txtcolor, footer, fntLarge);
+		if (printLog().size())
+		{
+			drawText(footerX, footerY, txtcolor, printLog().last(), fntLarge);
+		}
 		SDL_RenderPresent(_renderer);
 	}
 

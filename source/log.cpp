@@ -2,6 +2,15 @@
 #include <stdarg.h>
 #include "nx/string.h"
 #include "socket.h"
+#include "log.h"
+
+Array<PrintHook> g_hooks;
+
+void registerPrintHook(PrintHook func)
+{
+	g_hooks.push(func);
+}
+
 
 FILE* f = NULL;
 
@@ -38,6 +47,11 @@ void print(const char * format, ...)
 
 	va_end(args);
 	fflush(f);
+
+	for (auto& f : g_hooks)
+	{
+		f();
+	}
 }
 
 void fatal(const char * format, ...)
@@ -50,6 +64,11 @@ void fatal(const char * format, ...)
 
 	va_end(args);
 	fflush(f);
+
+	for (auto& f : g_hooks)
+	{
+		f();
+	}
 }
 
 void error(const char * format, ...)
@@ -62,6 +81,11 @@ void error(const char * format, ...)
 
 	va_end(args);
 	fflush(f);
+
+	for (auto& f : g_hooks)
+	{
+		f();
+	}
 }
 
 void warning(const char * format, ...)
@@ -74,6 +98,11 @@ void warning(const char * format, ...)
 
 	va_end(args);
 	fflush(f);
+
+	for (auto& f : g_hooks)
+	{
+		f();
+	}
 }
 
 void debug(const char * format, ...)
@@ -86,4 +115,9 @@ void debug(const char * format, ...)
 
 	va_end(args);
 	fflush(f);
+
+	for (auto& f : g_hooks)
+	{
+		f();
+	}
 }
