@@ -115,18 +115,21 @@ bool Install::installNca(File* nca, NcaId ncaId)
 	storage.deletePlaceholder(ncaId);
 	storage.createPlaceholder(ncaId, ncaId, nca->size());
 
-	print("writing %s ", nca->path().c_str());
+	print("writing 0%% %s ", nca->path().c_str());
 	u64 i = 0;
+
+	u64 totalSize = nca->size();
 
 	nca->rewind();
 
 	while (nca->read(buffer, chunkSize))
 	{
-		print(".");
 		storage.writePlaceholder(ncaId, i, buffer.buffer(), buffer.size());
 		i += buffer.size();
+
+		print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
 	}
-	print("fin\n");
+	print("\n");
 
 	if (!storage.reg(ncaId, ncaId))
 	{

@@ -60,7 +60,14 @@ void print(const char * format, ...)
 	vsprintf(printBuffer, format, args);
 	printf("%s", printBuffer);
 
-	printLog().push(printBuffer);
+	if (printBuffer[0] == '\r')
+	{
+		printLog().push(printBuffer+1);
+	}
+	else
+	{
+		printLog().push(printBuffer);
+	}
 	/*
 	size_t len = strlen(printBuffer);
 
