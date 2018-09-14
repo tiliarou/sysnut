@@ -129,7 +129,9 @@ bool Install::installNca(File* nca, NcaId ncaId)
 
 		print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
 	}
+#ifdef __SWITCH__
 	print("\n");
+#endif
 
 	if (!storage.reg(ncaId, ncaId))
 	{

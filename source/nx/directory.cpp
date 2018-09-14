@@ -4,6 +4,8 @@
 #include "nx/contentstorage.h"
 #include "nx/install.h"
 
+#include <curl/curl.h>
+
 Directory::Directory()
 {
 }
