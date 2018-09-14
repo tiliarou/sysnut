@@ -7,6 +7,7 @@
 #include <SDL2/SDL_mixer.h>
 #include <SDL2/SDL_ttf.h>
 
+#include "nx/sddirectory.h"
 #include "gui/window.h"
 #include "nx/buffer.h"
 
@@ -98,14 +99,73 @@ public:
 class SdWnd : public Window
 {
 public:
-	SdWnd(Window* p, string id, Rect r) : Window(p, id, r)
+	SdWnd(Window* p, string id, Rect r) : Window(p, id, r), dir("/")
 	{
+		m_selectedIndex = 0;
+		m_offset = 0;
 	}
 
 	void draw() override
 	{
-		drawText(string("Hello World"), 20, 20, { 0, 0, 255, 255 }, 50);
+		const int maxLines = 11;
+		int y = 20;
+
+		if (m_selectedIndex >= m_offset + maxLines)
+		{
+			m_offset = m_selectedIndex - maxLines + 1;
+		}
+		
+		if (m_selectedIndex < m_offset)
+		{
+			m_offset = m_selectedIndex;
+		}
+
+		for (int i=0; i < maxLines; i++)
+		{
+			auto& f = dir.files()[i + m_offset];
+			if (i + m_offset == m_selectedIndex)
+			{
+				if (isFocused())
+				{
+					drawRect(0, y - 16, width(), 50, txtcolor);
+				}
+				drawText(20, y, selcolor, f->name(), fntMedium);
+				//drawText(f->name(), 20, y, { 0, 255, 255, 255 }, 50);
+			}
+			else
+			{
+				drawText(20, y, txtcolor, f->name(), fntMedium);
+				//drawText(f->name(), 20, y, { 0, 0, 255, 255 }, 50);
+			}
+			y += 50;
+		}
 	}
+
+	u64 keysDown(u64 keys) override
+	{
+		if (keys & KEY_UP)
+		{
+			if (m_selectedIndex)
+			{
+				m_selectedIndex--;
+			}
+			invalidate();
+		}
+
+		if (keys & KEY_DOWN)
+		{
+			if (m_selectedIndex < dir.files().size() - 1)
+			{
+				m_selectedIndex++;
+			}
+			invalidate();
+		}
+		return keys;
+	}
+
+	SdDirectory dir;
+	u32 m_selectedIndex;
+	u32 m_offset;
 };
 
 class NutWnd : public Window

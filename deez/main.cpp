@@ -16,8 +16,6 @@
 #include "nx/sddirectory.h"
 #include "gui/nutgui.h"
 
-SdDirectory dir("/");
-
 extern "C" {
 	void userAppInit(void);
 	void userAppExit(void);
