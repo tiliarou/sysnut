@@ -1,4 +1,4 @@
-
+#pragma once
 
 
        ///////////////////////////////////////
@@ -226,12 +226,12 @@ namespace CustomUI
         HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
         PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
         ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
-        if(PressedInput & (KEY_LSTICK_UP | KEY_DUP))
+        if(PressedInput & KEY_UP)
         {
             if(spage > 0) spage--;
             else spage = pages.size() - 1;
         }
-        else if(PressedInput & (KEY_LSTICK_DOWN | KEY_DDOWN))
+        else if(PressedInput & KEY_DOWN)
         {
             if(spage < pages.size() - 1) spage++;
             else spage = 0;
@@ -348,13 +348,13 @@ namespace CustomUI
         HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
         PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
         ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
-        if(PressedInput & KEY_LSTICK_UP)
+        if(PressedInput & KEY_UP)
         {
             if(spage > 0) spage--;
             else spage = pages.size() - 1;
             renderGraphics();
         }
-        else if(PressedInput & KEY_LSTICK_DOWN)
+        else if(PressedInput & KEY_DOWN)
         {
             if(spage < pages.size() - 1) spage++;
             else spage = 0;

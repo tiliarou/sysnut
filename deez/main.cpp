@@ -14,7 +14,7 @@
 #include "nx/pfs0.h"
 #include "log.h"
 #include "nx/sddirectory.h"
-#include "CustomUI.h"
+#include "gui/nutgui.h"
 
 SdDirectory dir("/");
 
@@ -138,39 +138,10 @@ void guiThread(void* p = NULL)
 }
 
 
-static CustomUI::Page page1("SD");
-static CustomUI::Page page2("NUT");
-static CustomUI::Page page3("CDN");
-
-static string text1 = "Sample";
-
-void page2render()
-{
-	u32 i = 0;
-	auto nsps = dir.files().find(".nsp");
-	for (auto& f : *nsps)
-	{
-		page1.renderText(f->name(), 20, 20 + i++ * 50, { 0, 0, 255, 255 }, 50);
-	}
-}
-
-void page1render()
-{
-	page1.renderText("Text 2!", 30, 30, { 255, 0, 255, 255 }, 50);
-}
-
 int main(int argc, char **argv)
 {
 	(void)argc;
 	(void)argv;
-
-	CustomUI::init("Deez Title Installer", "Lorem Ipsum", CustomUI::HorizonDark());
-
-	page1.onRender(page1render);
-	page2.onRender(page2render);
-
-	CustomUI::addPage(page1);
-	CustomUI::addPage(page2);
 
 	print("Deez initializing\n");
 
@@ -192,28 +163,16 @@ int main(int argc, char **argv)
 	}*/
 
 	guiThread();
+
+	NutGui gui("Deez Title Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonDark());
 	
-	while(appletMainLoop())
+	while(appletMainLoop() && gui.loop())
     {
-		CustomUI::flushGraphics();
-
-        u64 kDown = CustomUI::PressedInput;
-
-        if (kDown & KEY_PLUS)
-		{
-			break;
-		}
-
-		if (kDown & KEY_A)
-		{
-			text1 = "A pressed!";
-			CustomUI::renderGraphics();
-		}
     }
 
 	print("fin\n");
 	
 	network_post_exit();
 
-	CustomUI::exitApp();
+	return 0;
 }

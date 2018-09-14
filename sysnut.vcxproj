@@ -130,8 +130,10 @@
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\CustomUI.h" />
     <ClInclude Include="include\debug.h" />
+    <ClInclude Include="include\gui\CustomUI.h" />
+    <ClInclude Include="include\gui\nutgui.h" />
+    <ClInclude Include="include\gui\window.h" />
     <ClInclude Include="include\log.h" />
     <ClInclude Include="include\mbedtls\config.h" />
     <ClInclude Include="include\nut.h" />
