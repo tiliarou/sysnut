@@ -62,7 +62,14 @@ void print(const char * format, ...)
 
 	if (printBuffer[0] == '\r')
 	{
-		printLog().push(printBuffer+1);
+		if (printLog().size())
+		{
+			printLog().last() = (printBuffer + 1);
+		}
+		else
+		{
+			printLog().push(printBuffer + 1);
+		}
 	}
 	else
 	{
