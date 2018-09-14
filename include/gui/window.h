@@ -13,6 +13,20 @@
 
 static SDL_Renderer* _renderer = 0;
 static SDL_Surface* _surface = 0;
+static string ttf;
+static SDL_Color txtcolor;
+static SDL_Color selcolor;
+
+static TTF_Font *fntMedium;
+static TTF_Font *fntLarge;
+
+struct RGBA
+{
+	int R;
+	int G;
+	int B;
+	int A;
+};
 
 struct Rect
 {
@@ -48,6 +62,10 @@ public:
 		_surface = 0;
 	}
 
+	virtual void draw()
+	{
+	}
+
 	SDL_Surface *surfInit(string Path)
 	{
 		SDL_Surface *srf = IMG_Load(Path.c_str());
@@ -65,11 +83,18 @@ public:
 		return tex;
 	}
 
+	void drawText(string Text, int X, int Y, RGBA Color, int Size)
+	{
+		SDL_Color clr = { Color.R, Color.G, Color.B, Color.A };
+		TTF_Font *fnt = TTF_OpenFont(ttf.c_str(), Size);
+		drawText(X + 411, Y + 88, clr, Text, fnt);
+	}
+
 	void drawText(int x, int y, SDL_Color scolor, string text, TTF_Font *font)
 	{
 		SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), scolor, 1280);
 		SDL_SetSurfaceAlphaMod(surface, 255);
-		SDL_Rect position = { x, y, surface->w, surface->h };
+		SDL_Rect position = { x + rect().x, y + rect().y, surface->w, surface->h };
 		SDL_BlitSurface(surface, NULL,_surface, &position);
 		SDL_FreeSurface(surface);
 	}
@@ -100,6 +125,16 @@ public:
 		drawBackXY(surf, tex, 0, 0);
 	}
 
+	virtual void invalidate()
+	{
+		if (parent())
+		{
+			parent()->invalidate();
+		}
+
+		m_redraw = true;
+	}
+
 	virtual u64 keysDown(u64 keys) { return keys; }
 	virtual u64 keysUp(u64 keys) { return keys; }
 
@@ -114,6 +149,7 @@ public:
 
 	Rect& rect() { return m_rect; }
 protected:
+	bool m_redraw = false;
 	Window*& parent() { return m_parent; }
 	Rect m_rect;
 	string m_id;

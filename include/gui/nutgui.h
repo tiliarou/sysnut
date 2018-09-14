@@ -10,14 +10,6 @@
 #include "gui/window.h"
 #include "nx/buffer.h"
 
-struct RGBA
-{
-	int R;
-	int G;
-	int B;
-	int A;
-};
-
 struct Theme
 {
 	string BackgroundPath;
@@ -31,7 +23,58 @@ class Menu : public Window
 public:
 	Menu(Window* p, string id, Rect r) : Window(p, id, r)
 	{
+		m_selectedIndex = 0;
 	}
+
+	u64 keysDown(u64 keys) override
+	{
+		if (keys & KEY_UP)
+		{
+			if (m_selectedIndex)
+			{
+				m_selectedIndex--;
+			}
+			invalidate();
+		}
+
+		if (keys & KEY_DOWN)
+		{
+			if (m_selectedIndex < m_tabs.size() - 1)
+			{
+				m_selectedIndex++;
+			}
+			invalidate();
+		}
+		return keys;
+	}
+
+	void draw() override
+	{
+		for (u32 i = 0; i < m_tabs.size(); i++)
+		{
+
+			if (i == m_selectedIndex)
+			{
+				drawText(20, 20 + (i * 50), selcolor, m_tabs[i], fntMedium);
+				m_panels[i]->draw();
+			}
+			else
+			{
+				drawText(20, 20 + (i * 50), txtcolor, m_tabs[i], fntMedium);
+			}
+		}
+	}
+
+	void add(string tab, Window* panel)
+	{
+		m_tabs.push(tab);
+		m_panels.push(sptr<Window>(panel));
+	}
+
+protected:
+	Buffer<string> m_tabs;
+	Buffer<sptr<Window>> m_panels;
+	u32 m_selectedIndex;
 };
 
 class Body : public Window
@@ -42,15 +85,46 @@ public:
 	}
 };
 
+class SdWnd : public Window
+{
+public:
+	SdWnd(Window* p, string id, Rect r) : Window(p, id, r)
+	{
+	}
+};
+
+class NutWnd : public Window
+{
+public:
+	NutWnd(Window* p, string id, Rect r) : Window(p, id, r)
+	{
+	}
+};
+
+class ConsoleWnd : public Window
+{
+public:
+	ConsoleWnd(Window* p, string id, Rect r) : Window(p, id, r)
+	{
+	}
+};
+
 class NutGui : public Window
 {
 public:
 	NutGui(string Title, string Footer, Theme Theme) : m_focus(0), Window(string("root"), Rect(0, 0, 1280, 720))
 	{
+		Rect panelRect(411, 88, 1249 - 411, 646 - 88);
+
 		menu = (Menu*)windows().push(sptr<Window>(new Menu(this, string("menu"), Rect(30, 88, 410 - 30, 646 - 88)))).get();
 		body = (Body*)windows().push(sptr<Window>(new Body(this, string("body"), Rect(411, 88, 1249 - 411, 646 - 88 )))).get();
 
-		focus() = body;
+		menu->add(string("SD"), new SdWnd(this, string("SD"), panelRect));
+		menu->add(string("CDN"), new NutWnd(this, string("CDN"), panelRect));
+		menu->add(string("NUT"), new NutWnd(this, string("NUT"), panelRect));
+		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
+
+		focus() = menu;
 
 
 		romfsInit();
@@ -71,7 +145,6 @@ public:
 		bgt = texInit(bgs);
 		txtcolor = { Theme.TextColor.R, Theme.TextColor.G, Theme.TextColor.B, Theme.TextColor.A };
 		selcolor = { Theme.SelectedTextColor.R, Theme.SelectedTextColor.G, Theme.SelectedTextColor.B, Theme.SelectedTextColor.A };
-		vol = 64;
 		title = Title;
 		footer = Footer;
 	}
@@ -89,10 +162,12 @@ public:
 
 	u64 keysDown(u64 keys) override
 	{
-		if (focus())
+		/*if (focus())
 		{
 			keys = focus()->keysDown(keys);
-		}
+		}*/
+
+		menu->keysDown(keys);
 
 		return keys;
 	}
@@ -121,12 +196,19 @@ public:
 		if (kDown & KEY_A)
 		{
 			//text1 = "A pressed!";
+			invalidate();
+		}
+
+		if (m_redraw)
+		{
 			renderGraphics();
+			m_redraw = false;
 		}
 
 		return true;
 	}
 
+	/*
 	void render()
 	{
 		hidScanInput();
@@ -134,6 +216,8 @@ public:
 		HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
 		PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
 		ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
+
+		keysDown(PressedInput);
 
 		SDL_RenderClear(_renderer);
 		drawBack(bgs, bgt);
@@ -144,7 +228,7 @@ public:
 		
 		drawText(footerX, footerY, txtcolor, footer, fntLarge);
 		SDL_RenderPresent(_renderer);
-	}
+	}*/
 
 	void renderGraphics()
 	{
@@ -152,7 +236,10 @@ public:
 		drawBack(bgs, bgt);
 		drawText(titleX, titleY, txtcolor, title, fntLarge);
 
-
+		if (menu)
+		{
+			menu->draw();
+		}
 
 
 		drawText(footerX, footerY, txtcolor, footer, fntLarge);
@@ -177,17 +264,12 @@ public:
 	Buffer<sptr<Window>>& windows() { return m_windows; }
 
 	SDL_Window *_window;
-	SDL_Color txtcolor;
-	SDL_Color selcolor;
-	string ttf;
-	TTF_Font *fntMedium;
-	TTF_Font *fntLarge;
 
 	SDL_Surface *bgs;
 	SDL_Texture *bgt;
 	string title;
 	string footer;
-	int vol;
+
 	int titleX = 60;
 	int titleY = 30;
 	int footerX = titleX;
