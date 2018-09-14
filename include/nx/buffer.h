@@ -218,6 +218,12 @@ public:
 			return true;
 		}
 
+		if (!newSize)
+		{
+			size() = newSize;
+			return true;
+		}
+
 		u64 newBufferSize = (newSize / BUFFER_ALIGN) * BUFFER_ALIGN + BUFFER_ALIGN;
 
 		T* newBuffer =  (T*)malloc((size_t)newBufferSize * sizeof(T));

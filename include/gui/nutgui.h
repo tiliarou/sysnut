@@ -103,6 +103,8 @@ public:
 	{
 		m_selectedIndex = 0;
 		m_offset = 0;
+
+		refresh();
 	}
 
 	void draw() override
@@ -120,9 +122,11 @@ public:
 			m_offset = m_selectedIndex;
 		}
 
-		for (int i=0; i < maxLines; i++)
+		dir.files().find("");
+
+		for (int i=0; i < maxLines && i + m_offset < files().size(); i++)
 		{
-			auto& f = dir.files()[i + m_offset];
+			auto& f = files()[i + m_offset];
 			if (i + m_offset == m_selectedIndex)
 			{
 				if (isFocused())
@@ -130,12 +134,10 @@ public:
 					drawRect(0, y - 16, width(), 50, txtcolor);
 				}
 				drawText(20, y, selcolor, f->name(), fntMedium);
-				//drawText(f->name(), 20, y, { 0, 255, 255, 255 }, 50);
 			}
 			else
 			{
 				drawText(20, y, txtcolor, f->name(), fntMedium);
-				//drawText(f->name(), 20, y, { 0, 0, 255, 255 }, 50);
 			}
 			y += 50;
 		}
@@ -154,7 +156,7 @@ public:
 
 		if (keys & KEY_DOWN)
 		{
-			if (m_selectedIndex < dir.files().size() - 1)
+			if (files().size() && m_selectedIndex < files().size() - 1)
 			{
 				m_selectedIndex++;
 			}
@@ -163,7 +165,24 @@ public:
 		return keys;
 	}
 
+	void refresh()
+	{
+		string nspExt(".nsp");
+		m_files.resize(0);
+		for (auto& f : dir.files())
+		{
+			if (f->name().endsWith(nspExt))
+			{
+				m_files.push(f);
+			}
+		}
+		//m_files = dir.files().find(".nsp");
+	}
+
+	Array<sptr<FileEntry>>& files() { return m_files; }
+
 	SdDirectory dir;
+	Array<sptr<FileEntry>> m_files;
 	u32 m_selectedIndex;
 	u32 m_offset;
 };
