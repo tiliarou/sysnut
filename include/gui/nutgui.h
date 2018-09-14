@@ -48,20 +48,30 @@ public:
 		return keys;
 	}
 
+	sptr<Window>& activePanel()
+	{
+		return m_panels[m_selectedIndex];
+	}
+
 	void draw() override
 	{
+		int y = 20;
 		for (u32 i = 0; i < m_tabs.size(); i++)
 		{
-
 			if (i == m_selectedIndex)
 			{
-				drawText(20, 20 + (i * 50), selcolor, m_tabs[i], fntMedium);
-				m_panels[i]->draw();
+				if (isFocused())
+				{
+					drawRect(0, y-16, width(), 50, txtcolor);
+				}
+				drawText(20, y, selcolor, m_tabs[i], fntMedium);
+				activePanel()->draw();
 			}
 			else
 			{
-				drawText(20, 20 + (i * 50), txtcolor, m_tabs[i], fntMedium);
+				drawText(20, y, txtcolor, m_tabs[i], fntMedium);
 			}
+			y += 50;
 		}
 	}
 
@@ -90,6 +100,11 @@ class SdWnd : public Window
 public:
 	SdWnd(Window* p, string id, Rect r) : Window(p, id, r)
 	{
+	}
+
+	void draw() override
+	{
+		drawText(string("Hello World"), 20, 20, { 0, 0, 255, 255 }, 50);
 	}
 };
 
@@ -124,7 +139,7 @@ public:
 		menu->add(string("NUT"), new NutWnd(this, string("NUT"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 
-		focus() = menu;
+		setFocus(menu);
 
 
 		romfsInit();
@@ -160,14 +175,51 @@ public:
 		romfsExit();
 	}
 
+	void setFocus(Window* w)
+	{
+		if (focus())
+		{
+			if (focus() == w)
+			{
+				return;
+			}
+			focus()->onDefocus();
+		}
+		focus() = w;
+		focus()->onFocus();
+	}
+
 	u64 keysDown(u64 keys) override
 	{
-		/*if (focus())
+		if (focus())
 		{
 			keys = focus()->keysDown(keys);
-		}*/
+		}
 
-		menu->keysDown(keys);
+		if (keys & KEY_LEFT)
+		{
+			if (focus() != menu)
+			{
+				setFocus(menu);
+				invalidate();
+			}
+		}
+
+		if (keys & KEY_RIGHT)
+		{
+			if (focus() == menu)
+			{
+				setFocus(menu->activePanel().get());
+				invalidate();
+			}
+		}
+
+		if (keys & KEY_A && focus() == menu)
+		{
+			setFocus(menu->activePanel().get());
+			invalidate();
+		}
+
 
 		return keys;
 	}
@@ -193,9 +245,14 @@ public:
 			return false;
 		}
 
-		if (kDown & KEY_A)
+		if (kDown & KEY_B)
 		{
-			//text1 = "A pressed!";
+			if (focus() == menu)
+			{
+				return false;
+			}
+
+			setFocus(menu);
 			invalidate();
 		}
 

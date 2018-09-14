@@ -87,7 +87,7 @@ public:
 	{
 		SDL_Color clr = { Color.R, Color.G, Color.B, Color.A };
 		TTF_Font *fnt = TTF_OpenFont(ttf.c_str(), Size);
-		drawText(X + 411, Y + 88, clr, Text, fnt);
+		drawText(X, Y, clr, Text, fnt);
 	}
 
 	void drawText(int x, int y, SDL_Color scolor, string text, TTF_Font *font)
@@ -102,8 +102,8 @@ public:
 	void drawRect(int x, int y, int w, int h, SDL_Color scolor)
 	{
 		SDL_Rect rect;
-		rect.x = x;
-		rect.y = y;
+		rect.x = x + this->rect().x;
+		rect.y = y + this->rect().y;
 		rect.w = w;
 		rect.h = h;
 		SDL_SetRenderDrawColor(_renderer, scolor.r, scolor.g, scolor.b, scolor.a);
@@ -135,6 +135,16 @@ public:
 		m_redraw = true;
 	}
 
+	virtual void onFocus()
+	{
+		m_isFocused = true;
+	}
+
+	virtual void onDefocus()
+	{
+		m_isFocused = false;
+	}
+
 	virtual u64 keysDown(u64 keys) { return keys; }
 	virtual u64 keysUp(u64 keys) { return keys; }
 
@@ -148,7 +158,10 @@ public:
 	string& id() { return m_id; }
 
 	Rect& rect() { return m_rect; }
+
+	bool& isFocused() { return m_isFocused; }
 protected:
+	bool m_isFocused = false;
 	bool m_redraw = false;
 	Window*& parent() { return m_parent; }
 	Rect m_rect;
