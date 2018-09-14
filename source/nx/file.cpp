@@ -68,6 +68,11 @@ u64 File::read(Buffer<u8>& buffer, u64 sz)
 		return 0;
 	}
 
+	if (!sz)
+	{
+		sz = size() - tell();
+	}
+
 	return m_parent->read(buffer, sz);
 }
 

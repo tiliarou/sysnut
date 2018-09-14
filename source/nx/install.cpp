@@ -225,7 +225,11 @@ bool Install::install()
 		auto cert = dir->openFile<File>(certFile);
 
 		Buffer<u8> ticketBuffer, certBuffer;
+
+		ticket->rewind();
 		ticket->read(ticketBuffer);
+
+		cert->rewind();
 		cert->read(certBuffer);
 
 		if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
