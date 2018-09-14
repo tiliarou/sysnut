@@ -8,6 +8,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "nx/sddirectory.h"
+#include "nx/install.h"
 #include "nx/pfs0.h"
 #include "gui/window.h"
 #include "nx/buffer.h"
@@ -97,15 +98,13 @@ public:
 	}
 };
 
-class SdWnd : public Window
+class HListWnd : public Window
 {
 public:
-	SdWnd(Window* p, string id, Rect r) : Window(p, id, r), dir("/")
+	HListWnd(Window* p, string id, Rect r) : Window(p, id, r)
 	{
 		m_selectedIndex = 0;
 		m_offset = 0;
-
-		refresh();
 	}
 
 	void draw() override
@@ -117,31 +116,33 @@ public:
 		{
 			m_offset = m_selectedIndex - maxLines + 1;
 		}
-		
+
 		if (m_selectedIndex < m_offset)
 		{
 			m_offset = m_selectedIndex;
 		}
 
-		dir.files().find("");
-
-		for (int i=0; i < maxLines && i + m_offset < files().size(); i++)
+		for (int i = 0; i < maxLines && i + m_offset < items().size(); i++)
 		{
-			auto& f = files()[i + m_offset];
+			auto& text = items()[i + m_offset];
 			if (i + m_offset == m_selectedIndex)
 			{
 				if (isFocused())
 				{
 					drawRect(0, y - 16, width(), 50, txtcolor);
 				}
-				drawText(20, y, selcolor, f->name(), fntMedium);
+				drawText(20, y, selcolor, text, fntMedium);
 			}
 			else
 			{
-				drawText(20, y, txtcolor, f->name(), fntMedium);
+				drawText(20, y, txtcolor, text, fntMedium);
 			}
 			y += 50;
 		}
+	}
+
+	virtual void select(u32 selected)
+	{
 	}
 
 	u64 keysDown(u64 keys) override
@@ -157,45 +158,111 @@ public:
 
 		if (keys & KEY_DOWN)
 		{
-			if (files().size() && m_selectedIndex < files().size() - 1)
+			if (items().size() && m_selectedIndex < items().size() - 1)
 			{
 				m_selectedIndex++;
 			}
 			invalidate();
 		}
 
-		if (keys & KEY_A && files().size())
+		if (keys & KEY_A && items().size())
 		{
-			Pfs0 nsp;
-			string name = string("/") + files()[m_selectedIndex]->name();
-			if (nsp.open(name))
-			{
-				nsp.install();
-			}
+			select(m_selectedIndex);
 		}
 		return keys;
 	}
 
-	void refresh()
+	void onFocus() override
+	{
+		Window::onFocus();
+		refresh();
+		invalidate();
+	}
+
+	virtual void refresh()
+	{
+	}
+
+	Array<string>& items() { return m_items; }
+
+	Array<string> m_items;
+	u32 m_selectedIndex;
+	u32 m_offset;
+};
+
+class SdWnd : public HListWnd
+{
+public:
+	SdWnd(Window* p, string id, Rect r) : HListWnd(p, id, r), dir("/")
+	{
+	}
+
+	void select(u32 i) override
+	{
+		(void)i;
+
+		Pfs0 nsp;
+		string name = string("/") + items()[m_selectedIndex];
+		if (nsp.open(name))
+		{
+			nsp.install();
+		}
+	}
+
+	void refresh() override
 	{
 		string nspExt(".nsp");
-		m_files.resize(0);
+		items().resize(0);
 		for (auto& f : dir.files())
 		{
 			if (f->name().endsWith(nspExt))
 			{
-				m_files.push(f);
+				items().push(f->name());
 			}
 		}
 		//m_files = dir.files().find(".nsp");
 	}
 
-	Array<sptr<FileEntry>>& files() { return m_files; }
-
 	SdDirectory dir;
-	Array<sptr<FileEntry>> m_files;
-	u32 m_selectedIndex;
-	u32 m_offset;
+};
+
+class TicketWnd : public HListWnd
+{
+public:
+	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
+	{
+	}
+
+	void refresh() override
+	{
+		Buffer<RightsId> rightsIds;
+		u32 rightsIdCount = 0;
+		u32 installedTicketCount = 0;
+		u8 titleKey[16];
+
+		items().resize(0);
+
+
+		if (esCountCommonTicket(&installedTicketCount))
+		{
+			error("Failed to count common tickets\n");
+			return;
+		}
+
+		rightsIds.resize(installedTicketCount);
+		memset(rightsIds.buffer(), NULL, rightsIds.sizeBytes());
+
+		if (esListCommonTicket(&rightsIdCount, rightsIds.buffer(), rightsIds.sizeBytes()))
+		{
+			error("Failed to list common tickets\n");
+			return;
+		}
+
+		for (unsigned int i = 0; i < rightsIdCount; i++)
+		{
+			items().push(getBaseTitleName(rightsIds[i].titleId()));
+		}
+	}
 };
 
 class NutWnd : public Window
@@ -227,6 +294,7 @@ public:
 		menu->add(string("SD"), new SdWnd(this, string("SD"), panelRect));
 		menu->add(string("CDN"), new NutWnd(this, string("CDN"), panelRect));
 		menu->add(string("NUT"), new NutWnd(this, string("NUT"), panelRect));
+		menu->add(string("Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 
 		setFocus(menu);

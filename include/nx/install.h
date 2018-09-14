@@ -8,6 +8,8 @@ class storage;
 class dir;
 class Nca;
 
+string getBaseTitleName(TitleId baseTitleId);
+
 class Install
 {
 public:

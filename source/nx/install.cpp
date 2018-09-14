@@ -238,3 +238,38 @@ bool Install::install()
 
 	return true;
 }
+
+string getBaseTitleName(TitleId baseTitleId)
+{
+	Result rc = 0;
+	NsApplicationControlData appControlData;
+	size_t sizeRead;
+
+	if (R_FAILED(rc = nsGetApplicationControlData(0x1, swapEndian(baseTitleId), &appControlData, sizeof(NsApplicationControlData), &sizeRead)))
+	{
+		error("Failed to get application control data. Error code: 0x%08x\n", rc);
+		return hx(baseTitleId);
+	}
+
+	if (sizeRead < sizeof(appControlData.nacp))
+	{
+		error("Incorrect size for nacp\n");
+		return "Unknown2";
+	}
+
+	NacpLanguageEntry *languageEntry;
+
+	if (R_FAILED(rc = nacpGetLanguageEntry(&appControlData.nacp, &languageEntry)))
+	{
+		error("Failed to get language entry. Error code: 0x%08x\n", rc);
+		return hx(baseTitleId);
+	}
+
+	if (languageEntry == NULL)
+	{
+		error("Language entry is null! Error code: 0x%08x\n", rc);
+		return hx(baseTitleId);
+	}
+
+	return languageEntry->name;
+}

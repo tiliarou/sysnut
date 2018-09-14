@@ -236,7 +236,7 @@ public:
 
 		if (buffer())
 		{
-			memcpy(newBuffer, buffer(), (size_t)size() * sizeof(T));
+			memcpy((void*)newBuffer, (void*)buffer(), (size_t)size() * sizeof(T));
 			free(buffer());
 		}
 
