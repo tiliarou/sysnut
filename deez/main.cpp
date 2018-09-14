@@ -123,18 +123,6 @@ void network_post_exit(void)
 	socketExit();
 }
 
-void guiThread(void* p = NULL)
-{
-	(void)p;
-
-	Pfs0 nsp;
-	string name("/gunbird.nsp");
-	if (nsp.open(name))
-	{
-		nsp.install();
-	}
-}
-
 
 int main(int argc, char **argv)
 {
@@ -159,8 +147,6 @@ int main(int argc, char **argv)
 		fatal("Failed to start application thread\n");
 		return -1;
 	}*/
-
-	guiThread();
 
 	NutGui gui("Deez Title Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonDark());
 	

@@ -8,6 +8,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #include "nx/sddirectory.h"
+#include "nx/pfs0.h"
 #include "gui/window.h"
 #include "nx/buffer.h"
 
@@ -161,6 +162,16 @@ public:
 				m_selectedIndex++;
 			}
 			invalidate();
+		}
+
+		if (keys & KEY_A && files().size())
+		{
+			Pfs0 nsp;
+			string name = string("/") + files()[m_selectedIndex]->name();
+			if (nsp.open(name))
+			{
+				nsp.install();
+			}
 		}
 		return keys;
 	}
