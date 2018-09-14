@@ -241,6 +241,7 @@ bool Install::install()
 
 string getBaseTitleName(TitleId baseTitleId)
 {
+#ifndef _MSC_VER
 	Result rc = 0;
 	NsApplicationControlData appControlData;
 	size_t sizeRead;
@@ -272,4 +273,7 @@ string getBaseTitleName(TitleId baseTitleId)
 	}
 
 	return languageEntry->name;
+#else
+	return "UNKNOWN";
+#endif
 }

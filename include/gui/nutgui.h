@@ -13,6 +13,11 @@
 #include "gui/window.h"
 #include "nx/buffer.h"
 
+string footer;
+
+CircularBuffer<string, 0x100>& printLog();
+
+
 struct Theme
 {
 	string BackgroundPath;
@@ -198,23 +203,53 @@ public:
 	u32 m_rowHeight = 50;
 };
 
+string installPath;
+
+void installThread(void* p = NULL)
+{
+	(void)p;
+
+	footer = string("Installing ") + installPath;
+
+	Pfs0 nsp;
+
+	if (nsp.open(installPath))
+	{
+		nsp.install();
+		footer = string("Installation complete ") + installPath;
+	}
+	else
+	{
+		footer = string("Installation failed for ") + installPath;
+	}
+}
+
 class SdWnd : public HListWnd<string>
 {
 public:
 	SdWnd(Window* p, string id, Rect r) : HListWnd(p, id, r), dir("/")
 	{
+		refresh();
 	}
 
 	void select(u32 i) override
 	{
 		(void)i;
 
-		Pfs0 nsp;
-		string name = string("/") + items()[m_selectedIndex];
-		if (nsp.open(name))
+		installPath = string("/") + items()[m_selectedIndex];
+		installThread();
+
+		/*if (threadCreate(&t, &installThread, NULL, 128 * 1024, 0x3B, -2))
 		{
-			nsp.install();
+			fatal("Failed to create application thread\n");
+			return;
 		}
+
+		if (threadStart(&t))
+		{
+			fatal("Failed to start application thread\n");
+			return;
+		}*/
 	}
 
 	void refresh() override
@@ -232,6 +267,7 @@ public:
 	}
 
 	SdDirectory dir;
+	Thread t;
 };
 
 class TitleRow
@@ -263,28 +299,15 @@ class TicketWnd : public HListWnd<TitleRow>
 public:
 	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
 	{
+		refresh();
 	}
 
-	/*void drawItem(int itemIndex, int displayIndex, TitleRow& item) override
+	void onFocus()
 	{
-		auto& row = items()[itemIndex];
-		int y = 20 + (displayIndex * rowHeight());
-
-		if (itemIndex == m_selectedIndex)
-		{
-			if (isFocused())
-			{
-				drawRect(0, y - 16, width(), 50, txtcolor);
-			}
-			drawText(20, y, selcolor, hx(row.titleId()), fntMedium);
-			drawText(20 + 100, y, selcolor, row.name(), fntMedium);
-		}
-		else
-		{
-			drawText(20, y, txtcolor, hx(row.titleId()), fntMedium);
-			drawText(20 + 100, y, txtcolor, row.name(), fntMedium);
-		}
-	}*/
+		Window::onFocus();
+		refresh();
+		invalidate();
+	}
 
 	void refresh() override
 	{
@@ -331,6 +354,25 @@ class ConsoleWnd : public Window
 public:
 	ConsoleWnd(Window* p, string id, Rect r) : Window(p, id, r)
 	{
+	}
+
+	void draw() override
+	{
+		const int maxLines = 11;
+
+		int offset = printLog().size() >= maxLines ? printLog().size() : 0;
+
+		for (int i = offset; i < maxLines && i + offset < printLog().size(); i++)
+		{
+			int y = 20 + ((i - offset) * 50);
+			drawText(20, y, txtcolor, printLog()[i], fntMedium);
+		}
+	}
+
+	void onFocus()
+	{
+		Window::onFocus();
+		invalidate();
 	}
 };
 
@@ -536,7 +578,7 @@ public:
 	SDL_Surface *bgs;
 	SDL_Texture *bgt;
 	string title;
-	string footer;
+	//string footer;
 
 	int titleX = 60;
 	int titleY = 30;

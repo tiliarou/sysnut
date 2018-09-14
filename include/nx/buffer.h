@@ -133,7 +133,7 @@ public:
 
 	T& first()
 	{
-		return m_buffer[0];
+		return (*this)[0];
 	}
 
 	T& last()
@@ -142,7 +142,7 @@ public:
 		{
 			return m_buffer[0];
 		}
-		return m_buffer[size() - 1];
+		return (*this)[size() - 1];
 	}
 
 	T& push(T n)
@@ -151,10 +151,10 @@ public:
 		if (!resize(sz + 1))
 		{
 			fatal("failed to resize buffer!\n");
-			return m_buffer[sz-1];
+			return (*this)[sz-1];
 		}
 		m_buffer[sz] = n;
-		return m_buffer[sz];
+		return (*this)[sz];
 	}
 
 	T pop()
@@ -367,4 +367,41 @@ protected:
 	T* m_buffer = NULL;
 	u64 m_size = 0;
 	u64 m_bufferSize = 0;
+};
+
+template<class T, u64 SZ>
+class CircularBuffer : public Buffer<T>
+{
+public:
+	CircularBuffer() : Buffer<T>()
+	{
+		Buffer<T>::resize(SZ);
+		Buffer<T>::resize(0);
+		circularPosition() = 0;
+	}
+
+	T& push(T n)
+	{
+		if (Buffer<T>::size() < SZ)
+		{
+			return Buffer<T>::push(n);
+		}
+		Buffer<T>::m_buffer[circularPosition()] = n;
+		circularPosition() = (circularPosition() + 1) % SZ;
+
+	}
+
+	const T& operator[](u32 i) const
+	{
+		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
+	}
+
+	T& operator[](u32 i)
+	{
+		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
+	}
+
+	u32& circularPosition() { return m_circularPosition; }
+private:
+	u32 m_circularPosition;
 };
