@@ -98,6 +98,7 @@ public:
 	}
 };
 
+template<class T>
 class HListWnd : public Window
 {
 public:
@@ -107,10 +108,27 @@ public:
 		m_offset = 0;
 	}
 
+	virtual void drawItem(int itemIndex, int displayIndex, T& item)
+	{
+		int y = 20 + (displayIndex * rowHeight());
+
+		if (itemIndex == m_selectedIndex)
+		{
+			if (isFocused())
+			{
+				drawRect(0, y - 16, width(), 50, txtcolor);
+			}
+			drawText(20, y, selcolor, (string)item, fntMedium);
+		}
+		else
+		{
+			drawText(20, y, txtcolor, (string)item, fntMedium);
+		}
+	}
+
 	void draw() override
 	{
 		const int maxLines = 11;
-		int y = 20;
 
 		if (m_selectedIndex >= m_offset + maxLines)
 		{
@@ -124,25 +142,13 @@ public:
 
 		for (int i = 0; i < maxLines && i + m_offset < items().size(); i++)
 		{
-			auto& text = items()[i + m_offset];
-			if (i + m_offset == m_selectedIndex)
-			{
-				if (isFocused())
-				{
-					drawRect(0, y - 16, width(), 50, txtcolor);
-				}
-				drawText(20, y, selcolor, text, fntMedium);
-			}
-			else
-			{
-				drawText(20, y, txtcolor, text, fntMedium);
-			}
-			y += 50;
+			drawItem(i + m_offset, i, items()[i + m_offset]);
 		}
 	}
 
 	virtual void select(u32 selected)
 	{
+		(void)selected;
 	}
 
 	u64 keysDown(u64 keys) override
@@ -183,14 +189,16 @@ public:
 	{
 	}
 
-	Array<string>& items() { return m_items; }
+	Array<T>& items() { return m_items; }
+	u32& rowHeight() { return m_rowHeight; }
 
-	Array<string> m_items;
+	Array<T> m_items;
 	u32 m_selectedIndex;
 	u32 m_offset;
+	u32 m_rowHeight = 50;
 };
 
-class SdWnd : public HListWnd
+class SdWnd : public HListWnd<string>
 {
 public:
 	SdWnd(Window* p, string id, Rect r) : HListWnd(p, id, r), dir("/")
@@ -226,12 +234,57 @@ public:
 	SdDirectory dir;
 };
 
-class TicketWnd : public HListWnd
+class TitleRow
+{
+public:
+	TitleRow()
+	{
+	}
+
+	TitleRow(TitleId titleId, string name) : m_titleId(titleId), m_name(name)
+	{
+	}
+
+	operator string()
+	{
+		return hx(titleId()) + "    " + name();
+	}
+
+	TitleId& titleId() { return m_titleId; }
+	string& name() { return m_name; }
+
+private:
+	TitleId m_titleId;
+	string m_name;
+};
+
+class TicketWnd : public HListWnd<TitleRow>
 {
 public:
 	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
 	{
 	}
+
+	/*void drawItem(int itemIndex, int displayIndex, TitleRow& item) override
+	{
+		auto& row = items()[itemIndex];
+		int y = 20 + (displayIndex * rowHeight());
+
+		if (itemIndex == m_selectedIndex)
+		{
+			if (isFocused())
+			{
+				drawRect(0, y - 16, width(), 50, txtcolor);
+			}
+			drawText(20, y, selcolor, hx(row.titleId()), fntMedium);
+			drawText(20 + 100, y, selcolor, row.name(), fntMedium);
+		}
+		else
+		{
+			drawText(20, y, txtcolor, hx(row.titleId()), fntMedium);
+			drawText(20 + 100, y, txtcolor, row.name(), fntMedium);
+		}
+	}*/
 
 	void refresh() override
 	{
@@ -260,7 +313,7 @@ public:
 
 		for (unsigned int i = 0; i < rightsIdCount; i++)
 		{
-			items().push(getBaseTitleName(rightsIds[i].titleId()));
+			items().push(TitleRow(rightsIds[i].titleId(), getBaseTitleName(rightsIds[i].titleId())));
 		}
 	}
 };
