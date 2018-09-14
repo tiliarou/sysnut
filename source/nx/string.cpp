@@ -21,10 +21,27 @@ string& string::operator=(const string& src)
 	return *this;
 }
 
+string& string::operator+=(const char* s)
+{
+	size_t len = strlen(s);
+
+	resize(length() + len + 1);
+
+	memcpy(this->buffer() + length(), s, len);
+
+	if (!size() || last() != NULL)
+	{
+		push(NULL);
+	}
+	return *this;
+}
+
 string string::operator+(const char* s)
 {
 	string result = *this;
-	size_t len = strlen(s);
+	result += s;
+	return result;
+	/*size_t len = strlen(s);
 
 	result.resize(length() + len + 1);
 
@@ -34,7 +51,7 @@ string string::operator+(const char* s)
 	{
 		push(NULL);
 	}
-	return result;
+	return result;*/
 }
 
 bool string::set(const void* src, u64 sz)

@@ -361,7 +361,6 @@ public:
 	{
 		const int maxLines = 11;
 
-		//int offset = printLog().size() >= maxLines ? printLog().size() : 0;
 		int end = printLog().size();
 		int i = end > maxLines ? end - maxLines : 0;
 

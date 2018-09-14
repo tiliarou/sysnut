@@ -4,18 +4,34 @@
 #include "socket.h"
 #include "log.h"
 
-Array<PrintHook> g_hooks;
+Array<PrintHook>* g_hooks = NULL;
+
+Array<PrintHook>* hooks()
+{
+	if (!g_hooks)
+	{
+		g_hooks = new Array<PrintHook>();
+	}
+	return g_hooks;
+}
 
 void registerPrintHook(PrintHook func)
 {
-	g_hooks.push(func);
+	hooks()->push(func);
 }
 
 
 FILE* f = NULL;
 
-CircularBuffer<string, 0x100> g_printLog;
-CircularBuffer<string, 0x100>& printLog() { return g_printLog; }
+CircularBuffer<string, 0x100>* g_printLog = NULL;
+CircularBuffer<string, 0x100>& printLog()
+{
+	if (!g_printLog)
+	{
+		g_printLog = new CircularBuffer<string, 0x100>();
+	}
+	return *g_printLog;
+}
 
 char printBuffer[0x1000];
 
@@ -43,16 +59,33 @@ void print(const char * format, ...)
 	va_start(args, format);
 	vsprintf(printBuffer, format, args);
 	printf("%s", printBuffer);
+
 	printLog().push(printBuffer);
+	/*
+	size_t len = strlen(printBuffer);
+
+	if (!printLog().size())
+	{
+		printLog().push(string(""));
+	}
+
+	printLog().last() += printBuffer;*/
 
 	va_end(args);
 	fflush(f);
 
-	for (auto& f : g_hooks)
+	for (auto& f : *hooks())
 	{
 		f();
 	}
+
+	/*if (printBuffer[len - 1] == '\n')
+	{
+		printLog().push(string(""));
+	}*/
 }
+
+/*
 
 void fatal(const char * format, ...)
 {
@@ -121,3 +154,4 @@ void debug(const char * format, ...)
 		f();
 	}
 }
+*/

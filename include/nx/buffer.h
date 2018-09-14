@@ -40,6 +40,7 @@ public:
 		buffer() = NULL;
 		size() = 0;
 		bufferSize() = 0;
+		resize(0);
 	}
 
 	~Buffer()
@@ -215,12 +216,6 @@ public:
 		{
 			size() = newSize;
 			initializeItems(originalSize, newSize);
-			return true;
-		}
-
-		if (!newSize)
-		{
-			size() = newSize;
 			return true;
 		}
 
