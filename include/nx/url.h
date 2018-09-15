@@ -44,7 +44,23 @@ public:
 		if (isValid_)
 		{
 			scheme() = fromRange(uriParse_.scheme);
-			user() = decode(fromRange(uriParse_.userInfo));
+
+			user() = fromRange(uriParse_.userInfo);
+
+			if (user().length())
+			{
+				auto bits = user().split(':');
+				if (bits->size() > 1)
+				{
+					user() = decode((*bits)[0]);
+					password() = decode((*bits)[1]);
+				}
+				else
+				{
+					user() = decode(user());
+				}
+			}
+
 			host() = fromRange(uriParse_.hostText);
 			port() = atoi(fromRange(uriParse_.portText).c_str());
 			path() = fromList(uriParse_.pathHead, "/");
