@@ -2,6 +2,7 @@
 #include "log.h"
 #include "nx/file.h"
 #include "nx/diskfile.h"
+#include "nx/curlfile.h"
 #include "mbedtls/sha256.h"
 
 void nullDeleter(File*) {}
@@ -24,7 +25,20 @@ bool File::open(string& path, const char* mode)
 		close();
 	}
 
-	sptr<DiskFile> f(new DiskFile());
+	this->path() = path;
+
+	File* fp = NULL;
+
+	if (this->path().scheme() == "ftp")
+	{
+		fp = new CurlFile();
+	}
+	else
+	{
+		fp = new DiskFile();
+	}
+
+	sptr<File> f(fp);
 
 
 	if (!f->open(path, mode))
@@ -39,8 +53,6 @@ bool File::open(string& path, const char* mode)
 	{
 		return false;
 	}
-
-	this->path() = path;
 
 	return true;
 }

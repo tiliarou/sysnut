@@ -5,6 +5,8 @@
 class Url
 {
 public:
+	Url(const Url&) = delete;
+
 	Url() 
 	{
 		isValid_ = false;
@@ -13,6 +15,11 @@ public:
 	Url(string uri)	: uri_(uri)
 	{
 		set(uri);
+	}
+
+	Url(const char* s) : uri_(s)
+	{
+		set(uri_);
 	}
 
 	bool set(string uri)

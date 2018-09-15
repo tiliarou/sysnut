@@ -3,6 +3,7 @@
 #include "nx/buffer.h"
 #include "nx/sptr.h"
 #include "nx/integer.h"
+#include "nx/url.h"
 #include <stdio.h>
 
 #define MAX_FILE_CHILDREN 0x10
@@ -13,7 +14,7 @@ public:
 	File();
 	virtual ~File();
 
-	bool open(string& path, const char* mode = "rb");
+	virtual bool open(string& path, const char* mode = "rb");
 	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
 	static sptr<File> factory(string& path, const char* mode = "rb");
@@ -45,7 +46,7 @@ public:
 	virtual u64 read(Buffer<u8>& buffer, u64 sz = 0);
 
 	bool isOpen();
-	string& path() { return m_path; }
+	Url& path() { return m_path; }
 
 	sptr<File>& parent() { return m_parent; }
 
@@ -64,7 +65,7 @@ public:
 
 protected:
 
-	string m_path;
+	Url m_path;
 	sptr<File> m_parent;
 	u64 m_partitionOffset = 0;
 	u64 m_partitionSize = 0;

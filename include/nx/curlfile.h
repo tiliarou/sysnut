@@ -7,7 +7,7 @@ class CurlFile : public File
 public:
 	CurlFile();
 	virtual ~CurlFile();
-	virtual bool open(string& path, const char* mode = "rb");
+	virtual bool open(string& path, const char* mode = "rb") override;
 	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);

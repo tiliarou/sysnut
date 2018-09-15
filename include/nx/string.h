@@ -18,6 +18,9 @@ public:
 
 	string& operator+=(const string s);
 
+	bool operator==(const string& s);
+	bool operator==(const char* s);
+
 	string& trim();
 
 	sptr<Array<string>> split(char c);

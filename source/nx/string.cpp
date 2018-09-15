@@ -14,6 +14,27 @@ string::string(const string& src)
 	*this = src;
 }
 
+bool string::operator==(const string& s)
+{
+	if (s.length() != length())
+	{
+		return false;
+	}
+	return memcmp(buffer(), s.buffer(), size()) == 0;
+}
+
+bool string::operator==(const char* s)
+{
+	u64 len = (u64)strlen(s);
+
+	if (len != length())
+	{
+		return false;
+	}
+
+	return memcmp(buffer(), s, size()) == 0;
+}
+
 string& string::operator=(const string& src)
 {
 	src.slice(*this, 0, src.size());
