@@ -66,13 +66,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);include;</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86;$(VC_SourcePath);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -82,7 +83,7 @@
       <TargetMachine>MachineX86</TargetMachine>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;ws2_32.lib;uuid.lib;odbc32.lib;odbccp32.lib;libcurl_a.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;ws2_32.lib;uuid.lib;odbc32.lib;odbccp32.lib;libcurl_a.lib;Crypt32.lib;wldap32.lib;normaliz.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -110,6 +111,7 @@
     <ClCompile Include="source\nx\bufferedfile.cpp" />
     <ClCompile Include="source\nx\crypto.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
+    <ClCompile Include="source\nx\curldirectory.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
     <ClCompile Include="source\nx\diskfile.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
@@ -127,6 +129,20 @@
     <ClCompile Include="source\nx\string.cpp" />
     <ClCompile Include="source\server.cpp" />
     <ClCompile Include="source\socket.cpp" />
+    <ClCompile Include="source\uriparser\UriCommon.c" />
+    <ClCompile Include="source\uriparser\UriCompare.c" />
+    <ClCompile Include="source\uriparser\UriEscape.c" />
+    <ClCompile Include="source\uriparser\UriFile.c" />
+    <ClCompile Include="source\uriparser\UriIp4.c" />
+    <ClCompile Include="source\uriparser\UriIp4Base.c" />
+    <ClCompile Include="source\uriparser\UriNormalize.c" />
+    <ClCompile Include="source\uriparser\UriNormalizeBase.c" />
+    <ClCompile Include="source\uriparser\UriParse.c" />
+    <ClCompile Include="source\uriparser\UriParseBase.c" />
+    <ClCompile Include="source\uriparser\UriQuery.c" />
+    <ClCompile Include="source\uriparser\UriRecompose.c" />
+    <ClCompile Include="source\uriparser\UriResolve.c" />
+    <ClCompile Include="source\uriparser\UriShorten.c" />
     <ClCompile Include="winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +158,7 @@
     <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
+    <ClInclude Include="include\nx\curldirectory.h" />
     <ClInclude Include="include\nx\directory.h" />
     <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />
@@ -163,6 +180,7 @@
     <ClInclude Include="include\nx\sptr.h" />
     <ClInclude Include="include\nx\uptr.h" />
     <ClInclude Include="include\nx\string.h" />
+    <ClInclude Include="include\nx\url.h" />
     <ClInclude Include="include\server.h" />
     <ClInclude Include="include\socket.h" />
     <ClInclude Include="include\util\graphics_util.hpp" />

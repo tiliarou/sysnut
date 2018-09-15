@@ -16,6 +16,12 @@ public:
 	string operator+(const char* s);
 	string& operator+=(const char* s);
 
+	string& operator+=(const string s);
+
+	string& trim();
+
+	sptr<Array<string>> split(char c);
+
 	u64 length() const { return _MIN(m_size ? m_size - 1 : 0, strlen((const char*)buffer())); }
 
 	bool startsWith(string s);

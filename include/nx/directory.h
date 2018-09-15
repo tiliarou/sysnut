@@ -2,6 +2,7 @@
 #include "nx/string.h"
 #include "nx/buffer.h"
 #include "nx/sptr.h"
+#include "nx/url.h"
 
 class File;
 
@@ -129,11 +130,11 @@ public:
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
-	string& dirPath() { return m_dirPath; }
+	Url& dirPath() { return m_dirPath; }
 
 	bool install();
 protected:
-	string m_dirPath;
+	Url m_dirPath;
 	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;
 };

@@ -292,7 +292,6 @@ bool Keys::open(const char* file)
 			}
 			else if (strcmp(key, "header_key") == 0) {
 				uhx(headerKey, value, sizeof(headerKey));
-				debug("header_key = %s\n", hx(headerKey).buffer());
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "package2_key_source") == 0) {

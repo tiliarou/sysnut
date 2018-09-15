@@ -36,6 +36,19 @@ string& string::operator+=(const char* s)
 	return *this;
 }
 
+string& string::operator+=(const string s)
+{
+	resize(length() + s.length() + 1);
+
+	memcpy(this->buffer() + length(), s, s.length());
+
+	if (!size() || last() != NULL)
+	{
+		push(NULL);
+	}
+	return *this;
+}
+
 string string::operator+(const char* s)
 {
 	string result = *this;
@@ -183,4 +196,51 @@ Buffer<u8> uhx(string hex)
 	}
 
 	return key;
+}
+
+sptr<Array<string>> string::split(char c)
+{
+	sptr<Array<string>> result(new Array<string>());
+
+	u32 start = 0;
+	for (u32 i = 0; i < length(); i++)
+	{
+		if ((*this)[i] == c)
+		{
+			string buffer;
+			slice(buffer, start, i);
+			buffer.push('\0');
+			result->push(buffer);
+			start = i + 1;
+		}
+	}
+
+	string buffer;
+	slice(buffer, start, length());
+	buffer.push('\0');
+	result->push(buffer);
+
+	return result;
+}
+
+string& string::trim()
+{
+	u32 i = size();
+
+	while (i > 0)
+	{
+		i--;
+
+		char c = (*this)[i];
+		if (c == '\r' || c == '\n' || c == '\0' || c == ' ' || c == '\t')
+		{
+			pop();
+		}
+		else
+		{
+			break;
+		}
+	}
+	push('\0');
+	return *this;
 }

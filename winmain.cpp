@@ -5,6 +5,7 @@
 #include "log.h"
 #include "nx/integer.h"
 #include "nx/sddirectory.h"
+#include "nx/curldirectory.h"
 
 bool appletMainLoop()
 {
@@ -13,10 +14,6 @@ bool appletMainLoop()
 
 int main()
 {
-	SdDirectory dir(".");
-	for (auto& f : dir.files())
-	{
-	}
 	/*Nca cnmt;
 	cnmt.open(string("C:\\Users\\bwarner\\Desktop\\nba2k19\\890e546667bc9a12c88fc06203c874c2.cnmt.nca"));
 	Buffer<u8> data;
@@ -30,12 +27,21 @@ int main()
 		print("fs\n");
 	}*/
 
+	CurlDirectory dir(string("ftp://localhost/switch/nsp/titles/"));
+
+	print("scheme: %s, host: %s\n", dir.dirPath().scheme().c_str(), dir.dirPath().host().c_str());
+
+	/*for (auto& f : dir.files())
+	{
+		print("file: %s\n", f->name());
+	}*/
+
 	
-	Pfs0 nsp;
+	/*Pfs0 nsp;
 	if (nsp.open(string("gunbird.nsp")))
 	{
 		nsp.install();
-	}
+	}*/
 	
 
 	return 0;

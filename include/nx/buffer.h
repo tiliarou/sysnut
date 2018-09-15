@@ -170,6 +170,13 @@ public:
 		return n;
 	}
 
+	sptr<Buffer<T>> slice(s64 start, s64 end) const
+	{
+		sptr<Buffer<T>> out(new Buffer<T>());
+		slice(*out, start, end);
+		return out;
+	}
+
 	bool slice(Buffer<T>& out, s64 start, s64 end) const
 	{
 		//print("slicing %d, %d\n", (s32)start, (s32)end);
@@ -180,7 +187,7 @@ public:
 			return false;
 		}
 
-		memcpy(out.buffer(), c_str() + start, (size_t)sz);
+		memcpy(out.buffer(), buffer() + (start * sizeof(T)), (size_t)sz * sizeof(T));
 
 		return true;
 	}
