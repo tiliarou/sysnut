@@ -1,11 +1,30 @@
-Homebrew title installer.
+Homebrew network title installer.
 
+# Installation
+
+ - Create the directory /switch/deez/ on your switch's SD card.
+ 
+ - Copy deez.nro to /switch/deez/deez.nro .
+ 
+ - Obtain or generate a keys.txt file and place it in /switch/deez/keys.txt .  keys.txt is a text file containing various switch encryption keys.  If you plan to generate it yourself, you can find instructions here:  https://gbatemp.net/threads/how-to-get-switch-keys-for-hactool-xci-decrypting.506978/
+ 
+ - Copy locations.conf to /switch/deez/locations.conf .  You should edit this file, it is only an example.
 you must have keys.txt in your sd root for this to work.  Only scans for NSP's in the sd root.  WIP.
 
-Code has not been fully tested, use at your own risk.
+# Disclaimer
+
+Use at your own risk, and always have a NAND backup.
+
+# Credits
+
+Tinfoil source code was reverse-engineered with plenty of help from Adubbz answering questions:
+https://github.com/Adubbz/Tinfoil
 
 icons lifted from:
 https://github.com/NightlyFox/switchIconLibrary
 
 UI Code started from:
 https://github.com/XorTroll/CustomUI/
+
+HACTOOL source code was reverse-engineered, with small bits of code lifted here and there:
+https://github.com/SciresM/hactool
