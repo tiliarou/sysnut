@@ -1,6 +1,7 @@
 #pragma once
 
 #include "nx/file.h"
+#include "nx/url.h"
 #include "nx/buffer.h"
 #include "nx/crypto.h"
 #include "nx/integer.h"
@@ -43,7 +44,7 @@ public:
 	BufferedFile();
 	virtual ~BufferedFile();
 
-	virtual bool open(string& path, const char* mode = "rb");
+	virtual bool open(Url path, const char* mode = "rb");
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);
 	bool seekThrough(u64 offset, int whence = 0);

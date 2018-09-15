@@ -14,7 +14,7 @@ public:
 	File();
 	virtual ~File();
 
-	virtual bool open(string& path, const char* mode = "rb");
+	virtual bool open(Url path, const char* mode = "rb");
 	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
 	static sptr<File> factory(string& path, const char* mode = "rb");

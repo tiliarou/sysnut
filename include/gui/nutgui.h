@@ -208,25 +208,6 @@ public:
 	u32 m_rowHeight = 50;
 };
 
-string installPath;
-
-void installThread(void* p = NULL)
-{
-	(void)p;
-
-	Pfs0 nsp;
-
-	if (nsp.open(installPath))
-	{
-		nsp.install();
-		print(string("Installation complete for ") + installPath);
-	}
-	else
-	{
-		error(string("Installation failed for ") + installPath);
-	}
-}
-
 class SdWnd : public HListWnd<string>
 {
 public:
@@ -243,8 +224,18 @@ public:
 	{
 		(void)i;
 
-		installPath = string("/") + items()[m_selectedIndex];
-		installThread();
+		auto fileName = items()[m_selectedIndex];
+		auto nsp = dir->openFile<Pfs0>(fileName);
+		if (nsp)
+		{
+			print(string("Installing ") + fileName);
+			nsp->install();
+			print(string("Installation complete for ") + fileName);
+		}
+		else
+		{
+			error("Could not open %s\n", fileName.c_str());
+		}
 
 		/*if (threadCreate(&t, &installThread, NULL, 128 * 1024, 0x3B, -2))
 		{
@@ -274,7 +265,7 @@ public:
 	}
 
 	sptr<Directory> dir;
-	Thread t;
+	//Thread t;
 };
 
 class TitleRow

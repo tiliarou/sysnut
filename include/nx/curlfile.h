@@ -1,13 +1,14 @@
 #pragma once
 
 #include "nx/file.h"
+#include "nx/url.h"
 
 class CurlFile : public File
 {
 public:
 	CurlFile();
 	virtual ~CurlFile();
-	virtual bool open(string& path, const char* mode = "rb") override;
+	virtual bool open(Url path, const char* mode = "rb") override;
 	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);

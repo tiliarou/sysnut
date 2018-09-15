@@ -2,6 +2,7 @@
 #include "nx/file.h"
 #include "nx/string.h"
 #include "nx/buffer.h"
+#include "nx/url.h"
 #include <stdio.h>
 
 class DiskFile : public File
@@ -9,7 +10,7 @@ class DiskFile : public File
 public:
 	DiskFile();
 	virtual ~DiskFile();
-	virtual bool open(string& path, const char* mode = "rb") override;
+	virtual bool open(Url path, const char* mode = "rb") override;
 	virtual bool init();
 	virtual bool close();
 	bool seek(u64 offset, int whence = 0);

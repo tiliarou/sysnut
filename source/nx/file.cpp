@@ -17,7 +17,7 @@ File::~File()
 	close();
 }
 
-bool File::open(string& path, const char* mode)
+bool File::open(Url path, const char* mode)
 {
 	if (isOpen())
 	{

@@ -12,7 +12,7 @@ CurlFile::~CurlFile()
 	close();
 }
 
-bool CurlFile::open(string& path, const char* mode)
+bool CurlFile::open(Url path, const char* mode)
 {
 	if (isOpen())
 	{

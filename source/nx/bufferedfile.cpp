@@ -32,7 +32,7 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, integer<128>& key)
 	return true;
 }
 
-bool BufferedFile::open(string& path, const char* mode)
+bool BufferedFile::open(Url path, const char* mode)
 {
 	return File::open(path, mode);
 }
