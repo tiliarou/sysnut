@@ -58,6 +58,10 @@ void userAppInit(void)
 		fatalSimple(0xBEE7);
 
 
+	if (R_FAILED(plInitialize()))
+		fatalSimple(0xBFE7);
+
+
 
 	if (R_FAILED(ncmextInitialize()))
 		fatalSimple(0xBEEF);
@@ -82,6 +86,8 @@ void userAppExit(void)
 	ncmExit();
 	nsExit();
 	nsextExit();
+
+	plExit();
 
 	splCryptoExit();
 	splExit();
@@ -148,7 +154,7 @@ int main(int argc, char **argv)
 		return -1;
 	}*/
 
-	NutGui gui("Deez Title Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonDark());
+	NutGui gui("Deez Title \uE0E6 Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonDark());
 	
 	while(appletMainLoop() && gui.loop())
     {

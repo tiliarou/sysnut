@@ -12,6 +12,7 @@
 #include "nx/pfs0.h"
 #include "gui/window.h"
 #include "nx/buffer.h"
+#include "nx/font.h"
 
 string footer;
 class NutGui;
@@ -75,12 +76,12 @@ public:
 				{
 					drawRect(0, y-16, width(), 50, txtcolor);
 				}
-				drawText(20, y, selcolor, m_tabs[i], fntMedium);
+				drawText(20, y, selcolor, m_tabs[i], fonts->medium());
 				activePanel()->draw();
 			}
 			else
 			{
-				drawText(20, y, txtcolor, m_tabs[i], fntMedium);
+				drawText(20, y, txtcolor, m_tabs[i], fonts->medium());
 			}
 			y += 50;
 		}
@@ -126,11 +127,11 @@ public:
 			{
 				drawRect(0, y - 16, width(), 50, txtcolor);
 			}
-			drawText(20, y, selcolor, (string)item, fntMedium);
+			drawText(20, y, selcolor, (string)item, fonts->medium());
 		}
 		else
 		{
-			drawText(20, y, txtcolor, (string)item, fntMedium);
+			drawText(20, y, txtcolor, (string)item, fonts->medium());
 		}
 	}
 
@@ -371,7 +372,7 @@ public:
 		int y = 20;
 		while(i < end)
 		{
-			drawText(20, y, txtcolor, printLog()[i], fntMedium);
+			drawText(20, y, txtcolor, printLog()[i], fonts->medium());
 			y += 50;
 			i++;
 		}
@@ -391,6 +392,7 @@ public:
 	{
 		Rect panelRect(411, 88, 1249 - 411, 646 - 88);
 		nutGui = this;
+		fonts = new Fonts();
 
 		menu = (Menu*)windows().push(sptr<Window>(new Menu(this, string("menu"), Rect(30, 88, 410 - 30, 646 - 88)))).get();
 		body = (Body*)windows().push(sptr<Window>(new Body(this, string("body"), Rect(411, 88, 1249 - 411, 646 - 88 )))).get();
@@ -417,8 +419,7 @@ public:
 		SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
 
 		ttf = Theme.FontPath;
-		fntLarge = TTF_OpenFont(Theme.FontPath.c_str(), 25);
-		fntMedium = TTF_OpenFont(Theme.FontPath.c_str(), 20);
+
 		bgs = surfInit(Theme.BackgroundPath);
 		bgt = texInit(bgs);
 		txtcolor = { Theme.TextColor.R, Theme.TextColor.G, Theme.TextColor.B, Theme.TextColor.A };
@@ -438,6 +439,7 @@ public:
 		SDL_DestroyWindow(_window);
 		SDL_Quit();
 		romfsExit();
+		delete fonts;
 	}
 
 	static void printHook()
@@ -554,12 +556,12 @@ public:
 
 		SDL_RenderClear(_renderer);
 		drawBack(bgs, bgt);
-		drawText(titleX, titleY, txtcolor, title, fntLarge);
+		drawText(titleX, titleY, txtcolor, title, fonts->large());
 
 
 
 		
-		drawText(footerX, footerY, txtcolor, footer, fntLarge);
+		drawText(footerX, footerY, txtcolor, footer, fonts->large());
 		SDL_RenderPresent(_renderer);
 	}*/
 
@@ -567,7 +569,7 @@ public:
 	{
 		SDL_RenderClear(_renderer);
 		drawBack(bgs, bgt);
-		drawText(titleX, titleY, txtcolor, title, fntLarge);
+		drawText(titleX, titleY, txtcolor, title, fonts->large());
 
 		if (menu)
 		{
@@ -576,7 +578,7 @@ public:
 
 		if (printLog().size())
 		{
-			drawText(footerX, footerY, txtcolor, printLog().last(), fntLarge);
+			drawText(footerX, footerY, txtcolor, printLog().last(), fonts->large());
 		}
 		SDL_RenderPresent(_renderer);
 	}

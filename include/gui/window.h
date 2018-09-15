@@ -10,6 +10,7 @@
 #include "gui/nutgui.h"
 #include "nx/string.h"
 #include "nx/primitives.h"
+#include "nx/font.h"
 
 static SDL_Renderer* _renderer = 0;
 static SDL_Surface* _surface = 0;
@@ -17,8 +18,7 @@ static string ttf;
 static SDL_Color txtcolor;
 static SDL_Color selcolor;
 
-static TTF_Font *fntMedium;
-static TTF_Font *fntLarge;
+static Fonts* fonts;
 
 struct RGBA
 {
@@ -92,7 +92,7 @@ public:
 
 	void drawText(int x, int y, SDL_Color scolor, string text, TTF_Font *font)
 	{
-		SDL_Surface *surface = TTF_RenderText_Blended_Wrapped(font, text.c_str(), scolor, 1280);
+		SDL_Surface *surface = TTF_RenderUTF8_Blended_Wrapped(font, text.c_str(), scolor, width());
 		SDL_SetSurfaceAlphaMod(surface, 255);
 		SDL_Rect position = { x + rect().x, y + rect().y, surface->w, surface->h };
 		SDL_BlitSurface(surface, NULL,_surface, &position);
