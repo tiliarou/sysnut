@@ -136,7 +136,7 @@ public:
 
 	virtual string resolvePath(FileEntry& f);
 
-	static sptr<Directory> openDir(Url url);
+	static sptr<Directory> openDir(const Url url);
 	Url& dirPath() { return m_dirPath; }
 
 	bool install();

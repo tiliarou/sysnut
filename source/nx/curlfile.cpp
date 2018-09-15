@@ -162,7 +162,7 @@ u64 CurlFile::read(Buffer<u8>& buffer, u64 sz)
 
 bool CurlFile::isOpen()
 {
-	return path().length() > 0;
+	return path().isValid();
 }
 
 void CurlFile::onChildless()

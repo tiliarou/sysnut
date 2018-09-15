@@ -21,7 +21,6 @@ public:
 	virtual void onChildless() override;
 
 	bool isOpen();
-	string& path() { return m_path; }
 
 protected:
 	FILE* f = NULL;

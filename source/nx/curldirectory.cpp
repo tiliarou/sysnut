@@ -1,7 +1,7 @@
 #include "nx/curldirectory.h"
 #include <curl/curl.h>
 
-CurlDirectory::CurlDirectory(string url) : Directory()
+CurlDirectory::CurlDirectory(Url url) : Directory()
 {
 	dirPath() = url;
 }

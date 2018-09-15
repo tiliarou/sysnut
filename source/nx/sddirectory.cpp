@@ -5,7 +5,7 @@
 #include <dirent.h>
 #endif
 
-SdDirectory::SdDirectory(string path) : Directory()
+SdDirectory::SdDirectory(Url path) : Directory()
 {
 	dirPath() = path;
 }

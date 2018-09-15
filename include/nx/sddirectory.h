@@ -4,7 +4,7 @@
 class SdDirectory : public Directory
 {
 public:
-	SdDirectory(string path);
+	SdDirectory(Url path);
 	virtual DirectoryFiles& files() override;
 private:
 };

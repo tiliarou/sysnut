@@ -14,7 +14,7 @@ string::string(const string& src)
 	*this = src;
 }
 
-bool string::operator==(const string& s)
+bool string::operator==(const string& s) const
 {
 	if (s.length() != length())
 	{
@@ -23,7 +23,7 @@ bool string::operator==(const string& s)
 	return memcmp(buffer(), s.buffer(), size()) == 0;
 }
 
-bool string::operator==(const char* s)
+bool string::operator==(const char* s) const
 {
 	u64 len = (u64)strlen(s);
 
@@ -70,7 +70,7 @@ string& string::operator+=(const string s)
 	return *this;
 }
 
-string string::operator+(const char* s)
+string string::operator+(const char* s) const
 {
 	string result = *this;
 	result += s;

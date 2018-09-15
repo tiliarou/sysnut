@@ -13,6 +13,7 @@
 #include "gui/window.h"
 #include "nx/buffer.h"
 #include "nx/font.h"
+#include "rapidjson/document.h"
 
 string footer;
 class NutGui;
@@ -397,10 +398,64 @@ public:
 		menu = (Menu*)windows().push(sptr<Window>(new Menu(this, string("menu"), Rect(30, 88, 410 - 30, 646 - 88)))).get();
 		body = (Body*)windows().push(sptr<Window>(new Body(this, string("body"), Rect(411, 88, 1249 - 411, 646 - 88 )))).get();
 
-		menu->add(string("SD"), new SdWnd(this, Directory::openDir("/"), string("SD"), panelRect));
-		menu->add(string("CDN"), new NutWnd(this, string("CDN"), panelRect));
-		menu->add(string("NUT"), new NutWnd(this, string("NUT"), panelRect));
-		menu->add(string("FTP"), new SdWnd(this, Directory::openDir("ftp://192.168.254.11/switch/nsp/titles/"), string("FTP"), panelRect));
+		File f;
+		string s = "/switch/deez/locations.conf";
+		if (f.open(s))
+		{
+			Buffer<u8> buffer;
+			f.read(buffer);
+			buffer.push(0);
+			rapidjson::Document locations;
+			locations.Parse(buffer.c_str());
+			if (locations.IsArray())
+			{
+				for (auto itr = locations.Begin(); itr != locations.End(); ++itr)
+				{
+					Url url;
+					if (!itr->HasMember("title"))
+					{
+						continue;
+					}
+
+					if (itr->HasMember("url"))
+					{
+						url.set((*itr)["url"].GetString());
+					}
+
+					if (itr->HasMember("user"))
+					{
+						url.user() = (*itr)["user"].GetString();
+					}
+
+					if (itr->HasMember("password"))
+					{
+						url.password() = (*itr)["password"].GetString();
+					}
+
+					if (itr->HasMember("port"))
+					{
+						url.port() = atoi((*itr)["port"].GetString());
+					}
+
+					if (itr->HasMember("scheme"))
+					{
+						url.scheme() = (*itr)["scheme"].GetString();
+					}
+
+					if (itr->HasMember("path"))
+					{
+						url.path() = (*itr)["path"].GetString();
+					}
+
+					menu->add((*itr)["title"].GetString(), new SdWnd(this, Directory::openDir(url), url.str(), panelRect));
+				}
+			}
+			else
+			{
+				menu->add(string("SD Root"), new SdWnd(this, Directory::openDir("/"), string("SD"), panelRect));
+			}
+		}
+
 		menu->add(string("Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 

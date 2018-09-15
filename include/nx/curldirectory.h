@@ -6,7 +6,7 @@
 class CurlDirectory : public Directory
 {
 public:
-	CurlDirectory(string url);
+	CurlDirectory(Url url);
 	virtual DirectoryFiles& files() override;
 
 	virtual string resolvePath(FileEntry& f);

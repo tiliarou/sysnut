@@ -5,7 +5,19 @@
 class Url
 {
 public:
-	Url(const Url&) = delete;
+	Url(const Url& s)
+	{
+		isValid() = s.isValid();
+
+		scheme() = s.scheme();
+		user() = s.user();
+		password() = s.password();
+		host() = s.host();
+		port() = s.port();
+		path() = s.path();
+		query() = s.query();
+		fragment() = s.fragment();
+	}
 
 	Url() 
 	{
@@ -27,12 +39,12 @@ public:
 		UriUriA uriParse_;
 		UriParserStateA state_;
 		state_.uri = &uriParse_;
-		isValid_ = uriParseUriA(&state_, uri_.c_str()) == URI_SUCCESS;
+		isValid_ = uriParseUriA(&state_, uri.c_str()) == URI_SUCCESS;
 
 		if (isValid_)
 		{
 			scheme() = fromRange(uriParse_.scheme);
-			user() = fromRange(uriParse_.userInfo);
+			user() = decode(fromRange(uriParse_.userInfo));
 			host() = fromRange(uriParse_.hostText);
 			port() = atoi(fromRange(uriParse_.portText).c_str());
 			path() = fromList(uriParse_.pathHead, "/");
@@ -49,19 +61,54 @@ public:
 
 	operator const char*()
 	{
-		return uri_.c_str();
+		return str().c_str();
 	}
 
-	operator string&()
+	operator const string&()
 	{
+		return str();
+	}
+
+	string& str()
+	{
+		uri_ = "";
+
+		if (scheme().length() && host().length())
+		{
+			uri_ += scheme() + "://";
+
+			if (user().length())
+			{
+				uri_ += encode(user());
+
+				if (password().length())
+				{
+					uri_ += ":";
+					uri_ += encode(password());
+				}
+
+				uri_ += "@";
+			}
+
+			uri_ += host();
+
+			if (port() > 0)
+			{
+				char tmp[16];
+				tmp[0] = '\0';
+
+				itoa(port(), tmp, 10);
+				uri_ += ":";
+				uri_ += tmp;
+			}
+		}
+		uri_ += path();
 		return uri_;
 	}
 
-	string& str() { return uri_; }
-
 	const char* c_str()
 	{
-		return uri_.c_str();
+		return str().c_str();
 	}
 
 	static string encode(const string s)
@@ -81,7 +128,17 @@ public:
 		return result;
 	}
 
-	bool isValid() const { return isValid_; }
+	const bool& isValid() const { return isValid_; }
+	bool& isValid() { return isValid_; }
+
+	const string& scheme() const { return m_scheme; }
+	const string& user() const { return m_user; }
+	const string& password() const { return m_password; }
+	const string& host() const { return m_host; }
+	const int& port() const { return m_port; }
+	const string& path() const { return m_path; }
+	const string& query() const { return m_query; }
+	const string& fragment() const { return m_fragment; }
 
 	string& scheme() { return m_scheme; }
 	string& user() { return m_user; }
@@ -92,7 +149,7 @@ public:
 	string& query() { return m_query; }
 	string& fragment() { return m_fragment; }
 
-private:
+protected:
 	string uri_;
 
 	bool        isValid_;

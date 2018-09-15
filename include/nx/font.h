@@ -10,12 +10,6 @@ extern "C" {
 #include <SDL2/SDL_ttf.h>
 #endif
 
-#define fontHuge 10
-#define fontLarge 8
-#define fontMedium 6
-#define fontSmall 4
-#define fontTiny 3
-
 #define FON_A "\uE0E0"
 #define FON_B "\uE0E1"
 #define FON_X "\uE0E2"
@@ -39,7 +33,7 @@ extern "C" {
 #define FON_L3 "\uE104"
 #define FON_R3 "\uE105"
 
-#define FONT_LIGHT 4
+#define FONT_BOOK 4
 #define FONT_EXT 0
 
 
@@ -66,12 +60,11 @@ public:
 	{
 	}
 
-	TTF_Font* large(u32 i = FONT_LIGHT)
+	TTF_Font* large(u32 i = FONT_BOOK)
 	{
 		if (i >= totalFontFaces)
 		{
-			error("tried to get out of index font! %d of %d\n", i, totalFontFaces);
-			return TTF_OpenFont("romfs:/Fonts/NintendoStandard.ttf", 25);
+			return NULL;
 		}
 
 		if (!m_fonts[i][2])
@@ -81,12 +74,11 @@ public:
 		return m_fonts[i][2];
 	}
 
-	TTF_Font* medium(u32 i = FONT_LIGHT)
+	TTF_Font* medium(u32 i = FONT_BOOK)
 	{
 		if (i >= totalFontFaces)
 		{
-			error("tried to get out of index font! %d of %d\n", i, totalFontFaces);
-			return TTF_OpenFont("romfs:/Fonts/NintendoStandard.ttf", 20);
+			return NULL;
 		}
 
 		if (!m_fonts[i][1])

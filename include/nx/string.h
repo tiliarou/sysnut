@@ -13,13 +13,13 @@ public:
 	~string();
 	bool set(const void* src, u64 sz=0);
 	operator const char*() const { return c_str(); }
-	string operator+(const char* s);
+	string operator+(const char* s) const;
 	string& operator+=(const char* s);
 
 	string& operator+=(const string s);
 
-	bool operator==(const string& s);
-	bool operator==(const char* s);
+	bool operator==(const string& s) const;
+	bool operator==(const char* s) const;
 
 	string& trim();
 

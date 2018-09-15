@@ -19,7 +19,7 @@ public:
 	virtual void onChildless() override;
 
 	bool isOpen();
-	string& path() { return m_path; }
+	//string& path() { return m_path; }
 
 protected:
 	u64& currentPosition() { return m_position; }

@@ -164,6 +164,7 @@
     <ClInclude Include="include\nx\directory.h" />
     <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />
+    <ClInclude Include="include\nx\font.h" />
     <ClInclude Include="include\nx\fs.hpp" />
     <ClInclude Include="include\nx\install.h" />
     <ClInclude Include="include\nx\integer.h" />

@@ -14,7 +14,7 @@ File* FileEntry::open()
 	return File::factoryRawPtr(path);
 }
 
-sptr<Directory> Directory::openDir(Url url)
+sptr<Directory> Directory::openDir(const Url url)
 {
 	Directory* p = NULL;
 	if (url.scheme() == "ftp" || url.scheme() == "ftps" || url.scheme() == "sftp" || url.scheme() == "tftp" || url.scheme() == "http" || url.scheme() == "https" || url.scheme() == "scp")
