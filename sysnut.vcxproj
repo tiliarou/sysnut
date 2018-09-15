@@ -112,6 +112,7 @@
     <ClCompile Include="source\nx\crypto.cpp" />
     <ClCompile Include="source\nx\cnmt.cpp" />
     <ClCompile Include="source\nx\curldirectory.cpp" />
+    <ClCompile Include="source\nx\curlfile.cpp" />
     <ClCompile Include="source\nx\directory.cpp" />
     <ClCompile Include="source\nx\diskfile.cpp" />
     <ClCompile Include="source\nx\file.cpp" />
@@ -159,6 +160,7 @@
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
     <ClInclude Include="include\nx\curldirectory.h" />
+    <ClInclude Include="include\nx\curlfile.h" />
     <ClInclude Include="include\nx\directory.h" />
     <ClInclude Include="include\nx\diskfile.h" />
     <ClInclude Include="include\nx\file.h" />

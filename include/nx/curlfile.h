@@ -1,14 +1,12 @@
 #pragma once
-#include "nx/file.h"
-#include "nx/string.h"
-#include "nx/buffer.h"
-#include <stdio.h>
 
-class DiskFile : public File
+#include "nx/file.h"
+
+class CurlFile : public File
 {
 public:
-	DiskFile();
-	virtual ~DiskFile();
+	CurlFile();
+	virtual ~CurlFile();
 	virtual bool open(string& path, const char* mode = "rb");
 	virtual bool init();
 	virtual bool close();
@@ -24,6 +22,8 @@ public:
 	string& path() { return m_path; }
 
 protected:
-	FILE* f = NULL;
+	u64& currentPosition() { return m_position; }
+
 	u64 m_size = 0;
+	u64 m_position = 0;
 };
