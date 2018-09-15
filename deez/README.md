@@ -8,8 +8,7 @@ Homebrew network title installer.
  
  - Obtain or generate a keys.txt file and place it in /switch/deez/keys.txt .  keys.txt is a text file containing various switch encryption keys.  If you plan to generate it yourself, you can find instructions here:  https://gbatemp.net/threads/how-to-get-switch-keys-for-hactool-xci-decrypting.506978/
  
- - Copy locations.conf to /switch/deez/locations.conf .  You should edit this file, it is only an example.
-you must have keys.txt in your sd root for this to work.  Only scans for NSP's in the sd root.  WIP.
+ - Copy locations.conf to /switch/deez/locations.conf .  You should edit this file, it is only an example, and points to the various local and network locations hosting your switch content.
 
 # Disclaimer
 
