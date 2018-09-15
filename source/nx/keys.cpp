@@ -8,7 +8,7 @@
 #ifdef _MSC_VER
 Keys g_keys("keys.txt");
 #else
-Keys g_keys("/keys.txt");
+Keys g_keys("/switch/deez/keys.txt");
 #endif
 
 Keys& keys()
