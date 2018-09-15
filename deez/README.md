@@ -28,3 +28,6 @@ https://github.com/XorTroll/CustomUI/
 
 HACTOOL source code was reverse-engineered, with small bits of code lifted here and there:
 https://github.com/SciresM/hactool
+
+Random JSON parser:
+https://github.com/nlohmann/json
