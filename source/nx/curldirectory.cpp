@@ -6,14 +6,14 @@ CurlDirectory::CurlDirectory(string url) : Directory()
 	dirPath() = url;
 }
 
-size_t write_callback(char *ptr, size_t size, size_t nmemb, DirectoryFiles* files)
+size_t write_callback(char *ptr, size_t size, size_t nmemb, CurlDirectory* cd)
 {
-	if (files)
+	if (cd)
 	{
 		auto lst = string(ptr).split('\n');
 		for (auto& f : *lst)
 		{
-			files->push(sptr<FileEntry>(new FileEntry(f.trim(), 0)));
+			cd->m_files.push(sptr<FileEntry>(new FileEntry(cd, f.trim(), 0)));
 		}
 	}
 	return size;
@@ -32,7 +32,7 @@ DirectoryFiles& CurlDirectory::files()
 		curl_easy_setopt(curl, CURLOPT_URL, dirPath().c_str());
 		curl_easy_setopt(curl, CURLOPT_DIRLISTONLY, 1L);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &m_files);
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, this);
 
 		CURLcode ret = curl_easy_perform(curl);
 
@@ -40,4 +40,10 @@ DirectoryFiles& CurlDirectory::files()
 	}
 
 	return m_files;
+}
+
+string CurlDirectory::resolvePath(FileEntry& f)
+{
+	string name = Url::encode(f.name());
+	return dirPath().str() + name;
 }

@@ -390,7 +390,7 @@ public:
 		}
 		Buffer<T>::m_buffer[circularPosition()] = n;
 		circularPosition() = (circularPosition() + 1) % SZ;
-
+		return Buffer<T>::m_buffer[circularPosition()];
 	}
 
 	const T& operator[](u32 i) const

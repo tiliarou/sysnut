@@ -228,9 +228,13 @@ void installThread(void* p = NULL)
 class SdWnd : public HListWnd<string>
 {
 public:
-	SdWnd(Window* p, string id, Rect r) : HListWnd(p, id, r), dir("/")
+	SdWnd(Window* p, sptr<Directory> directory, string id, Rect r) : HListWnd(p, id, r), dir(directory)
 	{
 		refresh();
+	}
+
+	~SdWnd()
+	{
 	}
 
 	void select(u32 i) override
@@ -257,7 +261,7 @@ public:
 	{
 		string nspExt(".nsp");
 		items().resize(0);
-		for (auto& f : dir.files())
+		for (auto& f : dir->files())
 		{
 			if (f->name().endsWith(nspExt))
 			{
@@ -267,7 +271,7 @@ public:
 		//m_files = dir.files().find(".nsp");
 	}
 
-	SdDirectory dir;
+	sptr<Directory> dir;
 	Thread t;
 };
 
@@ -391,9 +395,10 @@ public:
 		menu = (Menu*)windows().push(sptr<Window>(new Menu(this, string("menu"), Rect(30, 88, 410 - 30, 646 - 88)))).get();
 		body = (Body*)windows().push(sptr<Window>(new Body(this, string("body"), Rect(411, 88, 1249 - 411, 646 - 88 )))).get();
 
-		menu->add(string("SD"), new SdWnd(this, string("SD"), panelRect));
+		menu->add(string("SD"), new SdWnd(this, Directory::openDir("/"), string("SD"), panelRect));
 		menu->add(string("CDN"), new NutWnd(this, string("CDN"), panelRect));
 		menu->add(string("NUT"), new NutWnd(this, string("NUT"), panelRect));
+		menu->add(string("FTP"), new SdWnd(this, Directory::openDir("ftp://192.168.254.11/switch/nsp/titles/"), string("FTP"), panelRect));
 		menu->add(string("Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 

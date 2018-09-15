@@ -3,8 +3,31 @@
 #include "nx/ipc/ns_ext.h"
 #include "nx/contentstorage.h"
 #include "nx/install.h"
+#include "nx/curldirectory.h"
+#include "nx/sddirectory.h"
 
 #include <curl/curl.h>
+
+File* FileEntry::open()
+{
+	string path = parent()->resolvePath(*this);
+	return File::factoryRawPtr(path);
+}
+
+sptr<Directory> Directory::openDir(Url url)
+{
+	Directory* p = NULL;
+	if (url.scheme() == "ftp" || url.scheme() == "ftps" || url.scheme() == "sftp" || url.scheme() == "tftp" || url.scheme() == "http" || url.scheme() == "https" || url.scheme() == "scp")
+	{
+		p = new CurlDirectory(url);
+	}
+	else
+	{
+		p = new SdDirectory(url);
+	}
+
+	return sptr<Directory>(p);
+}
 
 Directory::Directory()
 {
@@ -46,4 +69,9 @@ bool Directory::install()
 		}
 	}
 	return true;
+}
+
+string Directory::resolvePath(FileEntry& f)
+{
+	return dirPath().str() + f.name();
 }

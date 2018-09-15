@@ -32,7 +32,7 @@ DirectoryFiles& SdDirectory::files()
 		{
 			continue;
 		}
-		sptr<FileEntry> fe(new FileEntry(de->d_name, 0));
+		sptr<FileEntry> fe(new FileEntry(this, de->d_name, 0));
 		m_files.push(fe);
 	}
 	closedir(dr);

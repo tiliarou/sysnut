@@ -5,6 +5,7 @@
 #include "nx/url.h"
 
 class File;
+class Directory;
 
 class FileEntry
 {
@@ -14,8 +15,9 @@ public:
 		m_size = 0;
 	}
 
-	FileEntry(string fileName, u64 sz)
+	FileEntry(Directory* parent, string fileName, u64 sz)
 	{
+		this->parent() = parent;
 		name() = fileName;
 		size() = sz;
 	}
@@ -43,13 +45,12 @@ public:
 
 	const u64& size() const { return m_size; }
 	u64& size() { return m_size; }
+	Directory*& parent() { return m_parent; }
 protected:
 
-	virtual File* open()
-	{
-		return NULL;
-	}
+	virtual File* open();
 
+	Directory* m_parent;
 	string m_name;
 	u64 m_size;
 };
@@ -117,11 +118,14 @@ public:
 	template<class T>
 	sptr<T> openFile(string name)
 	{
-		for (auto& f : files())
+		if (files().size())
 		{
-			if (f->name() == name)
+			for (auto& f : files())
 			{
-				return f->open<T>();
+				if (f.get() && f->name() == name)
+				{
+					return f->open<T>();
+				}
 			}
 		}
 		return NULL;
@@ -130,11 +134,14 @@ public:
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
+	virtual string resolvePath(FileEntry& f);
+
+	static sptr<Directory> openDir(Url url);
 	Url& dirPath() { return m_dirPath; }
 
 	bool install();
+	DirectoryFiles m_files;
 protected:
 	Url m_dirPath;
-	DirectoryFiles m_files;
 	Array<sptr<Directory>> m_directories;
 };

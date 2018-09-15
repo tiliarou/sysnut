@@ -185,6 +185,12 @@
     <ClInclude Include="include\nx\url.h" />
     <ClInclude Include="include\server.h" />
     <ClInclude Include="include\socket.h" />
+    <ClInclude Include="include\uriparser\Uri.h" />
+    <ClInclude Include="include\uriparser\UriBase.h" />
+    <ClInclude Include="include\uriparser\UriDefsAnsi.h" />
+    <ClInclude Include="include\uriparser\UriDefsConfig.h" />
+    <ClInclude Include="include\uriparser\UriDefsUnicode.h" />
+    <ClInclude Include="include\uriparser\UriIp4.h" />
     <ClInclude Include="include\util\graphics_util.hpp" />
     <ClInclude Include="include\util\network_util.hpp" />
     <ClInclude Include="include\util\title_util.hpp" />

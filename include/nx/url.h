@@ -57,9 +57,28 @@ public:
 		return uri_;
 	}
 
+	string& str() { return uri_; }
+
 	const char* c_str()
 	{
 		return uri_.c_str();
+	}
+
+	static string encode(const string s)
+	{
+		string result;
+		result.resize(s.size() * 3);
+		uriEscapeA(s.c_str(), (char*)result.buffer(), false, false);
+		result.resize(strlen(result.c_str()) + 1);
+		return result;
+	}
+
+	static string decode(const string s)
+	{
+		string result = s;
+		uriUnescapeInPlaceA((char*)result.buffer());
+		result.resize(strlen(result.c_str()) + 1);
+		return result;
 	}
 
 	bool isValid() const { return isValid_; }

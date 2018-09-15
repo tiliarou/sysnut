@@ -59,6 +59,7 @@ bool CurlFile::seek(u64 offset, int whence)
 	default:
 		return false;
 	}
+	return false;
 }
 
 bool CurlFile::rewind()
