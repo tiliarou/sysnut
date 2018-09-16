@@ -154,7 +154,7 @@ int main(int argc, char **argv)
 		return -1;
 	}*/
 
-	NutGui gui("Deez Title \uE0E6 Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonDark());
+	NutGui gui("Deez Title \uE0E6 Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonCurrent());
 	
 	while(appletMainLoop() && gui.loop())
     {

@@ -33,13 +33,18 @@ extern "C" {
 #define FON_L3 "\uE104"
 #define FON_R3 "\uE105"
 
-#define FONT_BOOK 4
-#define FONT_EXT 0
-
 
 class Fonts
 {
 public:
+	const static u8 FONT_BOOK = 4;
+	const static u8 FONT_EXT = 0;
+
+	const static u8 FONT_SIZE_HUGE = 45;
+	const static u8 FONT_SIZE_LARGE = 35;
+	const static u8 FONT_SIZE_MEDIUM = 25;
+	const static u8 FONT_SIZE_SMALL = 15;
+
 	Fonts() 
 	{
 		languageCode = 0;
@@ -60,6 +65,20 @@ public:
 	{
 	}
 
+	TTF_Font* huge(u32 i = FONT_BOOK)
+	{
+		if (i >= totalFontFaces)
+		{
+			return NULL;
+		}
+
+		if (!m_fonts[i][3])
+		{
+			m_fonts[i][3] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, FONT_SIZE_HUGE);
+		}
+		return m_fonts[i][3];
+	}
+
 	TTF_Font* large(u32 i = FONT_BOOK)
 	{
 		if (i >= totalFontFaces)
@@ -69,7 +88,7 @@ public:
 
 		if (!m_fonts[i][2])
 		{
-			m_fonts[i][2] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, 25);
+			m_fonts[i][2] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, FONT_SIZE_LARGE);
 		}
 		return m_fonts[i][2];
 	}
@@ -83,12 +102,26 @@ public:
 
 		if (!m_fonts[i][1])
 		{
-			m_fonts[i][1] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, 20);
+			m_fonts[i][1] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, FONT_SIZE_MEDIUM);
 		}
 		return m_fonts[i][1];
 	}
+
+	TTF_Font* small(u32 i = FONT_BOOK)
+	{
+		if (i >= totalFontFaces)
+		{
+			return NULL;
+		}
+
+		if (!m_fonts[i][0])
+		{
+			m_fonts[i][0] = TTF_OpenFontRW(SDL_RWFromMem((void*)m_fontData[i].address, m_fontData[i].size), 1, FONT_SIZE_SMALL);
+		}
+		return m_fonts[i][0];
+	}
 private:
-	TTF_Font* m_fonts[PlSharedFontType_Total][3];
+	TTF_Font* m_fonts[PlSharedFontType_Total][4];
 	PlFontData m_fontData[PlSharedFontType_Total];
 	size_t totalFontFaces;
 	u64 languageCode;

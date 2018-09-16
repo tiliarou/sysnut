@@ -14,7 +14,6 @@
 
 static SDL_Renderer* _renderer = 0;
 static SDL_Surface* _surface = 0;
-static string ttf;
 static SDL_Color txtcolor;
 static SDL_Color selcolor;
 
@@ -51,6 +50,8 @@ public:
 	{
 		this->id() = id;
 		this->rect() = r;
+
+		buttonTextB() = "Back";
 	}
 
 	Window(Window* parent, string id, Rect r) : m_parent(parent)
@@ -83,16 +84,9 @@ public:
 		return tex;
 	}
 
-	void drawText(string Text, int X, int Y, RGBA Color, int Size)
-	{
-		SDL_Color clr = { Color.R, Color.G, Color.B, Color.A };
-		TTF_Font *fnt = TTF_OpenFont(ttf.c_str(), Size);
-		drawText(X, Y, clr, Text, fnt);
-	}
-
 	void drawText(int x, int y, SDL_Color scolor, string text, TTF_Font *font)
 	{
-		SDL_Surface *surface = TTF_RenderUTF8_Blended_Wrapped(font, text.c_str(), scolor, width());
+		SDL_Surface *surface = TTF_RenderUTF8_Blended(font, text.c_str(), scolor);
 		SDL_SetSurfaceAlphaMod(surface, 255);
 		SDL_Rect position = { x + rect().x, y + rect().y, surface->w, surface->h };
 		SDL_BlitSurface(surface, NULL,_surface, &position);
@@ -160,11 +154,125 @@ public:
 	Rect& rect() { return m_rect; }
 
 	bool& isFocused() { return m_isFocused; }
+
+	string& buttonTextA() { return m_buttonTextA; }
+	string& buttonTextB() { return m_buttonTextB; }
+	string& buttonTextX() { return m_buttonTextX; }
+	string& buttonTextY() { return m_buttonTextY; }
+
 protected:
+	string m_buttonTextA;
+	string m_buttonTextB;
+	string m_buttonTextX;
+	string m_buttonTextY;
 	bool m_isFocused = false;
 	bool m_redraw = false;
 	Window*& parent() { return m_parent; }
 	Rect m_rect;
 	string m_id;
 	Window* m_parent;
+};
+
+class TextBlock
+{
+public:
+	TextBlock()
+	{
+	}
+
+	TextBlock(SDL_Color color, string text, TTF_Font *font) : color(color), text(text), font(font)
+	{
+		if (TTF_SizeUTF8(font, text.c_str(), &width, &height))
+		{
+			width = height = 0;
+		}
+	}
+
+	int width;
+	int height;
+	SDL_Color color;
+	TTF_Font* font;
+	string text;
+};
+
+class P
+{
+public:
+	const static u8 ALIGN_LEFT = 1;
+	const static u8 ALIGN_RIGHT = 2;
+	const static u8 ALIGN_CENTER = 3;
+
+	const static u8 VALIGN_TOP = 4;
+	const static u8 VALIGN_BOTTOM = 8;
+	const static u8 VALIGN_CENTER = 12;
+
+	P(Window* window, Rect r, u8 align = ALIGN_LEFT | VALIGN_TOP) : m_window(window), m_r(r), m_align(align)
+	{
+	}
+
+	void drawText(SDL_Color color, string text, TTF_Font *font)
+	{
+		blocks.push(TextBlock(color, text, font));
+	}
+
+	void render()
+	{
+		int tallest = 0;
+		int totalWidth = 0;
+		int cursorX = 0;
+
+		int halign = m_align & 3;
+		int valign = m_align & 12;
+
+
+		for (auto& block : blocks)
+		{
+			totalWidth += block.width;
+			if (block.height > tallest)
+			{
+				tallest = block.height;
+			}
+		}
+
+		cursorX = 0;
+
+		for (auto& block : blocks)
+		{
+			int x, y;
+			switch (valign)
+			{
+				case VALIGN_CENTER:
+					y = ((m_r.height - block.height) / 2);
+					break;
+				case VALIGN_BOTTOM:
+					y = m_r.height - block.height;
+					break;
+				case VALIGN_TOP:
+				default:
+					y = 0;
+			}
+
+			switch (halign)
+			{
+				case ALIGN_CENTER:
+					x = ((m_r.width - block.width) / 2) + cursorX;
+					break;
+				case ALIGN_RIGHT:
+					x = m_r.width - totalWidth + cursorX;
+					break;
+				case ALIGN_LEFT:
+				default:
+					x = cursorX;
+			}
+
+			m_window->drawText(x + m_r.x, y + m_r.y, block.color, block.text, block.font);
+			cursorX += block.width;
+		}
+	}
+
+private:
+	Array<TextBlock> blocks;
+	Window* m_window;
+	Rect m_r;
+	u8 m_align;
 };

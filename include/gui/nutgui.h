@@ -37,6 +37,8 @@ public:
 	Menu(Window* p, string id, Rect r) : Window(p, id, r)
 	{
 		m_selectedIndex = 0;
+		buttonTextB() = "Exit";
+		buttonTextA() = "OK";
 	}
 
 	u64 keysDown(u64 keys) override
@@ -68,23 +70,23 @@ public:
 
 	void draw() override
 	{
-		int y = 20;
+		int y = Fonts::FONT_SIZE_MEDIUM;
 		for (u32 i = 0; i < m_tabs.size(); i++)
 		{
 			if (i == m_selectedIndex)
 			{
 				if (isFocused())
 				{
-					drawRect(0, y-16, width(), 50, txtcolor);
+					drawRect(0, y-((Fonts::FONT_SIZE_HUGE - Fonts::FONT_SIZE_MEDIUM) / 2), width(), Fonts::FONT_SIZE_HUGE, txtcolor);
 				}
-				drawText(20, y, selcolor, m_tabs[i], fonts->medium());
+				drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, m_tabs[i], fonts->medium());
 				activePanel()->draw();
 			}
 			else
 			{
-				drawText(20, y, txtcolor, m_tabs[i], fonts->medium());
+				drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, m_tabs[i], fonts->medium());
 			}
-			y += 50;
+			y += Fonts::FONT_SIZE_HUGE;
 		}
 	}
 
@@ -120,25 +122,25 @@ public:
 
 	virtual void drawItem(int itemIndex, int displayIndex, T& item)
 	{
-		int y = 20 + (displayIndex * rowHeight());
+		int y = Fonts::FONT_SIZE_MEDIUM + (displayIndex * Fonts::FONT_SIZE_HUGE);
 
 		if (itemIndex == m_selectedIndex)
 		{
 			if (isFocused())
 			{
-				drawRect(0, y - 16, width(), 50, txtcolor);
+				drawRect(0, y - ((Fonts::FONT_SIZE_HUGE - Fonts::FONT_SIZE_MEDIUM) / 2), width(), Fonts::FONT_SIZE_HUGE, txtcolor);
 			}
-			drawText(20, y, selcolor, (string)item, fonts->medium());
+			drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, (string)item, fonts->medium());
 		}
 		else
 		{
-			drawText(20, y, txtcolor, (string)item, fonts->medium());
+			drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, (string)item, fonts->medium());
 		}
 	}
 
 	void draw() override
 	{
-		const int maxLines = 11;
+		const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 
 		if (m_selectedIndex >= m_offset + maxLines)
 		{
@@ -205,7 +207,7 @@ public:
 	Array<T> m_items;
 	u32 m_selectedIndex;
 	u32 m_offset;
-	u32 m_rowHeight = 50;
+	u32 m_rowHeight = Fonts::FONT_SIZE_MEDIUM;
 };
 
 class SdWnd : public HListWnd<string>
@@ -213,6 +215,10 @@ class SdWnd : public HListWnd<string>
 public:
 	SdWnd(Window* p, sptr<Directory> directory, string id, Rect r) : HListWnd(p, id, r), dir(directory)
 	{
+		buttonTextB() = "Back";
+		buttonTextA() = "Install";
+		buttonTextX() = "Install All";
+		buttonTextY() = "Delete prodinfo";
 		refresh();
 	}
 
@@ -356,7 +362,7 @@ public:
 
 	void draw() override
 	{
-		const int maxLines = 11;
+		const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 
 		int end = printLog().size();
 		int i = end > maxLines ? end - maxLines : 0;
@@ -365,7 +371,7 @@ public:
 		while(i < end)
 		{
 			drawText(20, y, txtcolor, printLog()[i], fonts->medium());
-			y += 50;
+			y += Fonts::FONT_SIZE_MEDIUM;
 			i++;
 		}
 	}
@@ -463,8 +469,6 @@ public:
 		TTF_Init();
 
 		SDL_SetRenderDrawColor(_renderer, 255, 255, 255, 255);
-
-		ttf = Theme.FontPath;
 
 		bgs = surfInit(Theme.BackgroundPath);
 		bgt = texInit(bgs);
@@ -624,8 +628,41 @@ public:
 
 		if (printLog().size())
 		{
-			drawText(footerX, footerY, txtcolor, printLog().last(), fonts->large());
+			drawText(footerX, footerY, txtcolor, printLog().last(), fonts->medium());
 		}
+
+
+		if (focus())
+		{
+			P p(this, Rect(640, 648, 610, 72), P::ALIGN_RIGHT | P::VALIGN_CENTER);
+
+			if (focus()->buttonTextY().size())
+			{
+				p.drawText(txtcolor, FON_Y, fonts->medium(Fonts::FONT_EXT));
+				p.drawText(txtcolor, string(" ") + focus()->buttonTextY() + "   ", fonts->medium());
+			}
+
+			if (focus()->buttonTextX().size())
+			{
+				p.drawText(txtcolor, FON_X, fonts->medium(Fonts::FONT_EXT));
+				p.drawText(txtcolor, string(" ") + focus()->buttonTextX() + "   ", fonts->medium());
+			}
+
+			if (focus()->buttonTextB().size())
+			{
+				p.drawText(txtcolor, FON_B, fonts->medium(Fonts::FONT_EXT));
+				p.drawText(txtcolor, string(" ") + focus()->buttonTextB() + "   ", fonts->medium());
+			}
+
+			if (focus()->buttonTextA().size())
+			{
+				p.drawText(txtcolor, FON_A, fonts->medium(Fonts::FONT_EXT));
+				p.drawText(txtcolor, string(" ") + focus()->buttonTextA() + "   ", fonts->medium());
+			}
+
+			p.render();
+		}
+
 		SDL_RenderPresent(_renderer);
 	}
 
