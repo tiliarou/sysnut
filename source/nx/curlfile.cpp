@@ -16,7 +16,7 @@ bool CurlFile::open(Url path, const char* mode)
 {
 	if (isOpen())
 	{
-		warning("opening file with closing handle first %s\n", path);
+		warning("opening file with closing handle first %s\n", path.c_str());
 		close();
 	}
 

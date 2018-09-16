@@ -43,7 +43,7 @@ bool File::open(Url path, const char* mode)
 
 	if (!f->open(path, mode))
 	{
-		error("failed to open file %s\n", path);
+		error("failed to open file %s\n", path.c_str());
 		return false;
 	}
 
