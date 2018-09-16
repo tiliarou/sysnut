@@ -308,20 +308,20 @@ public:
 	{
 	}
 
-	TitleRow(TitleId titleId, string name) : m_titleId(titleId), m_name(name)
+	TitleRow(RightsId rightsId, string name) : m_rightsId(rightsId), m_name(name)
 	{
 	}
 
 	operator string()
 	{
-		return hx(titleId()) + "    " + name();
+		return hx(m_rightsId.titleId()) + "    " + name();
 	}
 
-	TitleId& titleId() { return m_titleId; }
+	RightsId& rightsId() { return m_rightsId; }
 	string& name() { return m_name; }
 
 private:
-	TitleId m_titleId;
+	RightsId m_rightsId;
 	string m_name;
 };
 
@@ -331,6 +331,9 @@ public:
 	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
 	{
 		icon() = FON_TICKET;
+		buttonTextB() = "Back";
+		buttonTextX() = "Delete";
+
 		refresh();
 	}
 
@@ -339,6 +342,19 @@ public:
 		Window::onFocus();
 		refresh();
 		invalidate();
+	}
+
+	u64 keysDown(u64 keys) override
+	{
+		keys = HListWnd<TitleRow>::keysDown(keys);
+
+		if (keys & KEY_X && items().size())
+		{
+			esDeleteTicket(&items()[m_selectedIndex].rightsId(), sizeof(RightsId));
+			refresh();
+			invalidate();
+		}
+		return keys;
 	}
 
 	void refresh() override
@@ -368,7 +384,17 @@ public:
 
 		for (unsigned int i = 0; i < rightsIdCount; i++)
 		{
-			items().push(TitleRow(rightsIds[i].titleId(), getBaseTitleName(rightsIds[i].titleId())));
+			items().push(TitleRow(rightsIds[i], getBaseTitleName(rightsIds[i].titleId())));
+		}
+
+		if (m_selectedIndex >= items().size())
+		{
+			m_selectedIndex = items().size();
+
+			if (m_selectedIndex)
+			{
+				m_selectedIndex--;
+			}
 		}
 	}
 };
@@ -482,7 +508,7 @@ public:
 			}
 		}
 
-		menu->add(string("Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
+		menu->add(string("Common Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 
 		setFocus(menu);
