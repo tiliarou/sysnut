@@ -79,12 +79,20 @@ public:
 				{
 					drawRect(0, y-((Fonts::FONT_SIZE_HUGE - Fonts::FONT_SIZE_MEDIUM) / 2), width(), Fonts::FONT_SIZE_HUGE, txtcolor);
 				}
-				drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, m_tabs[i], fonts->medium());
+				if (m_panels[i])
+				{
+					drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, m_panels[i]->icon(), fonts->medium(Fonts::FONT_EXT));
+				}
+				drawText(Fonts::FONT_SIZE_MEDIUM * 5 / 2, y, selcolor, m_tabs[i], fonts->medium());
 				activePanel()->draw();
 			}
 			else
 			{
-				drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, m_tabs[i], fonts->medium());
+				if (m_panels[i])
+				{
+					drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, m_panels[i]->icon(), fonts->medium(Fonts::FONT_EXT));
+				}
+				drawText(Fonts::FONT_SIZE_MEDIUM * 5 / 2, y, txtcolor, m_tabs[i], fonts->medium());
 			}
 			y += Fonts::FONT_SIZE_HUGE;
 		}
@@ -202,12 +210,10 @@ public:
 	}
 
 	Array<T>& items() { return m_items; }
-	u32& rowHeight() { return m_rowHeight; }
 
 	Array<T> m_items;
 	u32 m_selectedIndex;
 	u32 m_offset;
-	u32 m_rowHeight = Fonts::FONT_SIZE_MEDIUM;
 };
 
 class SdWnd : public HListWnd<string>
@@ -219,6 +225,27 @@ public:
 		buttonTextA() = "Install";
 		buttonTextX() = "Install All";
 		buttonTextY() = "Delete prodinfo";
+
+		if (dir)
+		{
+			if (dir->dirPath().scheme() == "ftp")
+			{
+				icon() = FON_PC;
+			}
+			else if (!dir->dirPath().scheme().length())
+			{
+				icon() = FON_SD;
+			}
+			else
+			{
+				icon() = FON_ERROR;
+			}
+		}
+		else
+		{
+			icon() = FON_ERROR;
+		}
+
 		refresh();
 	}
 
@@ -303,6 +330,7 @@ class TicketWnd : public HListWnd<TitleRow>
 public:
 	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
 	{
+		icon() = FON_TICKET;
 		refresh();
 	}
 
@@ -330,7 +358,7 @@ public:
 		}
 
 		rightsIds.resize(installedTicketCount);
-		memset(rightsIds.buffer(), NULL, rightsIds.sizeBytes());
+		memset(rightsIds.buffer(), 0, rightsIds.sizeBytes());
 
 		if (esListCommonTicket(&rightsIdCount, rightsIds.buffer(), rightsIds.sizeBytes()))
 		{
@@ -358,6 +386,7 @@ class ConsoleWnd : public Window
 public:
 	ConsoleWnd(Window* p, string id, Rect r) : Window(p, id, r)
 	{
+		icon() = FON_CHAT;
 	}
 
 	void draw() override

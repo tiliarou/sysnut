@@ -73,7 +73,14 @@ void print(const char * format, ...)
 	}
 	else
 	{
-		printLog().push(printBuffer);
+		string line(printBuffer);
+		if (line.length())
+		{
+			line.pop();
+			line.pop();
+			line.push('\0');
+		}
+		printLog().push(line);
 	}
 	/*
 	size_t len = strlen(printBuffer);
