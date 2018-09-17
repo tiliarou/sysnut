@@ -128,6 +128,7 @@
     <ClCompile Include="source\nx\pfs0.cpp" />
     <ClCompile Include="source\nx\sddirectory.cpp" />
     <ClCompile Include="source\nx\string.cpp" />
+    <ClCompile Include="source\nx\ticket.cpp" />
     <ClCompile Include="source\server.cpp" />
     <ClCompile Include="source\socket.cpp" />
     <ClCompile Include="source\uriparser\UriCommon.c" />
@@ -156,6 +157,8 @@
     <ClInclude Include="include\nut.h" />
     <ClInclude Include="include\nx\bktr.h" />
     <ClInclude Include="include\nx\bufferedfile.h" />
+    <ClInclude Include="include\nx\chinesesdbuffer.h" />
+    <ClInclude Include="include\nx\circularbuffer.h" />
     <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />
@@ -174,6 +177,7 @@
     <ClInclude Include="include\nx\ipc\spl.h" />
     <ClInclude Include="include\nx\ivfc.h" />
     <ClInclude Include="include\nx\keys.h" />
+    <ClInclude Include="include\nx\lock.h" />
     <ClInclude Include="include\nx\nca.h" />
     <ClInclude Include="include\nx\contentstorage.h" />
     <ClInclude Include="include\nx\fs.h" />
@@ -181,6 +185,7 @@
     <ClInclude Include="include\nx\primitives.h" />
     <ClInclude Include="include\nx\sddirectory.h" />
     <ClInclude Include="include\nx\sptr.h" />
+    <ClInclude Include="include\nx\ticket.h" />
     <ClInclude Include="include\nx\uptr.h" />
     <ClInclude Include="include\nx\string.h" />
     <ClInclude Include="include\nx\url.h" />

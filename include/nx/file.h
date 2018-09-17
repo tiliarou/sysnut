@@ -17,6 +17,8 @@ public:
 	virtual bool open(Url path, const char* mode = "rb");
 	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
+	static bool copy(string src, string dst);
+
 	static sptr<File> factory(string& path, const char* mode = "rb");
 	static sptr<File> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 

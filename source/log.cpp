@@ -3,6 +3,7 @@
 #include "nx/string.h"
 #include "socket.h"
 #include "log.h"
+#include "nx/circularbuffer.h"
 
 Array<PrintHook>* g_hooks = NULL;
 

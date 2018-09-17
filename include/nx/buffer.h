@@ -10,6 +10,7 @@
 #include "nut.h"
 #include "nx/sptr.h"
 #include "log.h"
+#include "nx/integer.h"
 #include <new>
 
 #ifdef __SWITCH__
@@ -141,7 +142,7 @@ public:
 	{
 		if (!size())
 		{
-			return m_buffer[0];
+			return (*this)[0];
 		}
 		return (*this)[size() - 1];
 	}
@@ -364,6 +365,23 @@ public:
 		return &m_buffer[size()];
 	}
 
+	/*
+	integer<256> sha256()
+	{
+		integer<256> result(0);
+
+		mbedtls_sha256_context ctx;
+		mbedtls_sha256_init(&ctx);
+
+		mbedtls_sha256_update(&ctx, buffer(), sizeBytes());
+
+		mbedtls_sha256_finish(&ctx, (u8*)&result);
+
+		mbedtls_sha256_free(&ctx);
+		return result;
+	}
+	*/
+
 protected:
 
 	T* m_buffer = NULL;
@@ -371,39 +389,3 @@ protected:
 	u64 m_bufferSize = 0;
 };
 
-template<class T, u64 SZ>
-class CircularBuffer : public Buffer<T>
-{
-public:
-	CircularBuffer() : Buffer<T>()
-	{
-		Buffer<T>::resize(SZ);
-		Buffer<T>::resize(0);
-		circularPosition() = 0;
-	}
-
-	T& push(T n)
-	{
-		if (Buffer<T>::size() < SZ)
-		{
-			return Buffer<T>::push(n);
-		}
-		Buffer<T>::m_buffer[circularPosition()] = n;
-		circularPosition() = (circularPosition() + 1) % SZ;
-		return Buffer<T>::m_buffer[circularPosition()];
-	}
-
-	const T& operator[](u32 i) const
-	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
-	}
-
-	T& operator[](u32 i)
-	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
-	}
-
-	u32& circularPosition() { return m_circularPosition; }
-private:
-	u32 m_circularPosition;
-};

@@ -77,9 +77,15 @@ typedef u32 Service;
 
 #define FS_MAX_PATH 0x301
 
+#define Thread u64
+
+#define _1MS 1
+
 #else
 #include <switch.h>
 #include <switch/arm/atomics.h>
 #include "nx/primitives.h"
 #define closesocket close
+
+#define _1MS 1000000
 #endif

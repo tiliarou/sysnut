@@ -1,6 +1,7 @@
 #pragma once
 
 #include <switch.h>
+#include <sys/stat.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h> 
 #include <SDL2/SDL_image.h>
@@ -21,6 +22,119 @@ class NutGui;
 NutGui* nutGui = NULL;
 
 CircularBuffer<string, 0x100>& printLog();
+
+class TitleKeyDumper
+{
+public:
+	TitleKeyDumper()
+	{
+	}
+
+	bool dumpPersonal()
+	{
+		FsFileSystem tmpMountedFs;
+
+		if (!fsMount_SystemSaveData(&tmpMountedFs, 0x80000000000000E2)) // personal ticket database
+		{
+			return false;
+		}
+
+		print("Successfuly opened personal ticket database!\n");
+
+		mkdir("personalTickets/", 777);
+
+		if (fsdevMountDevice("espersonalized", tmpMountedFs))
+		{
+			error("Failed to mount espersonalized\n");
+			return false;
+		}
+
+		auto dir = Directory::openDir("espersonalized:/");
+		if (dir)
+		{
+			for (auto& d : dir->files())
+			{
+				string from = string("espersonalized:/") + d->name();
+				string to = string("personalTickets/") + d->name();
+
+				print("copying file: %s\n", d->name().c_str());
+
+				File::copy(from, to);
+			}
+			print("Successly dumped personal!\n");
+			fsdevUnmountDevice("espersonalized");
+			return true;
+		}
+
+		fsdevUnmountDevice("espersonalized");
+		return false;
+	}
+
+	bool dumpCommon()
+	{
+		FsFileSystem tmpMountedFs;
+
+		if (!fsMount_SystemSaveData(&tmpMountedFs, 0x80000000000000E1)) // common ticket database
+		{
+			return false;
+		}
+
+		print("Successfuly opened common ticket database!\n");
+
+		mkdir("commonTickets/", 777);
+
+		if (fsdevMountDevice("escommon", tmpMountedFs))
+		{
+			error("Failed to mount escommon\n");
+			return false;
+		}
+
+		auto dir = Directory::openDir("escommon:/");
+		if (dir)
+		{
+			for (auto& d : dir->files())
+			{
+				string from = string("escommon:/") + d->name();
+				string to = string("commonTickets/") + d->name();
+
+				print("copying file: %s\n", d->name().c_str());
+
+				File::copy(from, to);
+			}
+			print("Successly dumped common!\n");
+			fsdevUnmountDevice("escommon");
+			return true;
+		}
+
+		fsdevUnmountDevice("escommon");
+		return false;
+	}
+
+	bool dump()
+	{
+		print("Begining key dump\n");
+		bool dumpedCommon = false, dumpedPersonal = false;
+
+		for (int i = 0; i < 100 && (!dumpedCommon || !dumpedPersonal); i++)
+		{
+			pmshellTerminateProcessByTitleId(0x0100000000000033);
+
+			if (!dumpedPersonal)
+			{
+				dumpedPersonal = dumpPersonal();
+			}
+
+			if (!dumpedCommon)
+			{
+				dumpedCommon = dumpCommon();
+			}
+		}
+
+		error("Failed to dump title keys.\n");
+		return false;
+	}
+private:
+};
 
 
 struct Theme
@@ -353,6 +467,11 @@ public:
 			esDeleteTicket(&items()[m_selectedIndex].rightsId(), sizeof(RightsId));
 			refresh();
 			invalidate();
+		}
+		if (keys & KEY_Y)
+		{
+			TitleKeyDumper td;
+			td.dump();
 		}
 		return keys;
 	}

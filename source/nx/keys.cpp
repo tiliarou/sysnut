@@ -11,6 +11,12 @@ Keys g_keys("keys.txt");
 Keys g_keys("/switch/deez/keys.txt");
 #endif
 
+#define VERIFY_KEY(NAME, KEY, HASH) \
+if (sha256(KEY) != integer<256>(HASH)) \
+{ \
+	print("Bad key hash: %s = %s, expected %s\n", NAME, hx(sha256(KEY)).c_str(), hx(integer<256>(HASH)).c_str()); \
+}
+
 Keys& keys()
 {
 	return g_keys;
@@ -280,18 +286,22 @@ bool Keys::open(const char* file)
 			}
 			else if (strcmp(key, "titlekek_source") == 0) {
 				uhx(titlekekSource, value, sizeof(titlekekSource));
+				VERIFY_KEY("titlekek_source", titlekekSource, "445e3495308d9ef16f215997cce027419adaaca5661e933e5834cc4f5d8bfaf2");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "header_kek_source") == 0) {
 				uhx(headerKekSource, value, sizeof(headerKekSource));
+				VERIFY_KEY("header_kek_source", headerKekSource, "b97b807cef362d3ab4529c27685ed0e3b64151f20a377c62607ef83e81a20a07");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "header_key_source") == 0) {
 				uhx(headerKeySource, value, sizeof(headerKeySource));
+				VERIFY_KEY("header_key_source", headerKeySource, "fd03479aecb42b9d642c377925022cd0ba6ca3a7deffbbad7c718e7ad6b585ae");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "header_key") == 0) {
 				uhx(headerKey, value, sizeof(headerKey));
+				VERIFY_KEY("header_key", headerKey, "52aa1da1624d2945e74d2318b7cc386769a66c96c4d7f7e8292eeca6d123203d");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "package2_key_source") == 0) {
@@ -300,14 +310,17 @@ bool Keys::open(const char* file)
 			}
 			else if (strcmp(key, "sd_card_kek_source") == 0) {
 				uhx(sdCardKekSource, value, sizeof(sdCardKekSource));
+				VERIFY_KEY("sd_card_kek_source", sdCardKekSource, "830295736c5e3579c75cd71a6cdb630e8e4b490672219f5377dc731b6e5671f1");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "sd_card_nca_key_source") == 0) {
 				uhx(sdCardKeySources[1], value, sizeof(sdCardKeySources[1]));
+				VERIFY_KEY("sd_card_nca_key_source", sdCardKeySources[1], "699b53eb637b6b14e8fadfe5a05dcf79b447e84e7c6562ce2eb3b2c6d8a3db51");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "sd_card_save_key_source") == 0) {
 				uhx(sdCardKeySources[0], value, sizeof(sdCardKeySources[0]));
+				VERIFY_KEY("sd_card_save_key_source", sdCardKeySources[0], "f45c8cc44a91bb5ea56d896b22fbd84d1fb0241fb736ebdc4085921b61497634");
 				matchedKey = 1;
 			}
 			else if (strcmp(key, "master_key_source") == 0) {
@@ -373,7 +386,29 @@ bool Keys::open(const char* file)
 					snprintf(testName, sizeof(testName), "master_key_%02x", i);
 					if (strcmp(key, testName) == 0) {
 						uhx(masterKeys[i], value, sizeof(masterKeys[i]));
+						switch (i)
+						{
+							case 0:
+								VERIFY_KEY(testName, masterKeys[i], "dc48df7ca2548457750c0f1178f38d0b719046979b60a6298be43f70b0c34b82");
+								break;
+							case 1:
+								VERIFY_KEY(testName, masterKeys[i], "4165c3cd4a108f521e66b461c74e77c7386ef2160174bd556982d6e8a7311236");
+								break;
+							case 2:
+								VERIFY_KEY(testName, masterKeys[i], "050fb20068c3b92e6bae48d8d89fb9ccf6eedd72ab8e2f8a814081af7f5796e8");
+								break;
+							case 3:
+								VERIFY_KEY(testName, masterKeys[i], "995042dc56a3daad15e1cc9b1e85b04adef2ffdf1478288ad15781138c529420");
+								break;
+							case 4:
+								VERIFY_KEY(testName, masterKeys[i], "2b454c48b6aa2a4f8a15b11df367422ee2b512aa9a0b10f70dacdb47bd3fa9a6");
+								break;
+							default:
+								VERIFY_KEY(testName, masterKeys[i], "0000000000000000000000000000000000000000000000000000000000000000");
+								break;
+						}
 						matchedKey = 1;
+
 						break;
 					}
 
@@ -427,5 +462,15 @@ bool Keys::open(const char* file)
 	}
 
 	fclose(f);
+
+	if (masterKeys[0].empty())
+	{
+		error("Missing masterKey0 key!\n");
+	}
+
+	if (titlekekSource.empty())
+	{
+		error("Missing titleKekSource key!\n");
+	}
 	return true;
 }

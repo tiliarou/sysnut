@@ -51,7 +51,7 @@ class integer
 public:
 	integer<BITS>()
 	{
-		*this = 0;
+		memset(&buffer, 0, sizeof(integer<BITS>));
 	}
 
 	integer<BITS>(word n)
@@ -70,6 +70,45 @@ public:
 			{
 				a[j] = b[sizeof(word) - j - 1];
 			}
+		}
+	}
+
+	integer<BITS>(const char (&hex)[(BITS / 8 * 2) + 1])
+	{
+		unsigned char* tmp = (unsigned char*)&buffer;
+		memset(tmp, 0, sizeof(integer<BITS>));
+
+
+		long len = 0;
+
+		for (long i = 0; i < strlen(hex); i++)
+		{
+			if (!isHex(hex[i]))
+			{
+				break;
+			}
+			len++;
+		}
+
+		if (!len)
+		{
+			return;
+		}
+
+		if (len % 2)
+		{
+			return;
+		}
+
+		for (unsigned int i = 0; i < len; i++)
+		{
+			char val = hextoi(hex[i]);
+
+			if ((i & 1) == 0)
+			{
+				val <<= 4;
+			}
+			tmp[i >> 1] |= val;
 		}
 	}
 
@@ -674,12 +713,17 @@ public:
 		return *this = temp;
 	}
 
+	operator bool() const
+	{
+		return !empty();
+	}
+
 	bool empty() const
 	{
 		const integer<BITS>& a = *this;
 		for (long i = 0; i < size(); i++)
 		{
-			if (a[i])
+			if ((bool)a[i])
 			{
 				return false;
 			}
@@ -1146,15 +1190,21 @@ public:
 		return temp;
 	}
 
+	/*const word& operator[](unsigned long i) const
+	{
+		return buffer[i];
+	}*/
+
 	word& operator[](unsigned long i)
 	{
 		return buffer[i];
 	}
 
-	const word& operator[](unsigned long i) const
+	bool operator!() const
 	{
-		return buffer[i];
+		return !empty();
 	}
+
 
 	const word& read(unsigned long i) const
 	{
@@ -1256,6 +1306,36 @@ public:
 	{
 		return BITS / 8 / sizeof(word);
 	}
+
+	static int isHex(char c)
+	{
+		if ('a' <= c && c <= 'f') return 1;
+		if ('A' <= c && c <= 'F') return 1;
+		if ('0' <= c && c <= '9') return 1;
+		return 0;
+	}
+
+	static char hextoi(char c)
+	{
+		if ('a' <= c && c <= 'f') return c - 'a' + 0xA;
+		if ('A' <= c && c <= 'F') return c - 'A' + 0xA;
+		if ('0' <= c && c <= '9') return c - '0';
+		return 0;
+	}
+
+	static char itohex(u8 nibble, bool cap)
+	{
+		if (nibble < 0xA)
+		{
+			return '0' + nibble;
+		}
+		else if (nibble < 0x10)
+		{
+			return (cap ? 'A' : 'a') + (nibble - 0xA);
+		}
+		return '\0';
+	}
+
 	//private:
 	word buffer[BITS / 8 / sizeof(word)];
 } PACKED;

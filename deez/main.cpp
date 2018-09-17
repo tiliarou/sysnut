@@ -61,6 +61,11 @@ void userAppInit(void)
 	if (R_FAILED(plInitialize()))
 		fatalSimple(0xBFE7);
 
+	if (R_FAILED(pmshellInitialize()))
+		fatalSimple(0xBFE8);
+
+
+
 
 
 	if (R_FAILED(ncmextInitialize()))
@@ -87,6 +92,7 @@ void userAppExit(void)
 	nsExit();
 	nsextExit();
 
+	pmshellExit();
 	plExit();
 
 	splCryptoExit();

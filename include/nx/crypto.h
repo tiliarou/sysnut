@@ -2,6 +2,7 @@
 #include "nx/primitives.h"
 #include "nx/buffer.h"
 #include "mbedtls/cipher.h"
+#include "mbedtls/sha256.h"
 
 typedef enum : u8 {
 	CRYPT_NULL = 0,
@@ -58,3 +59,18 @@ private:
 	mbedtls_cipher_context_t cipherDec;
 };
 
+template<class T>
+integer<256> sha256(T n)
+{
+	integer<256> result(0);
+
+	mbedtls_sha256_context ctx;
+	mbedtls_sha256_init(&ctx);
+
+	mbedtls_sha256_update(&ctx, (const u8*)&n, sizeof(T));
+
+	mbedtls_sha256_finish(&ctx, (u8*)&result);
+
+	mbedtls_sha256_free(&ctx);
+	return result;
+}

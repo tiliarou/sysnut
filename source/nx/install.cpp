@@ -100,6 +100,37 @@ bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 
 }
 
+void Install::installThread(InstallThreadContext* ctx)
+{
+	print("Download thread started\n");
+	Install* install = ctx->install;
+	File* nca = ctx->nca;
+	u64 totalSize = nca->size();
+
+	const u64 chunkSize = 0x100000;
+	u64 i = 0;
+	while (ctx->threadRunning)
+	{
+		if (!ctx->buffers[i].lock.acquireWriteLock())
+		{
+			ctx->buffers[i].buffer().resize(0);
+			return;
+		}
+
+		if (!nca->read(ctx->buffers[i].buffer(), chunkSize))
+		{
+		}
+
+		install->storage.writePlaceholder(ctx->ncaId, i, ctx->buffers[i].buffer().buffer(), ctx->buffers[i].buffer().size());
+		i += ctx->buffers[i].buffer().size();
+
+		print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
+
+		ctx->buffers[i].lock.releaseWriteLock();
+	}
+	print("Download thread ended\n");
+}
+
 bool Install::installNca(File* nca, NcaId ncaId)
 {
 	Buffer<u8> buffer;
@@ -121,13 +152,32 @@ bool Install::installNca(File* nca, NcaId ncaId)
 	u64 totalSize = nca->size();
 
 	nca->rewind();
-
-	while (nca->read(buffer, chunkSize))
+	if (nca->size() < 0x100000 || 1)
 	{
-		storage.writePlaceholder(ncaId, i, buffer.buffer(), buffer.size());
-		i += buffer.size();
+		while (nca->read(buffer, chunkSize))
+		{
+			storage.writePlaceholder(ncaId, i, buffer.buffer(), buffer.size());
+			i += buffer.size();
 
-		print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
+			print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
+		}
+	}
+	else
+	{
+		InstallThreadContext ctx(this, nca, ncaId);
+#ifdef __SWITCH__
+		if (threadCreate(&ctx.t, (void(*)(void*))&installThread, &ctx, 128 * 1024, 0x3B, -2))
+		{
+			error("Failed to create download thread!\n");
+			return false;
+		}
+
+		if (threadStart(&ctx.t))
+		{
+			error("Failed to start download thread!\n");
+			return false;
+		}
+#endif
 	}
 #ifdef __SWITCH__
 	print("\n");
