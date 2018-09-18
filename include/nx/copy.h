@@ -78,7 +78,17 @@ public:
 			return false;
 		}
 
-		readerThread(this);
+		readerWorker();
+
+		for(u64 i=0; buffers.size(); i++)
+		{
+			if (i > 5 * 100) // 5 seconds
+			{
+				error("timed out waiting for writer thread to complete\n");
+				break;
+			}
+			nxSleep(10);
+		}
 		print("copy complete\n");
 		return true;
 	}
@@ -233,7 +243,7 @@ public:
 
 	static const u32 BUFFER_SIZE = 0x800000;
 
-	ChineseSdBuffer<CopyBuffer, 8> buffers;
+	ChineseSdBuffer<CopyBuffer, 4> buffers;
 };
 
 class FileCopy : public Copy
@@ -438,6 +448,7 @@ public:
 		FileStreamBuffer f(this);
 
 		fsrc->read((Buffer<u8>&)f);
+		f.flush();
 
 		readerExit();
 	}

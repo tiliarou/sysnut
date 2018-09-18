@@ -117,14 +117,18 @@ u64 CurlFile::size()
 	return m_size;
 }
 
+unsigned long l = 0;
 size_t curlReadCallback(void *ptr, size_t size, size_t nmemb, Buffer<u8>* buffer)
 {
 	u64 currentSize = buffer->size();
 	size *= nmemb;
 
-	//Buffer<u8> tmp(ptr, size);
+	buffer->writeBuffer(ptr, size);
 
-	buffer->writeBuffer(ptr, size);	
+	/*if (l++ >= 2507)
+	{
+		print("%d\n", size);
+	}*/
 
 	//buffer->resize(currentSize + size);
 	//memcpy(buffer->buffer() + currentSize, ptr, size);
