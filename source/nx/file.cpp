@@ -119,7 +119,37 @@ u64 File::read(Buffer<u8>& buffer, u64 sz)
 		sz = size() - tell();
 	}
 
-	return m_parent->read(buffer, sz);
+	if (m_parent)
+	{
+		return m_parent->read(buffer, sz);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+u64 File::write(Buffer<u8>& buffer)
+{
+	if (!isOpen())
+	{
+		error("tried to write to closed file\n");
+		return 0;
+	}
+
+	if (!buffer.size())
+	{
+		return 0;
+	}
+
+	if (m_parent)
+	{
+		return m_parent->write(buffer);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 bool File::isOpen()

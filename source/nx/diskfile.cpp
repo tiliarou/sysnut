@@ -117,9 +117,27 @@ u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 
 	buffer.resize(sz);
 
-	u64 r;
-	r = fread(buffer.buffer(), 1, (size_t)sz, f);
-	return r;
+	u64 bytesRead = (u64)fread(buffer.buffer(), 1, (size_t)sz, f);
+	buffer.resize(bytesRead);
+
+	return bytesRead;
+
+}
+
+u64 DiskFile::write(Buffer<u8>& buffer)
+{
+	if (!isOpen())
+	{
+		error("tried to write to closed file\n");
+		return 0;
+	}
+
+	if (!buffer.size())
+	{
+		return 0;
+	}
+
+	return (u64)fwrite(buffer.buffer(), 1, buffer.size(), f);
 }
 
 bool DiskFile::isOpen()

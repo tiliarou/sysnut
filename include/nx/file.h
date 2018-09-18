@@ -46,6 +46,7 @@ public:
 	virtual u64 tell();
 	virtual u64 size();
 	virtual u64 read(Buffer<u8>& buffer, u64 sz = 0);
+	virtual u64 write(Buffer<u8>& buffer);
 
 	bool isOpen();
 	Url& path() { return m_path; }

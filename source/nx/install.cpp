@@ -127,14 +127,11 @@ void Install::writerThread(InstallThreadContext* ctx)
 				continue;
 			}
 
-			if (!buffer->buffer().size())
+			if (buffer->buffer().size())
 			{
-				buffer->lock.releaseReadLock();
-				break;
+				ctx->install->storage.writePlaceholder(ctx->ncaId, offset, buffer->buffer().buffer(), buffer->buffer().size());
+				offset += buffer->buffer().size();
 			}
-
-			ctx->install->storage.writePlaceholder(ctx->ncaId, offset, buffer->buffer().buffer(), buffer->buffer().size());
-			offset += buffer->buffer().size();
 
 			//print("\rwriting %d%% %s ", int(totalSize ? (offset * 100 / totalSize) : 100), nca->path().c_str());
 
@@ -144,7 +141,7 @@ void Install::writerThread(InstallThreadContext* ctx)
 		}
 		else
 		{
-			nxSleep(10);
+			nxSleep(100);
 		}
 	}
 	ctx->threadRunning = false;
@@ -191,7 +188,7 @@ bool Install::installNca(File* nca, NcaId ncaId)
 
 	nca->rewind();
 
-	if (totalSize < 0x100000 || 1)
+	//if (totalSize < 0x100000)
 	{
 		Buffer<u8> buffer;
 
@@ -246,17 +243,29 @@ bool Install::installNca(File* nca, NcaId ncaId)
 			buffer->lock.releaseWriteLock();
 			bufferIndex++;
 		}
-		print("exiting read loop\n");
+		print("exiting read loop.. waiting for buffers to empty.\n");
+
+		for (int i = 0; i < 1000 && ctx.buffers.size(); i++)
+		{
+			if (i > 900)
+			{
+				error("Timed out waiting for buffers to flush\n");
+				break;
+			}
+			nxSleep(10);
+		}
+		error("buffers flushed!\n");
 	}
+	*/
 #ifdef __SWITCH__
 	print("\n");
 #endif
-*/
-	if (!storage.reg(ncaId, ncaId))
+
+	/*if (!storage.reg(ncaId, ncaId))
 	{
-		//error("Failed to register %s\n", ncaFile.c_str());
+		error("Failed to register %s\n", ncaFile.c_str());
 		return false;
-	}
+	}*/
 
 #ifndef _MSC_VER
 	storage.deletePlaceholder(ncaId);

@@ -159,6 +159,7 @@
     <ClInclude Include="include\nx\bufferedfile.h" />
     <ClInclude Include="include\nx\chinesesdbuffer.h" />
     <ClInclude Include="include\nx\circularbuffer.h" />
+    <ClInclude Include="include\nx\copy.h" />
     <ClInclude Include="include\nx\crypto.h" />
     <ClInclude Include="include\nx\buffer.h" />
     <ClInclude Include="include\nx\cnmt.h" />

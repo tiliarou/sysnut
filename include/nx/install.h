@@ -54,6 +54,51 @@ public:
 #endif
 	}
 
+	static void writerThread(InstallThreadContext* ctx)
+	{
+		if (!ctx || !ctx->install)
+		{
+			return;
+		}
+
+		InstallBuffer* buffer = NULL;
+		u64 offset = 0;
+		ctx->i = 0;
+		ctx->threadInit = true;
+		ctx->threadRunning = true;
+
+		while (ctx->threadRunning)
+		{
+			if (ctx->buffers.size())
+			{
+				if (!(buffer = ctx->buffers.first()))
+				{
+					continue;
+				}
+
+				if (!buffer->lock.acquireReadLock())
+				{
+					continue;
+				}
+
+				if (buffer->buffer().size())
+				{
+					//ctx->install->storage.writePlaceholder(ctx->ncaId, offset, buffer->buffer().buffer(), buffer->buffer().size());
+					offset += buffer->buffer().size();
+				}
+
+				ctx->buffers.shift();
+				buffer->lock.releaseReadLock();
+				ctx->i++;
+			}
+			else
+			{
+				nxSleep(100);
+			}
+		}
+		ctx->threadRunning = false;
+	}
+
 	bool threadInit;
 	bool threadRunning;
 
@@ -62,6 +107,7 @@ public:
 	NcaId ncaId;
 	Thread t;
 	u64 i;
+	u64 totalSize;
 
 	ChineseSdBuffer<InstallBuffer, 3> buffers;
 };
@@ -77,7 +123,7 @@ public:
 
 	static void writerThread(InstallThreadContext* ctx = NULL);
 
-private:
+//private:
 	Nca* cnmtNca;
 	Cnmt* cnmt;
 	ContentStorage storage;
