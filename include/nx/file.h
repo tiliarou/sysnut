@@ -19,11 +19,11 @@ public:
 
 	static bool copy(string src, string dst);
 
-	static sptr<File> factory(Url& path, const char* mode = "rb");
-	static sptr<File> factory(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static sptr<File> factory(Url path, const char* mode = "rb");
+	static sptr<File> factory(Url path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
-	static File* factoryRawPtr(Url& path, const char* mode = "rb");
-	static File* factoryRawPtr(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static File* factoryRawPtr(Url path, const char* mode = "rb");
+	static File* factoryRawPtr(Url path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
 	integer<256> sha256();
 
@@ -46,7 +46,7 @@ public:
 	virtual u64 tell();
 	virtual u64 size();
 	virtual u64 read(Buffer<u8>& buffer, u64 sz = 0);
-	virtual u64 write(Buffer<u8>& buffer);
+	virtual u64 write(const Buffer<u8>& buffer);
 
 	bool isOpen();
 	Url& path() { return m_path; }

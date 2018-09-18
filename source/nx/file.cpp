@@ -129,7 +129,7 @@ u64 File::read(Buffer<u8>& buffer, u64 sz)
 	}
 }
 
-u64 File::write(Buffer<u8>& buffer)
+u64 File::write(const Buffer<u8>& buffer)
 {
 	if (!isOpen())
 	{

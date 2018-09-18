@@ -51,8 +51,7 @@ public:
 
 	Buffer(const Buffer<T>& src)
 	{
-		resize(src.size());
-		set(src.buffer(), src.size());
+		operator=(src);
 	}
 
 	Buffer(const void* src, u64 sz)
@@ -73,7 +72,9 @@ public:
 	Buffer<T>& operator=(const Buffer<T>& src)
 	{
 		resize(src.size());
-		set(src.buffer(), src.size());
+		resize(0);
+		writeBuffer(src);
+		//set(src.buffer(), src.size());
 		return *this;
 	}
 
@@ -87,14 +88,38 @@ public:
 		return m_buffer[i];
 	}
 
-	u64 writeBuffer(const Buffer<T>& v)
+	virtual u64 writeBuffer(const Buffer<T>& v)
 	{
-		const T* p = v.buffer();
+		return writeBuffer(v.buffer(), v.size() * sizeof(T));
+
+		u64 originalSize = size();
+
+		resize(originalSize + v.size());
+		memcpy(buffer() + originalSize, v.buffer(), v.size() * sizeof(T));
+		return v.size();
+
+		/*const T* p = v.buffer();
 		for (size_t i = 0; i < v.size(); i++)
 		{
 			push(p[i]);
 		}
-		return v.size();
+		return v.size();*/
+	}
+
+	virtual u64 writeBuffer(const void* p, u64 sz)
+	{
+		u64 originalSize = size();
+
+		resize(originalSize + sz);
+		memcpy(buffer() + originalSize, p, sz * sizeof(T));
+		return sz;
+
+		/*const T* p = v.buffer();
+		for (size_t i = 0; i < v.size(); i++)
+		{
+		push(p[i]);
+		}
+		return v.size();*/
 	}
 
 	Buffer<T>& operator+=(const Buffer<T>& v)
@@ -216,7 +241,7 @@ public:
 		}
 	}
 
-	bool resize(u64 newSize)
+	virtual bool resize(u64 newSize)
 	{
 		u64 originalSize = size();
 

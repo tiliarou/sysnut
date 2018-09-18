@@ -18,7 +18,6 @@ private:
 
 
 
-template<u32 BUFFER_SIZE=0x800000, u32 BUFFER_COUNT=3>
 class Copy
 {
 public:
@@ -86,7 +85,15 @@ public:
 
 	static void WINAPI readerThread(Copy* ctx)
 	{
-		if (!ctx->readerInit())
+		if (ctx)
+		{
+			ctx->readerWorker();
+		}
+	}
+
+	virtual void readerWorker()
+	{
+		if (!readerInit())
 		{
 			return;
 		}
@@ -95,48 +102,56 @@ public:
 
 		while (1)
 		{
-			buffer = ctx->buffers.peek();
+			buffer = buffers.peek();
 
 			if (!(buffer->lock.acquireWriteLock()))
 			{
 				continue;
 			}
-			ctx->buffers.push();
+			buffers.push();
 
 			buffer->buffer().resize(0);
 
-			if (!ctx->readChunk(ctx->bytesRead, buffer->buffer(), BUFFER_SIZE))
+			if (!readChunk(bytesRead, buffer->buffer(), BUFFER_SIZE))
 			{
 				buffer->buffer().resize(0);
 				buffer->lock.releaseWriteLock();
 				break;
 			}
 
-			ctx->bytesRead += buffer->buffer().size();
+			bytesRead += buffer->buffer().size();
 
 			buffer->lock.releaseWriteLock();
 		}
 
-		ctx->readerExit();
+		readerExit();
 	}
 
 	static void WINAPI writerThread(Copy* ctx)
 	{
-		if (!ctx || !ctx->writerInit())
+		if (ctx)
+		{
+			ctx->writerWorker();
+		}
+	}
+
+	virtual void writerWorker()
+	{
+		if (!writerInit())
 		{
 			return;
 		}
 
 		CopyBuffer* buffer = NULL;
 
-		ctx->bytesWritten = 0;
-		ctx->threadRunningCount = true;
+		bytesWritten = 0;
+		threadRunningCount = true;
 
-		while (ctx->shouldRun())
+		while (shouldRun())
 		{
-			if (ctx->buffers.size())
+			if (buffers.size())
 			{
-				if (!(buffer = ctx->buffers.first()))
+				if (!(buffer = buffers.first()))
 				{
 					continue;
 				}
@@ -148,23 +163,23 @@ public:
 
 				if (buffer->buffer().size())
 				{
-					ctx->writeChunk(ctx->bytesWritten, buffer->buffer());
-					ctx->bytesWritten += buffer->buffer().size();
+					writeChunk(bytesWritten, buffer->buffer());
+					bytesWritten += buffer->buffer().size();
 				}
 
-				ctx->buffers.shift();
+				buffers.shift();
 				buffer->lock.releaseReadLock();
 			}
 			else
 			{
-				nxSleep(100);
+				nxSleep(1);
 			}
 		}
-		ctx->writerExit();
-		ctx->threadRunningCount--;
+		writerExit();
+		threadRunningCount--;
 	}
 
-	virtual u64 writeChunk(u64 offset, Buffer<u8>& buffer)
+	virtual u64 writeChunk(u64 offset, const Buffer<u8>& buffer)
 	{
 		return buffer.size();
 	}
@@ -183,6 +198,14 @@ public:
 	{
 		buffer.resize(0);
 		return sz;
+	}
+
+	virtual void readChunkComplete(u64 offset, const Buffer<u8>& buffer)
+	{
+	}
+
+	virtual void readChunkComplete(u64 offset, const void* buffer, u64 sz)
+	{
 	}
 
 	virtual bool readerInit()
@@ -208,26 +231,36 @@ public:
 	u64 bytesRead;
 	u64 bytesWritten;
 
-	ChineseSdBuffer<CopyBuffer, BUFFER_COUNT> buffers;
+	static const u32 BUFFER_SIZE = 0x800000;
+
+	ChineseSdBuffer<CopyBuffer, 8> buffers;
 };
 
-class FileCopy : public Copy<>
+class FileCopy : public Copy
 {
 public:
-	FileCopy(string src, string dst) : Copy<>()
+	FileCopy(string src, string dst) : Copy()
 	{
+		//fsrc = File::factory(src, "rb");
 		fsrc = sptr<File>(new File());
 		fsrc->open(src, "rb");
 
+		//fdst = File::factory(dst, "wb");
 		fdst = sptr<File>(new File());
 		fdst->open(dst, "wb");
 	}
 
-	u64 writeChunk(u64 offset, Buffer<u8>& buffer) override
+	FileCopy(sptr<File> src, sptr<File> dst) : Copy()
 	{
-		print("writing %x\n", offset);
+		fsrc = src;
+		fdst = dst;
+	}
+
+	u64 writeChunk(u64 offset, const Buffer<u8>& buffer) override
+	{
+		//print("writing %x\n", offset);
 		fdst->write(buffer);
-		print("write @ %x done\n", offset);
+		//print("write @ %x done\n", offset);
 		return buffer.size();
 	}
 
@@ -285,4 +318,98 @@ public:
 
 	sptr<File> fsrc;
 	sptr<File> fdst;
+};
+
+class FileStreamBuffer : Buffer<u8>
+{
+public:
+	FileStreamBuffer(Copy* c) : Buffer<u8>()
+	{
+		m_parent = c;
+		virtualSize = 0;
+	}
+
+	virtual bool resize(u64 newSize)
+	{
+		virtualSize = newSize;
+		return true;
+	}
+
+	virtual u64 writeBuffer(const Buffer<u8>& v) override
+	{
+		if (m_parent)
+		{
+			m_parent->readChunkComplete(virtualSize, v);
+		}
+
+		return v.size();
+	}
+
+	virtual u64 writeBuffer(const void* p, u64 sz) override
+	{
+		if (m_parent)
+		{
+			m_parent->readChunkComplete(virtualSize, p, sz);
+		}
+
+		return sz;
+	}
+
+private:
+	Copy* m_parent;
+	u64 virtualSize;
+};
+
+class FileStreamCopy : public FileCopy
+{
+public:
+	FileStreamCopy(string src, string dst) : FileCopy(src, dst)
+	{
+	}
+
+	FileStreamCopy(sptr<File> src, sptr<File> dst) : FileCopy(src, dst)
+	{
+	}
+
+	void readChunkComplete(u64 offset, const Buffer<u8>& data) override
+	{
+		readChunkComplete(offset, data.buffer(), data.size());
+	}
+
+	void readChunkComplete(u64 offset, const void* data, u64 sz) override
+	{
+		while (!buffers.canWrite())
+		{
+			warning("read timeout\n");
+		}
+		//print("Streamed chunk %x\n", bytesRead);
+		CopyBuffer* buffer = buffers.peek();
+
+		if (!(buffer->lock.acquireWriteLock()))
+		{
+			return;
+		}
+
+		buffers.push();
+
+		buffer->buffer().set(data, sz);
+
+		bytesRead += buffer->buffer().size();
+
+		buffer->lock.releaseWriteLock();
+	}
+
+	void readerWorker() override
+	{
+		if (!readerInit())
+		{
+			return;
+		}
+
+		FileStreamBuffer f(this);
+
+		fsrc->read((Buffer<u8>&)f);
+
+		readerExit();
+	}
 };

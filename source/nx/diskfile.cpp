@@ -124,7 +124,7 @@ u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 
 }
 
-u64 DiskFile::write(Buffer<u8>& buffer)
+u64 DiskFile::write(const Buffer<u8>& buffer)
 {
 	if (!isOpen())
 	{

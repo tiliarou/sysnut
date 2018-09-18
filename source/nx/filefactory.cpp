@@ -8,7 +8,7 @@ template < > const char* mapTypeExtension<Nca>() { return ".nca"; }
 template < > const char* mapTypeExtension<Pfs0>() { return ".nsp"; }
 template < > const char* mapTypeExtension<Cnmt>() { return ".cnmt"; }
 
-File* fileFactoryCreate(Url& path)
+File* fileFactoryCreate(Url path)
 {
 	if (path.str().endsWith(string(".nca")))
 	{
@@ -26,7 +26,7 @@ File* fileFactoryCreate(Url& path)
 	return new File();
 }
 
-sptr<File> File::factory(Url& path, const char* mode)
+sptr<File> File::factory(Url path, const char* mode)
 {
 	File* f = fileFactoryCreate(path);
 
@@ -38,7 +38,7 @@ sptr<File> File::factory(Url& path, const char* mode)
 	return sptr<File>(f);
 }
 
-sptr<File> File::factory(Url& path, sptr<File>& parent, u64 offset, u64 sz)
+sptr<File> File::factory(Url path, sptr<File>& parent, u64 offset, u64 sz)
 {
 	File* f = fileFactoryCreate(path);
 
@@ -52,7 +52,7 @@ sptr<File> File::factory(Url& path, sptr<File>& parent, u64 offset, u64 sz)
 	return sptr<File>(f);
 }
 
-File* File::factoryRawPtr(Url& path, const char* mode)
+File* File::factoryRawPtr(Url path, const char* mode)
 {
 	File* f = fileFactoryCreate(path);
 
@@ -64,7 +64,7 @@ File* File::factoryRawPtr(Url& path, const char* mode)
 	return f;
 }
 
-File* File::factoryRawPtr(Url& path, sptr<File>& parent, u64 offset, u64 sz)
+File* File::factoryRawPtr(Url path, sptr<File>& parent, u64 offset, u64 sz)
 {
 	File* f = fileFactoryCreate(path);
 

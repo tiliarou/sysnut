@@ -18,7 +18,7 @@ public:
 	u64 tell();
 	u64 size();
 	virtual u64 read(Buffer<u8>& buffer, u64 sz = 0) override;
-	virtual u64 write(Buffer<u8>& buffer) override;
+	virtual u64 write(const Buffer<u8>& buffer) override;
 
 	virtual void onChildless() override;
 
