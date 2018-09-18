@@ -42,8 +42,9 @@ DirectoryFiles& CurlDirectory::files()
 	return m_files;
 }
 
-string CurlDirectory::resolvePath(FileEntry& f)
+Url CurlDirectory::resolvePath(const FileEntry* f)
 {
-	string name = Url::encode(f.name());
-	return dirPath().str() + name;
+	Url url = dirPath();
+	url.path() += Url::encode(f->name());
+	return url;
 }

@@ -75,7 +75,7 @@ public:
 	{
 	}
 
-	operator const char*()
+	/*operator const char*()
 	{
 		return str().c_str();
 	}
@@ -83,7 +83,7 @@ public:
 	operator const string&()
 	{
 		return str();
-	}
+	}*/
 
 	string& str()
 	{
@@ -149,6 +149,16 @@ public:
 		uriUnescapeInPlaceA((char*)result.buffer());
 		result.resize(strlen(result.c_str()) + 1);
 		return result;
+	}
+
+	string baseName()
+	{
+		auto bits = path().split('/');
+		if (!bits || !bits->size())
+		{
+			return string();
+		}
+		return bits->last();
 	}
 
 	const bool& isValid() const { return isValid_; }

@@ -15,6 +15,7 @@
 #include "nx/buffer.h"
 #include "nx/font.h"
 #include "rapidjson/document.h"
+#include "nx/circularbuffer.h"
 
 string footer;
 class NutGui;
@@ -28,6 +29,12 @@ class TitleKeyDumper
 public:
 	TitleKeyDumper()
 	{
+		pmshellInitialize();
+	}
+
+	~TitleKeyDumper()
+	{
+		pmshellExit();
 	}
 
 	bool dumpPersonal()
@@ -112,6 +119,7 @@ public:
 
 	bool dump()
 	{
+		return false;
 		print("Begining key dump\n");
 		bool dumpedCommon = false, dumpedPersonal = false;
 

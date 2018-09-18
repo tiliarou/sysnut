@@ -20,7 +20,7 @@ bool string::operator==(const string& s) const
 	{
 		return false;
 	}
-	return memcmp(buffer(), s.buffer(), size()) == 0;
+	return memcmp(buffer(), s.buffer(), length()) == 0;
 }
 
 bool string::operator==(const char* s) const

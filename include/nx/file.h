@@ -19,22 +19,22 @@ public:
 
 	static bool copy(string src, string dst);
 
-	static sptr<File> factory(string& path, const char* mode = "rb");
-	static sptr<File> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static sptr<File> factory(Url& path, const char* mode = "rb");
+	static sptr<File> factory(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
-	static File* factoryRawPtr(string& path, const char* mode = "rb");
-	static File* factoryRawPtr(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static File* factoryRawPtr(Url& path, const char* mode = "rb");
+	static File* factoryRawPtr(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
 	integer<256> sha256();
 
 	template<class T = File>
-	static sptr<T> factory(string& path, char* mode = "rb")
+	static sptr<T> factory(Url& path, char* mode = "rb")
 	{
 		return reinterpret_cast<T*>(factoryRawPtr(path, mode));
 	}
 
 	template<class T = File>
-	static sptr<T> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0)
+	static sptr<T> factory(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0)
 	{
 		return reinterpret_cast<T*>(factoryRawPtr(path, f, offset, sz));
 	}

@@ -19,7 +19,7 @@ bool DiskFile::open(Url path, const char* mode)
 		close();
 	}
 
-	f = fopen(path, mode);
+	f = fopen(path.c_str(), mode);
 
 	if (!f)
 	{

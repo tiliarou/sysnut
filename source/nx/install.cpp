@@ -100,42 +100,81 @@ bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 
 }
 
-void Install::installThread(InstallThreadContext* ctx)
+void Install::writerThread(InstallThreadContext* ctx)
 {
-	print("Download thread started\n");
-	Install* install = ctx->install;
-	File* nca = ctx->nca;
-	u64 totalSize = nca->size();
+	if (!ctx || !ctx->install)
+	{
+		return;
+	}
 
-	const u64 chunkSize = 0x100000;
-	u64 i = 0;
+	InstallBuffer* buffer = NULL;
+	u64 offset = 0;
+	ctx->i = 0;
+	ctx->threadInit = true;
+	ctx->threadRunning = true;
+
 	while (ctx->threadRunning)
 	{
-		if (!ctx->buffers[i].lock.acquireWriteLock())
+		if (ctx->buffers.size())
 		{
-			ctx->buffers[i].buffer().resize(0);
-			return;
-		}
+			if (!(buffer = ctx->buffers.first()))
+			{
+				continue;
+			}
 
-		if (!nca->read(ctx->buffers[i].buffer(), chunkSize))
+			if (!buffer->lock.acquireReadLock())
+			{
+				continue;
+			}
+
+			if (!buffer->buffer().size())
+			{
+				buffer->lock.releaseReadLock();
+				break;
+			}
+
+			ctx->install->storage.writePlaceholder(ctx->ncaId, offset, buffer->buffer().buffer(), buffer->buffer().size());
+			offset += buffer->buffer().size();
+
+			//print("\rwriting %d%% %s ", int(totalSize ? (offset * 100 / totalSize) : 100), nca->path().c_str());
+
+			ctx->buffers.shift();
+			buffer->lock.releaseReadLock();
+			ctx->i++;
+		}
+		else
 		{
+			nxSleep(10);
 		}
-
-		install->storage.writePlaceholder(ctx->ncaId, i, ctx->buffers[i].buffer().buffer(), ctx->buffers[i].buffer().size());
-		i += ctx->buffers[i].buffer().size();
-
-		print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
-
-		ctx->buffers[i].lock.releaseWriteLock();
 	}
-	print("Download thread ended\n");
+	ctx->threadRunning = false;
+}
+
+static inline int getNextCpuId()
+{
+#ifdef __SWITCH__
+	const auto currProcNum = svcGetCurrentProcessorNumber();
+	const auto nextProcNum = (currProcNum + 1) % 4;
+	if (nextProcNum == 3) //ew, kernel cpu
+		return 0;
+	else
+		return (int)nextProcNum;
+#else
+	return 0;
+#endif
 }
 
 bool Install::installNca(File* nca, NcaId ncaId)
 {
-	Buffer<u8> buffer;
+	if (!nca)
+	{
+		error("Attempted to install NULL NCA Pointer\n");
+		return false;
+	}
+
 	const u64 chunkSize = 0x100000;
 	string ncaFile = hx(ncaId) + ".nca";
+	u64 totalSize = nca->size();
 
 	if (storage.has(ncaId))
 	{
@@ -144,16 +183,18 @@ bool Install::installNca(File* nca, NcaId ncaId)
 	}
 
 	storage.deletePlaceholder(ncaId);
-	storage.createPlaceholder(ncaId, ncaId, nca->size());
+	storage.createPlaceholder(ncaId, ncaId, totalSize);
 
 	print("writing 0%% %s ", nca->path().c_str());
 	u64 i = 0;
 
-	u64 totalSize = nca->size();
 
 	nca->rewind();
-	if (nca->size() < 0x100000 || 1)
+
+	if (totalSize < 0x100000 || 1)
 	{
+		Buffer<u8> buffer;
+
 		while (nca->read(buffer, chunkSize))
 		{
 			storage.writePlaceholder(ncaId, i, buffer.buffer(), buffer.size());
@@ -162,11 +203,14 @@ bool Install::installNca(File* nca, NcaId ncaId)
 			print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
 		}
 	}
-	else
+	/*else
 	{
+		u64 bufferIndex = 0;
 		InstallThreadContext ctx(this, nca, ncaId);
+
 #ifdef __SWITCH__
-		if (threadCreate(&ctx.t, (void(*)(void*))&installThread, &ctx, 128 * 1024, 0x3B, -2))
+		memset(&ctx.t, 0, sizeof(ctx.t));
+		if (threadCreate(&ctx.t, (void(*)(void*))&writerThread, &ctx, 1 * 1024 * 1024, 0x2D, getNextCpuId()))
 		{
 			error("Failed to create download thread!\n");
 			return false;
@@ -178,14 +222,39 @@ bool Install::installNca(File* nca, NcaId ncaId)
 			return false;
 		}
 #endif
+
+		const u64 chunkSize = 0x100000 * 16;
+		InstallBuffer* buffer = NULL;
+
+		while (1)
+		{
+			buffer = ctx.buffers.peek();
+			buffer->lock.acquireWriteLock();
+			ctx.buffers.push();
+
+			print("\rreading block %d\n", bufferIndex);
+
+			buffer->buffer().resize(0);
+
+			if (!nca->read(buffer->buffer(), chunkSize))
+			{
+				buffer->buffer().resize(0);
+				buffer->lock.releaseWriteLock();
+				break;
+			}
+
+			buffer->lock.releaseWriteLock();
+			bufferIndex++;
+		}
+		print("exiting read loop\n");
 	}
 #ifdef __SWITCH__
 	print("\n");
 #endif
-
+*/
 	if (!storage.reg(ncaId, ncaId))
 	{
-		error("Failed to register %s\n", ncaFile.c_str());
+		//error("Failed to register %s\n", ncaFile.c_str());
 		return false;
 	}
 
@@ -198,104 +267,119 @@ bool Install::installNca(File* nca, NcaId ncaId)
 
 bool Install::install()
 {
-	Array<RightsId> rightsIds;
-	print("installing cnmt\n");
-
-	for (auto& content : *cnmt)
+	try
 	{
-		string ncaFile = hx(content.record.ncaId) + ".nca";
+		Array<RightsId> rightsIds;
+		print("installing cnmt\n");
 
-		if (!dir->files().contains(ncaFile))
+		for (auto& content : *cnmt)
 		{
-			error("could not find file! %s\n", ncaFile);
+			string ncaFile = hx(content.record.ncaId) + ".nca";
+
+			if (!dir->files().contains(ncaFile))
+			{
+				error("could not find file! %s\n", ncaFile);
+				return false;
+			}
+
+			auto nca = dir->openFile<Nca>(ncaFile);
+			if (nca->rightsId().titleId() || nca->rightsId().masterKeyRev())
+			{
+				rightsIds.push(nca->rightsId());
+			}
+		}
+
+		for (auto& rightsId : rightsIds)
+		{
+			string ticketFile = hx(rightsId) + ".tik";
+			string certFile = hx(rightsId) + ".cert";
+
+			if (!dir->files().contains(ticketFile))
+			{
+				error("could not find ticket! %s\n", ticketFile);
+				return false;
+			}
+
+			if (!dir->files().contains(certFile))
+			{
+				error("could not find cert! %s\n", ticketFile);
+				return false;
+			}
+		}
+
+		for (auto& content : *cnmt)
+		{
+			string ncaFile = hx(content.record.ncaId) + ".nca";
+
+			auto nca = dir->openFile<File>(ncaFile);
+
+			if (!nca)
+			{
+				error("Failed to open %s\n", ncaFile.c_str());
+				return false;
+			}
+
+			if (!installNca(nca.get(), content.record.ncaId))
+			{
+				error("Install failed\n");
+				return false;
+			}
+		}
+
+		auto hash = uhx(cnmtNca->path().baseName());
+
+		if (!installNca((File*)cnmtNca, *reinterpret_cast<integer<128>*>(hash.buffer())))
+		{
+			error("Failed to install cnmt!\n");
 			return false;
 		}
 
-		auto nca = dir->openFile<Nca>(ncaFile);
-		if (nca->rightsId().titleId() || nca->rightsId().masterKeyRev())
+		if (!installContentMetaRecords(cnmt->ncmContentMeta()))
 		{
-			rightsIds.push(nca->rightsId());
-		}
-	}
-
-	for (auto& rightsId : rightsIds)
-	{
-		string ticketFile = hx(rightsId) + ".tik";
-		string certFile = hx(rightsId) + ".cert";
-
-		if (!dir->files().contains(ticketFile))
-		{
-			error("could not find ticket! %s\n", ticketFile);
+			error("Failed to install content meta records!\n");
 			return false;
 		}
 
-		if (!dir->files().contains(certFile))
+		if (!installApplicationRecord())
 		{
-			error("could not find cert! %s\n", ticketFile);
-			return false;
-		}
-	}
-
-	for (auto& content : *cnmt)
-	{
-		string ncaFile = hx(content.record.ncaId) + ".nca";
-
-		auto nca = dir->openFile<File>(ncaFile);
-
-		if (!installNca(nca.get(), content.record.ncaId))
-		{
+			error("Failed to install application record\n");
 			return false;
 		}
 
+		for (auto& rightsId : rightsIds)
+		{
+			string ticketFile = hx(rightsId) + ".tik";
+			string certFile = hx(rightsId) + ".cert";
+
+			auto ticket = dir->openFile<File>(ticketFile);
+			auto cert = dir->openFile<File>(certFile);
+
+			Buffer<u8> ticketBuffer, certBuffer;
+
+			ticket->rewind();
+			ticket->read(ticketBuffer);
+
+			cert->rewind();
+			cert->read(certBuffer);
+
+			if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
+			{
+				error("Failed to import ticket %s\n", ticketFile.c_str());
+				return false;
+			}
+			else
+			{
+				print("Imported %s\n", ticketFile.c_str());
+			}
+		}
+
+		return true;
 	}
-
-	auto hash = uhx(cnmtNca->path());
-
-	if (!installNca((File*)cnmtNca, *reinterpret_cast<integer<128>*>(hash.buffer())))
+	catch (...)
 	{
-		error("Failed to install cnmt!\n");
-	}
-
-	if (!installContentMetaRecords(cnmt->ncmContentMeta()))
-	{
-		error("Failed to install content meta records!\n");
+		error("An unknown error occurred during installation\n");
 		return false;
 	}
-
-	if (!installApplicationRecord())
-	{
-		error("Failed to install application record\n");
-		return false;
-	}
-
-	for (auto& rightsId : rightsIds)
-	{
-		string ticketFile = hx(rightsId) + ".tik";
-		string certFile = hx(rightsId) + ".cert";
-
-		auto ticket = dir->openFile<File>(ticketFile);
-		auto cert = dir->openFile<File>(certFile);
-
-		Buffer<u8> ticketBuffer, certBuffer;
-
-		ticket->rewind();
-		ticket->read(ticketBuffer);
-
-		cert->rewind();
-		cert->read(certBuffer);
-
-		if (esImportTicket(ticketBuffer.buffer(), ticketBuffer.size(), certBuffer.buffer(), certBuffer.size()))
-		{
-			error("Failed to import ticket %s\n", ticketFile.c_str());
-			return false;
-		}
-		else
-		{
-			print("Imported %s\n", ticketFile.c_str());
-		}
-	}
-
-	return true;
 }
 
 string getBaseTitleName(TitleId baseTitleId)
@@ -334,5 +418,14 @@ string getBaseTitleName(TitleId baseTitleId)
 	return languageEntry->name;
 #else
 	return "UNKNOWN";
+#endif
+}
+
+void nxSleep(u64 ms)
+{
+#ifdef __SWITCH__
+	svcSleepThread(ms * 1000000);
+#else
+	Sleep(ms);
 #endif
 }

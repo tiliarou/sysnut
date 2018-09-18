@@ -10,7 +10,7 @@
 
 File* FileEntry::open()
 {
-	string path = parent()->resolvePath(*this);
+	Url path = parent()->resolvePath(this);
 	return File::factoryRawPtr(path);
 }
 
@@ -71,7 +71,9 @@ bool Directory::install()
 	return true;
 }
 
-string Directory::resolvePath(FileEntry& f)
+Url Directory::resolvePath(const FileEntry* f)
 {
-	return dirPath().str() + f.name();
+	Url url = dirPath();
+	url.path() += f->name();
+	return url;
 }

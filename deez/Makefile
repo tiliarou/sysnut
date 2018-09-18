@@ -25,7 +25,7 @@ CFLAGS	:=	-g -Wall -Wextra -O2 -ffunction-sections \
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++17 -Wno-missing-field-initializers -Wno-missing-braces
+CXXFLAGS	:= $(CFLAGS) -std=gnu++17 -Wno-missing-field-initializers -Wno-missing-braces
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)

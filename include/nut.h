@@ -89,3 +89,5 @@ typedef u32 Service;
 
 #define _1MS 1000000
 #endif
+
+void nxSleep(u64 ms);

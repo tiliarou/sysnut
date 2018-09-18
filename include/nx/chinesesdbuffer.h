@@ -1,108 +1,152 @@
 #pragma once
 
 #include "nx/buffer.h"
+#include "nx/lock.h"
 
-template<class T, u64 SZ, bool OVERWRITE = false>
-class ChineseSdBuffer : public Buffer<T>
+template<class T, u64 SZ>
+class ChineseSdBuffer
 {
 public:
-	ChineseSdBuffer() : Buffer<T>()
+	ChineseSdBuffer()
 	{
-		Buffer<T>::resize(SZ);
-		Buffer<T>::resize(0);
 		circularStartPosition() = 0;
 		circularEndPosition() = 0;
 		//circularCurrentPosition() = 0;
 	}
 
-	u64 range()
-	{
-		return circularEndPosition() - circularStartPosition();
-	}
-
-	u64 size2()
+	u64 size()
 	{
 		return circularEndPosition() - circularStartPosition();
 	}
 
 	bool isFull()
 	{
-		return range() >= SZ;
+		return size() >= SZ;
 	}
 
-	bool push(T n)
+	bool canWrite()
 	{
-		if (m_size < SZ)
+		u64 c = 0;
+
+		while (isFull())
 		{
-			Buffer<T>::push(n);
-			circularEndPosition()++;
-			return true;
+			if (c++ > 500)
+			{
+				return false;
+			}
+			nxSleep(10);
+		}
+		return true;
+	}
+
+	bool canRead()
+	{
+		u64 c = 0;
+
+		while (!size())
+		{
+			if (c++ > 500)
+			{
+				return false;
+			}
+			nxSleep(10);
+		}
+		return true;
+	}
+
+	T* push()
+	{
+		if (!canWrite())
+		{
+			return NULL;
 		}
 
-		if (!OVERWRITE && isFull())
-		{
-			return false;
-		}
-
-		//Buffer<T>::m_buffer[(circularEndPosition()-1) % SZ] = n;
 		if (isFull())
 		{
-			first() = n;
 			circularStartPosition()++;
 			circularEndPosition()++;
 		}
 		else
 		{
-			last() = n;
-			//circularStartPosition()++;
 			circularEndPosition()++;
 		}
-		return true;
+		return last();
+	}
+
+	T* push(T n)
+	{
+		if (!canWrite())
+		{
+			return NULL;
+		}
+
+		if (isFull())
+		{
+			*first() = n;
+			circularStartPosition()++;
+			circularEndPosition()++;
+		}
+		else
+		{
+			circularEndPosition()++;
+			*last() = n;
+		}
+		return last();
 	}
 
 	bool shift()
 	{
-		if (!m_size)
+		if (!canRead())
 		{
 			return false;
 		}
 
 		circularStartPosition()++;
+		return true;
 	}
 
-	T& last()
+	T* last()
 	{
-		if (!m_size)
+		if (!canRead())
 		{
-			return (*this)[0];
+			return NULL;
 		}
-		return (*this)[(circularEndPosition() - 1) % SZ];
+
+		auto i = (circularEndPosition() - 1) % SZ;
+		return &m_buffer[i];
 	}
 
-	T& first()
+	T* peek()
 	{
-		if (!m_size)
+		auto i = (circularEndPosition()) % SZ;
+		return &m_buffer[i];
+	}
+
+	T* first()
+	{
+		if (!canRead())
 		{
-			return (*this)[0];
+			return NULL;
 		}
-		return (*this)[circularStartPosition() % SZ];
+		return &m_buffer[circularStartPosition() % SZ];
 	}
 
-	const T& operator[](u64 i) const
+	/*const T& operator[](u64 i) const
 	{
-		return Buffer<T>::m_buffer[(i + circularStartPosition()) % SZ];
+		return m_buffer[(i + circularStartPosition()) % SZ];
 	}
 
 	T& operator[](u64 i)
 	{
-		return Buffer<T>::m_buffer[(i + circularStartPosition()) % SZ];
-	}
+		return m_buffer[(i + circularStartPosition()) % SZ];
+	}*/
 
-	//u64& circularCurrentPosition() { return m_circularCurrentPosition; }
 	u64& circularStartPosition() { return m_circularStartPosition; }
 	u64& circularEndPosition() { return m_circularEndPosition; }
 private:
-	//u64 m_circularCurrentPosition;
+	Lock lock;
 	u64 m_circularStartPosition;
 	u64 m_circularEndPosition;
+
+	T m_buffer[SZ];
 };

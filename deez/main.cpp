@@ -61,9 +61,6 @@ void userAppInit(void)
 	if (R_FAILED(plInitialize()))
 		fatalSimple(0xBFE7);
 
-	if (R_FAILED(pmshellInitialize()))
-		fatalSimple(0xBFE8);
-
 
 
 
@@ -92,7 +89,6 @@ void userAppExit(void)
 	nsExit();
 	nsextExit();
 
-	pmshellExit();
 	plExit();
 
 	splCryptoExit();
@@ -101,8 +97,8 @@ void userAppExit(void)
 	fsdevUnmountAll();
 	fsExit();
 	smExit();
-	audoutExit();
 	timeExit();
+	hidExit();
 }
 
 bool network_pre_init()

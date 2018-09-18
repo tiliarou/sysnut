@@ -3,7 +3,7 @@
 #include "nx/ipc/ns_ext.h"
 #include "nx/contentstorage.h"
 #include "nx/buffer.h"
-#include "nx/circularbuffer.h"
+#include "nx/chinesesdbuffer.h"
 #include "nx/lock.h"
 
 class cnmt;
@@ -33,15 +33,24 @@ class InstallThreadContext
 public:
 	InstallThreadContext(Install* install, File* nca, NcaId ncaId)
 	{
+		this->install = install;
+		this->ncaId = ncaId;
 		threadInit = false;
-		threadRunning = true;
+		threadRunning = false;
+		i = 0;
 	}
 
 	~InstallThreadContext()
 	{
-		threadRunning = false;
+		print("killing thread\n");
+		if (threadRunning)
+		{
+			threadRunning = false;
+		}
 #ifdef __SWITCH__
-		svcSleepThread(_1MS * 10000);
+		threadWaitForExit(&t);
+		threadClose(&t);
+		print("thread died\n");
 #endif
 	}
 
@@ -52,8 +61,9 @@ public:
 	File* nca;
 	NcaId ncaId;
 	Thread t;
+	u64 i;
 
-	CircularBuffer<InstallBuffer, 5> buffers;
+	ChineseSdBuffer<InstallBuffer, 3> buffers;
 };
 
 class Install
@@ -65,7 +75,7 @@ public:
 	bool installContentMetaRecords(Buffer<u8> installContentMetaBuf);
 	bool installApplicationRecord();
 
-	static void installThread(InstallThreadContext* ctx = NULL);
+	static void writerThread(InstallThreadContext* ctx = NULL);
 
 private:
 	Nca* cnmtNca;

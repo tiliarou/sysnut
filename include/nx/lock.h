@@ -19,7 +19,7 @@ public:
 #elif _MSC_VER
 			Sleep(_1MS);
 #endif
-			if (i++ > _1MS * 3000)
+			if (i++ > 5000)
 			{
 				return false;
 			}
@@ -54,7 +54,7 @@ public:
 #ifdef __SWITCH__
 			svcSleepThread(_1MS);
 #endif
-			if (i++ > _1MS * 30000)
+			if (i++ > 5000)
 			{
 				return false;
 			}
