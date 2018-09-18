@@ -153,6 +153,7 @@ u64 CurlFile::read(Buffer<u8>& buffer, u64 sz)
 		char tmp[128];
 		sprintf(tmp, "%d-%d", (size_t)currentPosition(), (size_t)(currentPosition() + sz - 1));
 
+		curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, CURL_MAX_READ_SIZE);
 		curl_easy_setopt(curl, CURLOPT_URL, path().c_str());
 		curl_easy_setopt(curl, CURLOPT_RANGE, tmp);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlReadCallback);
@@ -163,6 +164,8 @@ u64 CurlFile::read(Buffer<u8>& buffer, u64 sz)
 		currentPosition() += buffer.size();
 		return buffer.size();
 	}
+
+	buffer.setEOF();
 
 	return 0;
 }

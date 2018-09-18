@@ -122,6 +122,10 @@ public:
 		return v.size();*/
 	}
 
+	virtual void setEOF()
+	{
+	}
+
 	Buffer<T>& operator+=(const Buffer<T>& v)
 	{
 		writeBuffer(v);

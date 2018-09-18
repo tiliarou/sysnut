@@ -337,27 +337,56 @@ public:
 
 	virtual u64 writeBuffer(const Buffer<u8>& v) override
 	{
-		if (m_parent)
-		{
-			m_parent->readChunkComplete(virtualSize, v);
-		}
-
-		return v.size();
+		return writeBuffer(v.buffer(), v.size());
 	}
 
 	virtual u64 writeBuffer(const void* p, u64 sz) override
 	{
-		if (m_parent)
+		if (sz >= BUFFER_SIZE)
 		{
-			m_parent->readChunkComplete(virtualSize, p, sz);
+			flush();
+			flush(p, sz);
+		}
+		else
+		{
+			cache.writeBuffer(p, sz);
+
+			if (cache.size() >= BUFFER_SIZE)
+			{
+				flush();
+			}
 		}
 
 		return sz;
 	}
 
+	virtual void setEOF() override
+	{
+		flush();
+	}
+
+	void flush()
+	{
+		if (cache.size())
+		{
+			flush(cache.buffer(), cache.size());
+			cache.resize(0);
+		}
+	}
+
+	void flush(const void* p, u64 sz)
+	{
+		if (m_parent)
+		{
+			m_parent->readChunkComplete(virtualSize, p, sz);
+		}
+	}
+
 private:
+	static const u32 BUFFER_SIZE = 0x80000;
 	Copy* m_parent;
 	u64 virtualSize;
+	Buffer<u8> cache;
 };
 
 class FileStreamCopy : public FileCopy
