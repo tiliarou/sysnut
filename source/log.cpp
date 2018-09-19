@@ -3,6 +3,7 @@
 #include "nx/string.h"
 #include "socket.h"
 #include "log.h"
+#include "nx/circularbuffer.h"
 
 Array<PrintHook>* g_hooks = NULL;
 
@@ -60,7 +61,7 @@ void print(const char * format, ...)
 	vsprintf(printBuffer, format, args);
 	printf("%s", printBuffer);
 
-	if (printBuffer[0] == '\r')
+	/*if (printBuffer[0] == '\r')
 	{
 		if (printLog().size())
 		{
@@ -73,31 +74,27 @@ void print(const char * format, ...)
 	}
 	else
 	{
-		printLog().push(printBuffer);
-	}
-	/*
-	size_t len = strlen(printBuffer);
+		string line(printBuffer);
+		if (line.length())
+		{
+			line.pop();
+			line.pop();
+			line.push('\0');
+		}
+		printLog().push() = line;
+	}*/
 
-	if (!printLog().size())
-	{
-		printLog().push(string(""));
-	}
-
-	printLog().last() += printBuffer;*/
 
 	va_end(args);
 	fflush(f);
 
-	for (auto& f : *hooks())
+	/*for (auto& f : *hooks())
 	{
 		f();
-	}
-
-	/*if (printBuffer[len - 1] == '\n')
-	{
-		printLog().push(string(""));
 	}*/
+
 }
+
 
 /*
 

@@ -16,7 +16,7 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, CurlDirectory* cd)
 			cd->m_files.push(sptr<FileEntry>(new FileEntry(cd, f.trim(), 0)));
 		}
 	}
-	return size;
+	return nmemb;
 }
 
 DirectoryFiles& CurlDirectory::files()
@@ -42,8 +42,9 @@ DirectoryFiles& CurlDirectory::files()
 	return m_files;
 }
 
-string CurlDirectory::resolvePath(FileEntry& f)
+Url CurlDirectory::resolvePath(const FileEntry* f)
 {
-	string name = Url::encode(f.name());
-	return dirPath().str() + name;
+	Url url = dirPath();
+	url.path() += Url::encode(f->name());
+	return url;
 }

@@ -16,7 +16,7 @@ bool CurlFile::open(Url path, const char* mode)
 {
 	if (isOpen())
 	{
-		warning("opening file with closing handle first %s\n", path);
+		warning("opening file with closing handle first %s\n", path.c_str());
 		close();
 	}
 
@@ -117,13 +117,13 @@ u64 CurlFile::size()
 	return m_size;
 }
 
+unsigned long l = 0;
 size_t curlReadCallback(void *ptr, size_t size, size_t nmemb, Buffer<u8>* buffer)
 {
 	u64 currentSize = buffer->size();
 	size *= nmemb;
 
-	buffer->resize(currentSize + size);
-	memcpy(buffer->buffer() + currentSize, ptr, size);
+	buffer->writeBuffer(ptr, size);
 	return size;
 }
 
@@ -147,15 +147,21 @@ u64 CurlFile::read(Buffer<u8>& buffer, u64 sz)
 	if (curl)
 	{
 		char tmp[128];
-		sprintf(tmp, "%d-%d", (size_t)currentPosition(), (size_t)(currentPosition() + sz - 1));
+		sprintf(tmp, "%d-%d", (unsigned int)currentPosition(), (unsigned int)(currentPosition() + sz - 1));
 
+		curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, CURL_MAX_READ_SIZE);
 		curl_easy_setopt(curl, CURLOPT_URL, path().c_str());
 		curl_easy_setopt(curl, CURLOPT_RANGE, tmp);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlReadCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
 
 		curl_easy_perform(curl);
+
+		currentPosition() += buffer.size();
+		return buffer.size();
 	}
+
+	buffer.setEOF();
 
 	return 0;
 }

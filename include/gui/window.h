@@ -50,6 +50,7 @@ public:
 	{
 		this->id() = id;
 		this->rect() = r;
+		icon() = "";
 
 		buttonTextB() = "Back";
 	}
@@ -155,12 +156,15 @@ public:
 
 	bool& isFocused() { return m_isFocused; }
 
+	string& icon() { return m_icon; }
 	string& buttonTextA() { return m_buttonTextA; }
 	string& buttonTextB() { return m_buttonTextB; }
 	string& buttonTextX() { return m_buttonTextX; }
 	string& buttonTextY() { return m_buttonTextY; }
 
 protected:
+	string m_icon;
+
 	string m_buttonTextA;
 	string m_buttonTextB;
 	string m_buttonTextX;

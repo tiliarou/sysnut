@@ -9,6 +9,6 @@ public:
 	CurlDirectory(Url url);
 	virtual DirectoryFiles& files() override;
 
-	virtual string resolvePath(FileEntry& f);
+	virtual Url resolvePath(const FileEntry* f);
 private:
 };

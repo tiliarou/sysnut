@@ -17,22 +17,24 @@ public:
 	virtual bool open(Url path, const char* mode = "rb");
 	bool open2(sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
-	static sptr<File> factory(string& path, const char* mode = "rb");
-	static sptr<File> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static bool copy(string src, string dst);
 
-	static File* factoryRawPtr(string& path, const char* mode = "rb");
-	static File* factoryRawPtr(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+	static sptr<File> factory(Url path, const char* mode = "rb");
+	static sptr<File> factory(Url path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
+
+	static File* factoryRawPtr(Url path, const char* mode = "rb");
+	static File* factoryRawPtr(Url path, sptr<File>& f, u64 offset = 0, u64 sz = 0);
 
 	integer<256> sha256();
 
 	template<class T = File>
-	static sptr<T> factory(string& path, char* mode = "rb")
+	static sptr<T> factory(Url& path, char* mode = "rb")
 	{
 		return reinterpret_cast<T*>(factoryRawPtr(path, mode));
 	}
 
 	template<class T = File>
-	static sptr<T> factory(string& path, sptr<File>& f, u64 offset = 0, u64 sz = 0)
+	static sptr<T> factory(Url& path, sptr<File>& f, u64 offset = 0, u64 sz = 0)
 	{
 		return reinterpret_cast<T*>(factoryRawPtr(path, f, offset, sz));
 	}
@@ -44,6 +46,7 @@ public:
 	virtual u64 tell();
 	virtual u64 size();
 	virtual u64 read(Buffer<u8>& buffer, u64 sz = 0);
+	virtual u64 write(const Buffer<u8>& buffer);
 
 	bool isOpen();
 	Url& path() { return m_path; }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <switch.h>
+#include <sys/stat.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL2_gfxPrimitives.h> 
 #include <SDL2/SDL_image.h>
@@ -14,6 +15,9 @@
 #include "nx/buffer.h"
 #include "nx/font.h"
 #include "rapidjson/document.h"
+#include "nx/circularbuffer.h"
+#include "nx/lock.h"
+#include "nx/thread2.h"
 
 string footer;
 class NutGui;
@@ -21,6 +25,126 @@ class NutGui;
 NutGui* nutGui = NULL;
 
 CircularBuffer<string, 0x100>& printLog();
+
+class TitleKeyDumper
+{
+public:
+	TitleKeyDumper()
+	{
+		pmshellInitialize();
+	}
+
+	~TitleKeyDumper()
+	{
+		pmshellExit();
+	}
+
+	bool dumpPersonal()
+	{
+		FsFileSystem tmpMountedFs;
+
+		if (!fsMount_SystemSaveData(&tmpMountedFs, 0x80000000000000E2)) // personal ticket database
+		{
+			return false;
+		}
+
+		print("Successfuly opened personal ticket database!\n");
+
+		mkdir("personalTickets/", 777);
+
+		if (fsdevMountDevice("espersonalized", tmpMountedFs))
+		{
+			error("Failed to mount espersonalized\n");
+			return false;
+		}
+
+		auto dir = Directory::openDir("espersonalized:/");
+		if (dir)
+		{
+			for (auto& d : dir->files())
+			{
+				string from = string("espersonalized:/") + d->name();
+				string to = string("personalTickets/") + d->name();
+
+				print("copying file: %s\n", d->name().c_str());
+
+				File::copy(from, to);
+			}
+			print("Successly dumped personal!\n");
+			fsdevUnmountDevice("espersonalized");
+			return true;
+		}
+
+		fsdevUnmountDevice("espersonalized");
+		return false;
+	}
+
+	bool dumpCommon()
+	{
+		FsFileSystem tmpMountedFs;
+
+		if (!fsMount_SystemSaveData(&tmpMountedFs, 0x80000000000000E1)) // common ticket database
+		{
+			return false;
+		}
+
+		print("Successfuly opened common ticket database!\n");
+
+		mkdir("commonTickets/", 777);
+
+		if (fsdevMountDevice("escommon", tmpMountedFs))
+		{
+			error("Failed to mount escommon\n");
+			return false;
+		}
+
+		auto dir = Directory::openDir("escommon:/");
+		if (dir)
+		{
+			for (auto& d : dir->files())
+			{
+				string from = string("escommon:/") + d->name();
+				string to = string("commonTickets/") + d->name();
+
+				print("copying file: %s\n", d->name().c_str());
+
+				File::copy(from, to);
+			}
+			print("Successly dumped common!\n");
+			fsdevUnmountDevice("escommon");
+			return true;
+		}
+
+		fsdevUnmountDevice("escommon");
+		return false;
+	}
+
+	bool dump()
+	{
+		return false;
+		print("Begining key dump\n");
+		bool dumpedCommon = false, dumpedPersonal = false;
+
+		for (int i = 0; i < 100 && (!dumpedCommon || !dumpedPersonal); i++)
+		{
+			pmshellTerminateProcessByTitleId(0x0100000000000033);
+
+			if (!dumpedPersonal)
+			{
+				dumpedPersonal = dumpPersonal();
+			}
+
+			if (!dumpedCommon)
+			{
+				dumpedCommon = dumpCommon();
+			}
+		}
+
+		error("Failed to dump title keys.\n");
+		return false;
+	}
+private:
+};
 
 
 struct Theme
@@ -79,12 +203,20 @@ public:
 				{
 					drawRect(0, y-((Fonts::FONT_SIZE_HUGE - Fonts::FONT_SIZE_MEDIUM) / 2), width(), Fonts::FONT_SIZE_HUGE, txtcolor);
 				}
-				drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, m_tabs[i], fonts->medium());
+				if (m_panels[i])
+				{
+					drawText(Fonts::FONT_SIZE_MEDIUM, y, selcolor, m_panels[i]->icon(), fonts->medium(Fonts::FONT_EXT));
+				}
+				drawText(Fonts::FONT_SIZE_MEDIUM * 5 / 2, y, selcolor, m_tabs[i], fonts->medium());
 				activePanel()->draw();
 			}
 			else
 			{
-				drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, m_tabs[i], fonts->medium());
+				if (m_panels[i])
+				{
+					drawText(Fonts::FONT_SIZE_MEDIUM, y, txtcolor, m_panels[i]->icon(), fonts->medium(Fonts::FONT_EXT));
+				}
+				drawText(Fonts::FONT_SIZE_MEDIUM * 5 / 2, y, txtcolor, m_tabs[i], fonts->medium());
 			}
 			y += Fonts::FONT_SIZE_HUGE;
 		}
@@ -124,7 +256,7 @@ public:
 	{
 		int y = Fonts::FONT_SIZE_MEDIUM + (displayIndex * Fonts::FONT_SIZE_HUGE);
 
-		if (itemIndex == m_selectedIndex)
+		if (itemIndex == (int)m_selectedIndex)
 		{
 			if (isFocused())
 			{
@@ -140,7 +272,6 @@ public:
 
 	void draw() override
 	{
-		const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 
 		if (m_selectedIndex >= m_offset + maxLines)
 		{
@@ -183,11 +314,65 @@ public:
 			invalidate();
 		}
 
+		if (keys & (KEY_RSTICK_DOWN | KEY_R | KEY_ZR)) // page down
+		{
+			pageMove(true, keys & KEY_ZR);
+		}
+
+		if (keys & (KEY_RSTICK_UP | KEY_L | KEY_ZL)) // page up
+		{
+			pageMove(false, keys & KEY_ZL);
+		}
+
 		if (keys & KEY_A && items().size())
 		{
 			select(m_selectedIndex);
 		}
 		return keys;
+	}
+
+	void pageMove(bool forward, bool fast)
+	{
+		long currentPosition = (long)m_selectedIndex;
+		long size = (long)items().size();
+
+		if (fast)
+		{
+			long pageSize = size / 8;
+
+			if (pageSize < maxLines)
+			{
+				pageSize = maxLines;
+			}
+
+			long currentPage = currentPosition / pageSize;
+			currentPosition = (currentPage + (forward ? 1 : -1)) * pageSize;
+		}
+		else
+		{
+			currentPosition += maxLines * (forward ? 1 : -1);
+		}
+
+		if (currentPosition >= size)
+		{
+			currentPosition = size - 1;
+		}
+
+		if (currentPosition < 0) currentPosition = 0;
+
+
+		long offset = currentPosition - (maxLines / 2);
+
+		if (offset + maxLines >= size)
+		{
+			offset = size - maxLines;
+		}
+		if (offset < 0) offset = 0;
+
+		m_selectedIndex = currentPosition;
+		m_offset = offset;
+
+		invalidate();
 	}
 
 	void onFocus() override
@@ -202,12 +387,12 @@ public:
 	}
 
 	Array<T>& items() { return m_items; }
-	u32& rowHeight() { return m_rowHeight; }
 
 	Array<T> m_items;
 	u32 m_selectedIndex;
 	u32 m_offset;
-	u32 m_rowHeight = Fonts::FONT_SIZE_MEDIUM;
+
+	static const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 };
 
 class SdWnd : public HListWnd<string>
@@ -219,6 +404,27 @@ public:
 		buttonTextA() = "Install";
 		buttonTextX() = "Install All";
 		buttonTextY() = "Delete prodinfo";
+
+		if (dir)
+		{
+			if (dir->dirPath().scheme() == "ftp")
+			{
+				icon() = FON_PC;
+			}
+			else if (!dir->dirPath().scheme().length())
+			{
+				icon() = FON_SD;
+			}
+			else
+			{
+				icon() = FON_ERROR;
+			}
+		}
+		else
+		{
+			icon() = FON_ERROR;
+		}
+
 		refresh();
 	}
 
@@ -281,20 +487,20 @@ public:
 	{
 	}
 
-	TitleRow(TitleId titleId, string name) : m_titleId(titleId), m_name(name)
+	TitleRow(RightsId rightsId, string name) : m_rightsId(rightsId), m_name(name)
 	{
 	}
 
 	operator string()
 	{
-		return hx(titleId()) + "    " + name();
+		return hx(m_rightsId.titleId()) + "    " + name();
 	}
 
-	TitleId& titleId() { return m_titleId; }
+	RightsId& rightsId() { return m_rightsId; }
 	string& name() { return m_name; }
 
 private:
-	TitleId m_titleId;
+	RightsId m_rightsId;
 	string m_name;
 };
 
@@ -303,6 +509,10 @@ class TicketWnd : public HListWnd<TitleRow>
 public:
 	TicketWnd(Window* p, string id, Rect r) : HListWnd(p, id, r)
 	{
+		icon() = FON_TICKET;
+		buttonTextB() = "Back";
+		buttonTextX() = "Delete";
+
 		refresh();
 	}
 
@@ -311,6 +521,24 @@ public:
 		Window::onFocus();
 		refresh();
 		invalidate();
+	}
+
+	u64 keysDown(u64 keys) override
+	{
+		keys = HListWnd<TitleRow>::keysDown(keys);
+
+		if (keys & KEY_X && items().size())
+		{
+			esDeleteTicket(&items()[m_selectedIndex].rightsId(), sizeof(RightsId));
+			refresh();
+			invalidate();
+		}
+		if (keys & KEY_Y)
+		{
+			TitleKeyDumper td;
+			td.dump();
+		}
+		return keys;
 	}
 
 	void refresh() override
@@ -330,7 +558,7 @@ public:
 		}
 
 		rightsIds.resize(installedTicketCount);
-		memset(rightsIds.buffer(), NULL, rightsIds.sizeBytes());
+		memset(rightsIds.buffer(), 0, rightsIds.sizeBytes());
 
 		if (esListCommonTicket(&rightsIdCount, rightsIds.buffer(), rightsIds.sizeBytes()))
 		{
@@ -340,7 +568,17 @@ public:
 
 		for (unsigned int i = 0; i < rightsIdCount; i++)
 		{
-			items().push(TitleRow(rightsIds[i].titleId(), getBaseTitleName(rightsIds[i].titleId())));
+			items().push(TitleRow(rightsIds[i], getBaseTitleName(rightsIds[i].titleId())));
+		}
+
+		if (m_selectedIndex >= items().size())
+		{
+			m_selectedIndex = items().size();
+
+			if (m_selectedIndex)
+			{
+				m_selectedIndex--;
+			}
 		}
 	}
 };
@@ -358,6 +596,7 @@ class ConsoleWnd : public Window
 public:
 	ConsoleWnd(Window* p, string id, Rect r) : Window(p, id, r)
 	{
+		icon() = FON_CHAT;
 	}
 
 	void draw() override
@@ -381,6 +620,16 @@ public:
 		Window::onFocus();
 		invalidate();
 	}
+};
+
+class GuiThread : public Thread2
+{
+public:
+	GuiThread() : Thread2()
+	{
+	}
+
+	bool step() override;
 };
 
 class NutGui : public Window
@@ -453,7 +702,7 @@ public:
 			}
 		}
 
-		menu->add(string("Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
+		menu->add(string("Common Tickets"), new TicketWnd(this, string("Tickets"), panelRect));
 		menu->add(string("Console"), new ConsoleWnd(this, string("CONSOLE"), panelRect));
 
 		setFocus(menu);
@@ -478,6 +727,7 @@ public:
 		footer = Footer;
 
 		registerPrintHook(&printHook);
+		guiThread.start();
 	}
 
 	~NutGui()
@@ -564,7 +814,10 @@ public:
 
 	bool loop()
 	{
-		flushGraphics();
+		hidScanInput();
+		HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
+		PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
+		ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
 
 		u64 kDown = keysDown(PressedInput);
 
@@ -584,12 +837,17 @@ public:
 			invalidate();
 		}
 
-		if (m_redraw)
+		return true;
+
+	}
+
+	bool gfxLoop()
+	{
+		if (Frame++ == 0 || m_redraw)
 		{
 			renderGraphics();
 			m_redraw = false;
 		}
-
 		return true;
 	}
 
@@ -666,20 +924,6 @@ public:
 		SDL_RenderPresent(_renderer);
 	}
 
-	void flushGraphics()
-	{
-		if (Frame == 0)
-		{
-			renderGraphics();
-		}
-
-		Frame++;
-		hidScanInput();
-		HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
-		PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
-		ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
-	}
-
 	Window*& focus() { return m_focus; }
 	Buffer<sptr<Window>>& windows() { return m_windows; }
 
@@ -701,7 +945,6 @@ public:
 	u64 PressedInput = 0;
 	u64 ReleasedInput = 0;
 
-	// Current frame/iteration, incremented by "flushGraphics" every loop
 	int Frame = 0;
 
 	static Theme HorizonLight()
@@ -714,7 +957,6 @@ public:
 		return{ "romfs:/Graphics/Background.Dark.png", "romfs:/Fonts/NintendoStandard.ttf",{ 255, 255, 255, 255 },{ 140, 140, 140, 255 } };
 	}
 
-	// Theme being used by the current console
 	static Theme HorizonCurrent()
 	{
 		ColorSetId id;
@@ -726,8 +968,20 @@ public:
 	}
 
 protected:
+	GuiThread guiThread;
 	Buffer<sptr<Window>> m_windows;
 	Window* m_focus;
 	Menu* menu;
 	Body* body;
+	Lock lock;
 };
+
+bool GuiThread::step()
+{
+	if (nutGui)
+	{
+		nutGui->gfxLoop();
+	}
+	nxSleep(100);
+	return true;
+}

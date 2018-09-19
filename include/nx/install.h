@@ -2,6 +2,10 @@
 #include "nx/cnmt.h"
 #include "nx/ipc/ns_ext.h"
 #include "nx/contentstorage.h"
+#include "nx/buffer.h"
+#include "nx/chinesesdbuffer.h"
+#include "nx/lock.h"
+#include "nx/copy.h"
 
 class cnmt;
 class storage;
@@ -9,6 +13,7 @@ class dir;
 class Nca;
 
 string getBaseTitleName(TitleId baseTitleId);
+
 
 class Install
 {
@@ -18,7 +23,8 @@ public:
 	bool installNca(File* nca, NcaId ncaId);
 	bool installContentMetaRecords(Buffer<u8> installContentMetaBuf);
 	bool installApplicationRecord();
-private:
+
+//private:
 	Nca* cnmtNca;
 	Cnmt* cnmt;
 	ContentStorage storage;

@@ -118,6 +118,7 @@ public:
 	template<class T>
 	sptr<T> openFile(string name)
 	{
+		print("opening %s\n", name.c_str());
 		if (files().size())
 		{
 			for (auto& f : files())
@@ -134,7 +135,7 @@ public:
 	virtual const Array<sptr<Directory>>& directories() const { return m_directories; };
 	virtual Array<sptr<Directory>>& directories() { return m_directories; };
 
-	virtual string resolvePath(FileEntry& f);
+	virtual Url resolvePath(const FileEntry* f);
 
 	static sptr<Directory> openDir(const Url url);
 	Url& dirPath() { return m_dirPath; }

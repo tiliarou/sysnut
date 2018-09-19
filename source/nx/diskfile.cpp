@@ -15,15 +15,15 @@ bool DiskFile::open(Url path, const char* mode)
 {
 	if (isOpen())
 	{
-		warning("opening file with closing handle first %s\n", path);
+		warning("opening file with closing handle first %s\n", path.c_str());
 		close();
 	}
 
-	f = fopen(path, mode);
+	f = fopen(path.c_str(), mode);
 
 	if (!f)
 	{
-		error("failed to open file %s\n", path);
+		error("failed to open file %s\n", path.c_str());
 		return false;
 	}
 
@@ -117,9 +117,47 @@ u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 
 	buffer.resize(sz);
 
-	u64 r;
-	r = fread(buffer.buffer(), 1, (size_t)sz, f);
-	return r;
+	if (sz <= 0x800000 || true)
+	{
+		u64 bytesRead = (u64)fread(buffer.buffer(), 1, (size_t)sz, f);
+		buffer.resize(bytesRead);
+		return bytesRead;
+	}
+	else
+	{
+		u64 bytesRead = 0, r, bytesRemaining = sz;
+		while (bytesRemaining && (r = (u64)fread(buffer.buffer(), 1, _MIN(bytesRemaining, 0x800000), f)))
+		{
+			bytesRead += r;
+
+			if (r < bytesRemaining)
+			{
+				bytesRemaining -= r;
+			}
+			else
+			{
+				bytesRemaining = 0;
+			}
+		}
+		return bytesRead;
+	}
+
+}
+
+u64 DiskFile::write(const Buffer<u8>& buffer)
+{
+	if (!isOpen())
+	{
+		error("tried to write to closed file\n");
+		return 0;
+	}
+
+	if (!buffer.size())
+	{
+		return 0;
+	}
+
+	return (u64)fwrite(buffer.buffer(), 1, buffer.size(), f);
 }
 
 bool DiskFile::isOpen()

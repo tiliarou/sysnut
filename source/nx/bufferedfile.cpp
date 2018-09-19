@@ -27,7 +27,7 @@ bool BufferedFile::setCrypto(crypt_type_t cryptoType, integer<128>& key)
 		case CRYPT_NONE:
 			break;
 		default:
-			error("Unknown crypto type: %x\n", crypto().type());
+			error("Unknown crypto type: %x\n", (unsigned int)crypto().type());
 	}
 	return true;
 }

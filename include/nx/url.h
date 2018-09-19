@@ -75,7 +75,7 @@ public:
 	{
 	}
 
-	operator const char*()
+	/*operator const char*()
 	{
 		return str().c_str();
 	}
@@ -83,39 +83,46 @@ public:
 	operator const string&()
 	{
 		return str();
-	}
+	}*/
 
 	string& str()
 	{
 		uri_ = "";
 
-		if (scheme().length() && host().length())
+		if (scheme().length())
 		{
-			uri_ += scheme() + "://";
-
-			if (user().length())
+			if (host().length())
 			{
-				uri_ += encode(user());
+				uri_ += scheme() + "://";
 
-				if (password().length())
+				if (user().length())
 				{
-					uri_ += ":";
-					uri_ += encode(password());
+					uri_ += encode(user());
+
+					if (password().length())
+					{
+						uri_ += ":";
+						uri_ += encode(password());
+					}
+
+					uri_ += "@";
 				}
 
-				uri_ += "@";
+				uri_ += host();
+
+				if (port() > 0)
+				{
+					char tmp[16];
+					tmp[0] = '\0';
+
+					itoa(port(), tmp, 10);
+					uri_ += ":";
+					uri_ += tmp;
+				}
 			}
-
-			uri_ += host();
-
-			if (port() > 0)
+			else
 			{
-				char tmp[16];
-				tmp[0] = '\0';
-
-				itoa(port(), tmp, 10);
-				uri_ += ":";
-				uri_ += tmp;
+				uri_ += scheme() + ":/";
 			}
 		}
 		uri_ += path();
@@ -142,6 +149,16 @@ public:
 		uriUnescapeInPlaceA((char*)result.buffer());
 		result.resize(strlen(result.c_str()) + 1);
 		return result;
+	}
+
+	string baseName()
+	{
+		auto bits = path().split('/');
+		if (!bits || !bits->size())
+		{
+			return string();
+		}
+		return bits->last();
 	}
 
 	const bool& isValid() const { return isValid_; }

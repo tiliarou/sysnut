@@ -10,6 +10,7 @@
 #include "nut.h"
 #include "nx/sptr.h"
 #include "log.h"
+#include "nx/integer.h"
 #include <new>
 
 #ifdef __SWITCH__
@@ -50,8 +51,7 @@ public:
 
 	Buffer(const Buffer<T>& src)
 	{
-		resize(src.size());
-		set(src.buffer(), src.size());
+		operator=(src);
 	}
 
 	Buffer(const void* src, u64 sz)
@@ -72,7 +72,9 @@ public:
 	Buffer<T>& operator=(const Buffer<T>& src)
 	{
 		resize(src.size());
-		set(src.buffer(), src.size());
+		resize(0);
+		writeBuffer(src);
+		//set(src.buffer(), src.size());
 		return *this;
 	}
 
@@ -86,14 +88,42 @@ public:
 		return m_buffer[i];
 	}
 
-	u64 writeBuffer(const Buffer<T>& v)
+	virtual u64 writeBuffer(const Buffer<T>& v)
 	{
-		const T* p = v.buffer();
+		return writeBuffer(v.buffer(), v.size() * sizeof(T));
+
+		u64 originalSize = size();
+
+		resize(originalSize + v.size());
+		memcpy((void*)(buffer() + originalSize), v.buffer(), v.size() * sizeof(T));
+		return v.size();
+
+		/*const T* p = v.buffer();
 		for (size_t i = 0; i < v.size(); i++)
 		{
 			push(p[i]);
 		}
-		return v.size();
+		return v.size();*/
+	}
+
+	virtual u64 writeBuffer(const void* p, u64 sz)
+	{
+		u64 originalSize = size();
+
+		resize(originalSize + sz);
+		memcpy((void*)(buffer() + originalSize), p, sz * sizeof(T));
+		return sz;
+
+		/*const T* p = v.buffer();
+		for (size_t i = 0; i < v.size(); i++)
+		{
+		push(p[i]);
+		}
+		return v.size();*/
+	}
+
+	virtual void setEOF()
+	{
 	}
 
 	Buffer<T>& operator+=(const Buffer<T>& v)
@@ -141,7 +171,7 @@ public:
 	{
 		if (!size())
 		{
-			return m_buffer[0];
+			return (*this)[0];
 		}
 		return (*this)[size() - 1];
 	}
@@ -179,7 +209,6 @@ public:
 
 	bool slice(Buffer<T>& out, s64 start, s64 end) const
 	{
-		//print("slicing %d, %d\n", (s32)start, (s32)end);
 		u64 sz = end - start;
 
 		if (!out.resize(sz))
@@ -215,7 +244,7 @@ public:
 		}
 	}
 
-	bool resize(u64 newSize)
+	virtual bool resize(u64 newSize)
 	{
 		u64 originalSize = size();
 
@@ -232,7 +261,7 @@ public:
 
 		if (!newBuffer)
 		{
-			fatal("out of memory, tried to alloc %d bytes\n", newSize);
+			fatal("out of memory, tried to alloc %d bytes\n", (int)newSize);
 			return false;
 		}
 
@@ -312,7 +341,7 @@ public:
 			return "";
 		}
 
-		return (char*)buffer() + i;
+		return (const char*)buffer() + i;
 	}
 
 	void dump(int sz = 0, int offset = 0) const
@@ -330,15 +359,15 @@ public:
 		{
 			if ((i + 1) % 32 == 0)
 			{
-				debug("%2.2X\n", (u8)c_str()[i]);
+				debug("%2.2X\n", (unsigned int)c_str()[i]);
 			}
 			else if ((i + 1) % 4 == 0)
 			{
-				debug("%2.2X ", (u8)c_str()[i]);
+				debug("%2.2X ", (unsigned int)c_str()[i]);
 			}
 			else
 			{
-				debug("%2.2X", (u8)c_str()[i]);
+				debug("%2.2X", (unsigned int)c_str()[i]);
 			}
 		}
 		debug("\n");
@@ -364,6 +393,23 @@ public:
 		return &m_buffer[size()];
 	}
 
+	/*
+	integer<256> sha256()
+	{
+		integer<256> result(0);
+
+		mbedtls_sha256_context ctx;
+		mbedtls_sha256_init(&ctx);
+
+		mbedtls_sha256_update(&ctx, buffer(), sizeBytes());
+
+		mbedtls_sha256_finish(&ctx, (u8*)&result);
+
+		mbedtls_sha256_free(&ctx);
+		return result;
+	}
+	*/
+
 protected:
 
 	T* m_buffer = NULL;
@@ -371,39 +417,3 @@ protected:
 	u64 m_bufferSize = 0;
 };
 
-template<class T, u64 SZ>
-class CircularBuffer : public Buffer<T>
-{
-public:
-	CircularBuffer() : Buffer<T>()
-	{
-		Buffer<T>::resize(SZ);
-		Buffer<T>::resize(0);
-		circularPosition() = 0;
-	}
-
-	T& push(T n)
-	{
-		if (Buffer<T>::size() < SZ)
-		{
-			return Buffer<T>::push(n);
-		}
-		Buffer<T>::m_buffer[circularPosition()] = n;
-		circularPosition() = (circularPosition() + 1) % SZ;
-		return Buffer<T>::m_buffer[circularPosition()];
-	}
-
-	const T& operator[](u32 i) const
-	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
-	}
-
-	T& operator[](u32 i)
-	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
-	}
-
-	u32& circularPosition() { return m_circularPosition; }
-private:
-	u32 m_circularPosition;
-};

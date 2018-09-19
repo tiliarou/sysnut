@@ -112,7 +112,8 @@ protected:
 	virtual File* open()
 	{
 		u64 headerSize = parent()->header().size();
-		return File::factoryRawPtr(name(), parent()->ptr(), entry().offset + headerSize, entry().size);
+		Url url = parent()->resolvePath(this);
+		return File::factoryRawPtr(url, parent()->ptr(), entry().offset + headerSize, entry().size);
 	}
 
 	pfs0_file_entry_t m_entry;

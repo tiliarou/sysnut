@@ -33,6 +33,11 @@ extern "C" {
 #define FON_L3 "\uE104"
 #define FON_R3 "\uE105"
 
+#define FON_CHAT "\uE132"
+#define FON_PC "\uE139"
+#define FON_SD "\uE121"
+#define FON_ERROR "\uE150"
+#define FON_TICKET "\uE133"
 
 class Fonts
 {

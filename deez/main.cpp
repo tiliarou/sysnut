@@ -63,6 +63,8 @@ void userAppInit(void)
 
 
 
+
+
 	if (R_FAILED(ncmextInitialize()))
 		fatalSimple(0xBEEF);
 
@@ -95,8 +97,8 @@ void userAppExit(void)
 	fsdevUnmountAll();
 	fsExit();
 	smExit();
-	audoutExit();
 	timeExit();
+	hidExit();
 }
 
 bool network_pre_init()
@@ -154,7 +156,7 @@ int main(int argc, char **argv)
 		return -1;
 	}*/
 
-	NutGui gui("Deez Title \uE0E6 Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonCurrent());
+	NutGui gui("Deez Network Title Installer", "prodinfo deleted, do not reboot.", NutGui::HorizonCurrent());
 	
 	while(appletMainLoop() && gui.loop())
     {

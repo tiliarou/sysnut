@@ -17,6 +17,40 @@ File::~File()
 	close();
 }
 
+bool File::copy(string src, string dst)
+{
+	FILE* f1 = fopen(src, "rb");
+	if (!f1)
+	{
+		error("Failed to open file %s\n", src.c_str());
+		return false;
+	}
+
+	FILE* f2 = fopen(dst, "wb");
+
+	if (!f2)
+	{
+		fclose(f1);
+		error("Failed to open file %s\n", dst.c_str());
+		return false;
+	}
+
+	size_t bytesRead = 0;
+	char buffer[0x1000];
+
+	do
+	{
+		bytesRead = fread(&buffer, 1, sizeof(buffer), f1);
+
+		if (bytesRead)
+		{
+			fwrite(buffer, 1, bytesRead, f2);
+		}
+	}
+	while (bytesRead > 0);
+	return true;
+}
+
 bool File::open(Url path, const char* mode)
 {
 	if (isOpen())
@@ -43,7 +77,7 @@ bool File::open(Url path, const char* mode)
 
 	if (!f->open(path, mode))
 	{
-		error("failed to open file %s\n", path);
+		error("failed to open file %s\n", path.c_str());
 		return false;
 	}
 
@@ -68,7 +102,7 @@ bool File::open2(sptr<File>& f, u64 offset, u64 sz)
 	partitionOffset() = offset;
 	partitionSize() = sz;
 
-	//print("created partition offset = %x, size = %x\n", offset, sz);
+	//print("created partition offset = %x, size = %x\n", (int)offset, (int)sz);
 	return init();
 }
 
@@ -85,7 +119,37 @@ u64 File::read(Buffer<u8>& buffer, u64 sz)
 		sz = size() - tell();
 	}
 
-	return m_parent->read(buffer, sz);
+	if (m_parent)
+	{
+		return m_parent->read(buffer, sz);
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+u64 File::write(const Buffer<u8>& buffer)
+{
+	if (!isOpen())
+	{
+		error("tried to write to closed file\n");
+		return 0;
+	}
+
+	if (!buffer.size())
+	{
+		return 0;
+	}
+
+	if (m_parent)
+	{
+		return m_parent->write(buffer);
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 bool File::isOpen()
