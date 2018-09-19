@@ -9,20 +9,20 @@ public:
 	{
 	}
 
-	bool acquireReadLock()
+	bool acquireReadLock(u32 timeout = 5000)
 	{
 		u64 i = 0;
 		while (writeMutex)
 		{
+			if (i++ > timeout)
+			{
+				return false;
+			}
 #ifdef __SWITCH__
 			svcSleepThread(_1MS);
 #elif _MSC_VER
 			Sleep(_1MS);
 #endif
-			if (i++ > 5000)
-			{
-				return false;
-			}
 		}
 #ifdef __SWITCH__
 		atomicIncrement64(&readMutex);
@@ -46,18 +46,18 @@ public:
 		return false;
 	}
 
-	bool acquireWriteLock()
+	bool acquireWriteLock(u32 timeout = 5000)
 	{
 		u64 i = 0;
 		while (readMutex || writeMutex)
 		{
-#ifdef __SWITCH__
-			svcSleepThread(_1MS);
-#endif
-			if (i++ > 5000)
+			if (++i > timeout)
 			{
 				return false;
 			}
+#ifdef __SWITCH__
+			svcSleepThread(_1MS);
+#endif
 		}
 #ifdef __SWITCH__
 		atomicIncrement64(&writeMutex);

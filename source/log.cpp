@@ -81,7 +81,7 @@ void print(const char * format, ...)
 			line.pop();
 			line.push('\0');
 		}
-		printLog().push(line);
+		printLog().push() = line;
 	}
 
 

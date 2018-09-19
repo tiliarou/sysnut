@@ -16,6 +16,8 @@
 #include "nx/font.h"
 #include "rapidjson/document.h"
 #include "nx/circularbuffer.h"
+#include "nx/lock.h"
+#include "nx/thread2.h"
 
 string footer;
 class NutGui;
@@ -254,7 +256,7 @@ public:
 	{
 		int y = Fonts::FONT_SIZE_MEDIUM + (displayIndex * Fonts::FONT_SIZE_HUGE);
 
-		if (itemIndex == m_selectedIndex)
+		if (itemIndex == (int)m_selectedIndex)
 		{
 			if (isFocused())
 			{
@@ -620,6 +622,25 @@ public:
 	}
 };
 
+class GuiThread : public Thread2
+{
+public:
+	GuiThread() : Thread2()
+	{
+	}
+
+	bool step() override
+	{
+		if (nutGui)
+		{
+			//nutGui->loop();
+			print("tick\n");
+		}
+		nxSleep(100);
+		return true;
+	}
+};
+
 class NutGui : public Window
 {
 public:
@@ -715,6 +736,7 @@ public:
 		footer = Footer;
 
 		registerPrintHook(&printHook);
+		guiThread.start();
 	}
 
 	~NutGui()
@@ -828,6 +850,7 @@ public:
 		}
 
 		return true;
+
 	}
 
 	/*
@@ -938,7 +961,6 @@ public:
 	u64 PressedInput = 0;
 	u64 ReleasedInput = 0;
 
-	// Current frame/iteration, incremented by "flushGraphics" every loop
 	int Frame = 0;
 
 	static Theme HorizonLight()
@@ -951,7 +973,6 @@ public:
 		return{ "romfs:/Graphics/Background.Dark.png", "romfs:/Fonts/NintendoStandard.ttf",{ 255, 255, 255, 255 },{ 140, 140, 140, 255 } };
 	}
 
-	// Theme being used by the current console
 	static Theme HorizonCurrent()
 	{
 		ColorSetId id;
@@ -963,8 +984,10 @@ public:
 	}
 
 protected:
+	GuiThread guiThread;
 	Buffer<sptr<Window>> m_windows;
 	Window* m_focus;
 	Menu* menu;
 	Body* body;
+	Lock lock;
 };

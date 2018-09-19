@@ -95,7 +95,7 @@ public:
 		u64 originalSize = size();
 
 		resize(originalSize + v.size());
-		memcpy(buffer() + originalSize, v.buffer(), v.size() * sizeof(T));
+		memcpy((void*)(buffer() + originalSize), v.buffer(), v.size() * sizeof(T));
 		return v.size();
 
 		/*const T* p = v.buffer();
@@ -111,7 +111,7 @@ public:
 		u64 originalSize = size();
 
 		resize(originalSize + sz);
-		memcpy(buffer() + originalSize, p, sz * sizeof(T));
+		memcpy((void*)(buffer() + originalSize), p, sz * sizeof(T));
 		return sz;
 
 		/*const T* p = v.buffer();

@@ -186,6 +186,7 @@
     <ClInclude Include="include\nx\primitives.h" />
     <ClInclude Include="include\nx\sddirectory.h" />
     <ClInclude Include="include\nx\sptr.h" />
+    <ClInclude Include="include\nx\thread2.h" />
     <ClInclude Include="include\nx\ticket.h" />
     <ClInclude Include="include\nx\uptr.h" />
     <ClInclude Include="include\nx\string.h" />

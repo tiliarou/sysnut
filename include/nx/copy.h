@@ -213,6 +213,8 @@ public:
 
 	virtual void readChunkComplete(u64 offset, const Buffer<u8>& buffer)
 	{
+		(void)offset;
+		(void)buffer;
 	}
 
 	virtual void readChunkComplete(u64 offset, const void* buffer, u64 sz)

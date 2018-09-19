@@ -25,6 +25,16 @@ public:
 		return m_buffer[circularPosition()++ % SZ];
 	}
 
+	T& push()
+	{
+		if (size() < SZ)
+		{
+			return m_buffer[size()++];
+		}
+
+		return m_buffer[circularPosition()++ % SZ];
+	}
+
 	bool isFull()
 	{
 		return size() >= SZ;
