@@ -124,14 +124,6 @@ size_t curlReadCallback(void *ptr, size_t size, size_t nmemb, Buffer<u8>* buffer
 	size *= nmemb;
 
 	buffer->writeBuffer(ptr, size);
-
-	/*if (l++ >= 2507)
-	{
-		print("%d\n", size);
-	}*/
-
-	//buffer->resize(currentSize + size);
-	//memcpy(buffer->buffer() + currentSize, ptr, size);
 	return size;
 }
 
@@ -155,7 +147,7 @@ u64 CurlFile::read(Buffer<u8>& buffer, u64 sz)
 	if (curl)
 	{
 		char tmp[128];
-		sprintf(tmp, "%d-%d", (size_t)currentPosition(), (size_t)(currentPosition() + sz - 1));
+		sprintf(tmp, "%d-%d", (unsigned int)currentPosition(), (unsigned int)(currentPosition() + sz - 1));
 
 		curl_easy_setopt(curl, CURLOPT_BUFFERSIZE, CURL_MAX_READ_SIZE);
 		curl_easy_setopt(curl, CURLOPT_URL, path().c_str());

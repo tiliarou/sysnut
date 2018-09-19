@@ -117,10 +117,30 @@ u64 DiskFile::read(Buffer<u8>& buffer, u64 sz)
 
 	buffer.resize(sz);
 
-	u64 bytesRead = (u64)fread(buffer.buffer(), 1, (size_t)sz, f);
-	buffer.resize(bytesRead);
+	if (sz <= 0x800000 || true)
+	{
+		u64 bytesRead = (u64)fread(buffer.buffer(), 1, (size_t)sz, f);
+		buffer.resize(bytesRead);
+		return bytesRead;
+	}
+	else
+	{
+		u64 bytesRead = 0, r, bytesRemaining = sz;
+		while (bytesRemaining && (r = (u64)fread(buffer.buffer(), 1, _MIN(bytesRemaining, 0x800000), f)))
+		{
+			bytesRead += r;
 
-	return bytesRead;
+			if (r < bytesRemaining)
+			{
+				bytesRemaining -= r;
+			}
+			else
+			{
+				bytesRemaining = 0;
+			}
+		}
+		return bytesRead;
+	}
 
 }
 

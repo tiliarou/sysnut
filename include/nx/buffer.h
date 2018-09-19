@@ -209,7 +209,6 @@ public:
 
 	bool slice(Buffer<T>& out, s64 start, s64 end) const
 	{
-		//print("slicing %d, %d\n", (s32)start, (s32)end);
 		u64 sz = end - start;
 
 		if (!out.resize(sz))
@@ -262,7 +261,7 @@ public:
 
 		if (!newBuffer)
 		{
-			fatal("out of memory, tried to alloc %d bytes\n", newSize);
+			fatal("out of memory, tried to alloc %d bytes\n", (int)newSize);
 			return false;
 		}
 
@@ -342,7 +341,7 @@ public:
 			return "";
 		}
 
-		return (char*)buffer() + i;
+		return (const char*)buffer() + i;
 	}
 
 	void dump(int sz = 0, int offset = 0) const
@@ -360,15 +359,15 @@ public:
 		{
 			if ((i + 1) % 32 == 0)
 			{
-				debug("%2.2X\n", (u8)c_str()[i]);
+				debug("%2.2X\n", (unsigned int)c_str()[i]);
 			}
 			else if ((i + 1) % 4 == 0)
 			{
-				debug("%2.2X ", (u8)c_str()[i]);
+				debug("%2.2X ", (unsigned int)c_str()[i]);
 			}
 			else
 			{
-				debug("%2.2X", (u8)c_str()[i]);
+				debug("%2.2X", (unsigned int)c_str()[i]);
 			}
 		}
 		debug("\n");

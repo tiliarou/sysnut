@@ -270,7 +270,6 @@ public:
 
 	void draw() override
 	{
-		const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 
 		if (m_selectedIndex >= m_offset + maxLines)
 		{
@@ -313,11 +312,65 @@ public:
 			invalidate();
 		}
 
+		if (keys & (KEY_RSTICK_DOWN | KEY_R | KEY_ZR)) // page down
+		{
+			pageMove(true, keys & KEY_ZR);
+		}
+
+		if (keys & (KEY_RSTICK_UP | KEY_L | KEY_ZL)) // page up
+		{
+			pageMove(false, keys & KEY_ZL);
+		}
+
 		if (keys & KEY_A && items().size())
 		{
 			select(m_selectedIndex);
 		}
 		return keys;
+	}
+
+	void pageMove(bool forward, bool fast)
+	{
+		long currentPosition = (long)m_selectedIndex;
+		long size = (long)items().size();
+
+		if (fast)
+		{
+			long pageSize = size / 8;
+
+			if (pageSize < maxLines)
+			{
+				pageSize = maxLines;
+			}
+
+			long currentPage = currentPosition / pageSize;
+			currentPosition = (currentPage + (forward ? 1 : -1)) * pageSize;
+		}
+		else
+		{
+			currentPosition += maxLines * (forward ? 1 : -1);
+		}
+
+		if (currentPosition >= size)
+		{
+			currentPosition = size - 1;
+		}
+
+		if (currentPosition < 0) currentPosition = 0;
+
+
+		long offset = currentPosition - (maxLines / 2);
+
+		if (offset + maxLines >= size)
+		{
+			offset = size - maxLines;
+		}
+		if (offset < 0) offset = 0;
+
+		m_selectedIndex = currentPosition;
+		m_offset = offset;
+
+		invalidate();
 	}
 
 	void onFocus() override
@@ -336,6 +389,8 @@ public:
 	Array<T> m_items;
 	u32 m_selectedIndex;
 	u32 m_offset;
+
+	static const int maxLines = 560 / Fonts::FONT_SIZE_HUGE;
 };
 
 class SdWnd : public HListWnd<string>

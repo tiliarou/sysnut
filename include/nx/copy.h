@@ -1,4 +1,5 @@
 #pragma once
+#include "nut.h"
 #include "nx/buffer.h"
 #include "nx/file.h"
 #include "nx/lock.h"
@@ -33,7 +34,7 @@ public:
 		totalSize = 0;
 	}
 
-	~Copy()
+	virtual ~Copy()
 	{
 		print("killing thread\n");
 		if (shouldRun())
@@ -41,8 +42,8 @@ public:
 			m_shouldRun = false;
 		}
 #ifdef __SWITCH__
-		threadWaitForExit(&t);
-		threadClose(&t);
+		threadWaitForExit(&writerThreadContext);
+		threadClose(&writerThreadContext);
 		print("thread died\n");
 #endif
 	}
@@ -50,14 +51,14 @@ public:
 	bool startWriterThread()
 	{
 #ifdef __SWITCH__
-		memset(&ctx.t, 0, sizeof(ctx.t));
+		memset(&writerThreadContext, 0, sizeof(writerThreadContext));
 		if (threadCreate(&writerThreadContext, (void(*)(void*))&writerThread, this, 1 * 1024 * 1024, 0x2D, getNextCpuId()))
 		{
 			error("Failed to create download thread!\n");
 			return false;
 		}
 
-		if (threadStart(&ctx.t))
+		if (threadStart(&writerThreadContext))
 		{
 			error("Failed to start download thread!\n");
 			return false;
@@ -268,17 +269,13 @@ public:
 
 	u64 writeChunk(u64 offset, const Buffer<u8>& buffer) override
 	{
-		//print("writing %x\n", offset);
 		fdst->write(buffer);
-		//print("write @ %x done\n", offset);
 		return buffer.size();
 	}
 
 	u64 readChunk(u64 offset, Buffer<u8>& buffer, u64 sz) override
 	{
-		print("reading %x...\n", offset);
 		sz = fsrc->read(buffer, sz);
-		print("read @  %x done\n", offset);
 		return sz;
 	}
 
@@ -421,7 +418,7 @@ public:
 		{
 			warning("read timeout\n");
 		}
-		//print("Streamed chunk %x\n", bytesRead);
+
 		CopyBuffer* buffer = buffers.peek();
 
 		if (!(buffer->lock.acquireWriteLock()))

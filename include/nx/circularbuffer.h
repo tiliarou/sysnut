@@ -3,38 +3,70 @@
 #include "nx/buffer.h"
 
 template<class T, u64 SZ>
-class CircularBuffer : public Buffer<T>
+class CircularBuffer
 {
 public:
-	CircularBuffer() : Buffer<T>()
+	CircularBuffer()
 	{
-		Buffer<T>::resize(SZ);
-		Buffer<T>::resize(0);
 		circularPosition() = 0;
+		size() = 0;
 	}
 
 	T& push(T n)
 	{
-		if (Buffer<T>::size() < SZ)
+		if (size() < SZ)
 		{
-			return Buffer<T>::push(n);
+			m_buffer[size()] = n;
+			return m_buffer[size()++];
 		}
-		Buffer<T>::m_buffer[circularPosition()] = n;
-		circularPosition() = (circularPosition() + 1) % SZ;
-		return Buffer<T>::m_buffer[circularPosition()];
+
+		m_buffer[circularPosition() % SZ] = n;
+
+		return m_buffer[circularPosition()++ % SZ];
+	}
+
+	bool isFull()
+	{
+		return size() >= SZ;
 	}
 
 	const T& operator[](u32 i) const
 	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
+		return m_buffer[(i + m_circularPosition) % SZ];
 	}
 
 	T& operator[](u32 i)
 	{
-		return Buffer<T>::m_buffer[(i + m_circularPosition) % SZ];
+		return m_buffer[(i + m_circularPosition) % SZ];
+	}
+
+	u64& size() { return m_size; }
+
+	T& last()
+	{
+		if (!size())
+		{
+			return m_buffer[0];
+		}
+
+		if (isFull())
+		{
+			return m_buffer[(circularPosition() - 1) % SZ];
+		}
+		else
+		{
+			return m_buffer[size() - 1];
+		}
+	}
+
+	T& first()
+	{
+		return m_buffer[circularPosition() % SZ];
 	}
 
 	u32& circularPosition() { return m_circularPosition; }
 private:
+	u64 m_size;
 	u32 m_circularPosition;
+	T m_buffer[SZ];
 };

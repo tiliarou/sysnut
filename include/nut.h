@@ -88,6 +88,8 @@ typedef u32 Service;
 #define closesocket close
 
 #define _1MS 1000000
+#define WINAPI
 #endif
 
 void nxSleep(u64 ms);
+int getNextCpuId();

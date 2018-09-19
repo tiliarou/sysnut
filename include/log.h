@@ -7,6 +7,7 @@ typedef void(*PrintHook)();
 #define warning print
 #define debug print
 
+
 void print(const char * format, ...);
 /*void fatal(const char * format, ...);
 void error(const char * format, ...);

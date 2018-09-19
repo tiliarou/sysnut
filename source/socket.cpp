@@ -18,7 +18,7 @@ bool initializeNetwork()
 
 	if (result != 0)
 	{
-		print("WSAStartup failed with error: %d\n", result);
+		print("WSAStartup failed with error: %d\n", (unsigned int)result);
 		return false;
 	}
 #endif

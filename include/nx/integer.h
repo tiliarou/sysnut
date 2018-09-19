@@ -1220,7 +1220,7 @@ public:
 	{
 		buffer[i] = value;
 	}
-
+	/*
 	void print() const
 	{
 		const char* fmt;
@@ -1264,7 +1264,7 @@ public:
 		}
 		printf("\n");
 	}
-
+	*/
 	const constexpr integer<BITS / 2>& low() const
 	{
 		return reinterpret_cast<const integer<BITS / 2>&>(*this);

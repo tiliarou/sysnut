@@ -11,12 +11,17 @@ ContentStorage::ContentStorage(FsStorageId _storageId)
 	{
 		error("Failed to open NCM ContentStorage %d\n", storageId());
 	}
+	else
+	{
+		print("opened content sotrage!");
+	}
 #endif
 }
 
 ContentStorage::~ContentStorage()
 {
 #ifndef _MSC_VER
+	print("closing content sotrage!");
     serviceClose(&m_contentStorage.s);
 #endif
 }

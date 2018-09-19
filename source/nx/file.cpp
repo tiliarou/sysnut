@@ -102,7 +102,7 @@ bool File::open2(sptr<File>& f, u64 offset, u64 sz)
 	partitionOffset() = offset;
 	partitionSize() = sz;
 
-	//print("created partition offset = %x, size = %x\n", offset, sz);
+	//print("created partition offset = %x, size = %x\n", (int)offset, (int)sz);
 	return init();
 }
 

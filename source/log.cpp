@@ -83,29 +83,18 @@ void print(const char * format, ...)
 		}
 		printLog().push(line);
 	}
-	/*
-	size_t len = strlen(printBuffer);
 
-	if (!printLog().size())
-	{
-		printLog().push(string(""));
-	}
-
-	printLog().last() += printBuffer;*/
 
 	va_end(args);
 	fflush(f);
 
-	for (auto& f : *hooks())
+	/*for (auto& f : *hooks())
 	{
 		f();
-	}
-
-	/*if (printBuffer[len - 1] == '\n')
-	{
-		printLog().push(string(""));
 	}*/
+
 }
+
 
 /*
 

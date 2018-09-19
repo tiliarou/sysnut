@@ -168,7 +168,7 @@ T* uhx(T& key, const char* hex, u64 len)
 	{
 		if (!ishex(hex[i]))
 		{
-			error("Key (%s) must be %d hex digits!\n", hex, len);
+			error("Key (%s) must be %d hex digits!\n", hex, (unsigned int)len);
 			return NULL;
 		}
 	}

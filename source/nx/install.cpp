@@ -100,54 +100,7 @@ bool Install::installContentMetaRecords(Buffer<u8> installContentMetaBuf)
 
 }
 
-void Install::writerThread(InstallThreadContext* ctx)
-{
-	if (!ctx || !ctx->install)
-	{
-		return;
-	}
-
-	InstallBuffer* buffer = NULL;
-	u64 offset = 0;
-	ctx->i = 0;
-	ctx->threadInit = true;
-	ctx->threadRunning = true;
-
-	while (ctx->threadRunning)
-	{
-		if (ctx->buffers.size())
-		{
-			if (!(buffer = ctx->buffers.first()))
-			{
-				continue;
-			}
-
-			if (!buffer->lock.acquireReadLock())
-			{
-				continue;
-			}
-
-			if (buffer->buffer().size())
-			{
-				ctx->install->storage.writePlaceholder(ctx->ncaId, offset, buffer->buffer().buffer(), buffer->buffer().size());
-				offset += buffer->buffer().size();
-			}
-
-			//print("\rwriting %d%% %s ", int(totalSize ? (offset * 100 / totalSize) : 100), nca->path().c_str());
-
-			ctx->buffers.shift();
-			buffer->lock.releaseReadLock();
-			ctx->i++;
-		}
-		else
-		{
-			nxSleep(100);
-		}
-	}
-	ctx->threadRunning = false;
-}
-
-static inline int getNextCpuId()
+int getNextCpuId()
 {
 #ifdef __SWITCH__
 	const auto currProcNum = svcGetCurrentProcessorNumber();
@@ -160,6 +113,46 @@ static inline int getNextCpuId()
 	return 0;
 #endif
 }
+
+class InstallCopy : public Copy
+{
+public:
+	InstallCopy(Install* install, File* nca, NcaId ncaId) : Copy()
+	{
+		this->install = install;
+		this->ncaId = ncaId;
+	}
+
+	~InstallCopy()
+	{
+	}
+
+	virtual u64 writeChunk(u64 offset, const Buffer<u8>& buffer) override
+	{
+		if (!install)
+		{
+			return 0;
+		}
+
+		install->storage.writePlaceholder(ncaId, offset, (void*)buffer.buffer(), buffer.size());
+		return buffer.size();
+	}
+
+	u64 readChunk(u64 offset, Buffer<u8>& buffer, u64 sz) override
+	{
+		if (!nca)
+		{
+			return 0;
+		}
+		sz = nca->read(buffer, sz);
+		return sz;
+	}
+
+	Install* install;
+	File* nca;
+	NcaId ncaId;
+};
+
 
 bool Install::installNca(File* nca, NcaId ncaId)
 {
@@ -189,7 +182,7 @@ bool Install::installNca(File* nca, NcaId ncaId)
 	nca->rewind();
 
 	//if (totalSize < 0x100000)
-	{
+
 		Buffer<u8> buffer;
 
 		while (nca->read(buffer, chunkSize))
@@ -198,74 +191,27 @@ bool Install::installNca(File* nca, NcaId ncaId)
 			i += buffer.size();
 
 			print("\rwriting %d%% %s ", int(totalSize ? (i * 100 / totalSize) : 100), nca->path().c_str());
+
+			buffer.resize(0);
 		}
-	}
+
 	/*else
 	{
-		u64 bufferIndex = 0;
-		InstallThreadContext ctx(this, nca, ncaId);
+		InstallCopy copy(this, nca, ncaId);
+		copy.start();
+		print("Download complete\n");
+	}*/
+	//print("registering NCA\n");
 
-#ifdef __SWITCH__
-		memset(&ctx.t, 0, sizeof(ctx.t));
-		if (threadCreate(&ctx.t, (void(*)(void*))&writerThread, &ctx, 1 * 1024 * 1024, 0x2D, getNextCpuId()))
-		{
-			error("Failed to create download thread!\n");
-			return false;
-		}
-
-		if (threadStart(&ctx.t))
-		{
-			error("Failed to start download thread!\n");
-			return false;
-		}
-#endif
-
-		const u64 chunkSize = 0x100000 * 16;
-		InstallBuffer* buffer = NULL;
-
-		while (1)
-		{
-			buffer = ctx.buffers.peek();
-			buffer->lock.acquireWriteLock();
-			ctx.buffers.push();
-
-			print("\rreading block %d\n", bufferIndex);
-
-			buffer->buffer().resize(0);
-
-			if (!nca->read(buffer->buffer(), chunkSize))
-			{
-				buffer->buffer().resize(0);
-				buffer->lock.releaseWriteLock();
-				break;
-			}
-
-			buffer->lock.releaseWriteLock();
-			bufferIndex++;
-		}
-		print("exiting read loop.. waiting for buffers to empty.\n");
-
-		for (int i = 0; i < 1000 && ctx.buffers.size(); i++)
-		{
-			if (i > 900)
-			{
-				error("Timed out waiting for buffers to flush\n");
-				break;
-			}
-			nxSleep(10);
-		}
-		error("buffers flushed!\n");
-	}
-	*/
-#ifdef __SWITCH__
 	print("\n");
-#endif
 
-	/*if (!storage.reg(ncaId, ncaId))
+
+	if (!storage.reg(ncaId, ncaId))
 	{
 		error("Failed to register %s\n", ncaFile.c_str());
 		return false;
-	}*/
+	}
+	print("registration complete\n");
 
 #ifndef _MSC_VER
 	storage.deletePlaceholder(ncaId);

@@ -49,7 +49,7 @@ bool Nca::init()
 	}
 	else
 	{
-		error("Unknown NCA magic (decryption failed?): %x\n", magic);
+		error("Unknown NCA magic (decryption failed?): %x\n", (unsigned int)magic);
 		close();
 		return false;
 	}

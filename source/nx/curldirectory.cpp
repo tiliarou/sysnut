@@ -16,7 +16,7 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, CurlDirectory* cd)
 			cd->m_files.push(sptr<FileEntry>(new FileEntry(cd, f.trim(), 0)));
 		}
 	}
-	return size;
+	return nmemb;
 }
 
 DirectoryFiles& CurlDirectory::files()
