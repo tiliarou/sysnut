@@ -92,58 +92,50 @@ public:
 
 	virtual bool step() override
 	{
-		writerWorker();
+		CopyBuffer* buffer = NULL;
+
+		if (buffers.size())
+		{
+			if (!(buffer = buffers.first()))
+			{
+				return true;
+			}
+
+			if (!buffer->lock.acquireReadLock())
+			{
+				return true;
+			}
+
+			if (buffer->buffer().size())
+			{
+				writeChunk(bytesWritten, buffer->buffer());
+				bytesWritten += buffer->buffer().size();
+			}
+
+			buffers.shift();
+			buffer->lock.releaseReadLock();
+		}
+		else
+		{
+			nxSleep(1);
+		}
 		return true;
 	}
 
 	virtual bool init() override
 	{
+		if (!writerInit())
+		{
+			return false;
+		}
+
+		bytesWritten = 0;
+
 		return true;
 	}
 
 	virtual void exit() override
 	{
-	}
-
-	virtual void writerWorker()
-	{
-		if (!writerInit())
-		{
-			return;
-		}
-
-		CopyBuffer* buffer = NULL;
-
-		bytesWritten = 0;
-
-		while (shouldRun())
-		{
-			if (buffers.size())
-			{
-				if (!(buffer = buffers.first()))
-				{
-					continue;
-				}
-
-				if (!buffer->lock.acquireReadLock())
-				{
-					continue;
-				}
-
-				if (buffer->buffer().size())
-				{
-					writeChunk(bytesWritten, buffer->buffer());
-					bytesWritten += buffer->buffer().size();
-				}
-
-				buffers.shift();
-				buffer->lock.releaseReadLock();
-			}
-			else
-			{
-				nxSleep(1);
-			}
-		}
 		writerExit();
 	}
 
