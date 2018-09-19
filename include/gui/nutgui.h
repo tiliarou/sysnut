@@ -629,16 +629,7 @@ public:
 	{
 	}
 
-	bool step() override
-	{
-		if (nutGui)
-		{
-			//nutGui->loop();
-			print("tick\n");
-		}
-		nxSleep(100);
-		return true;
-	}
+	bool step() override;
 };
 
 class NutGui : public Window
@@ -823,7 +814,10 @@ public:
 
 	bool loop()
 	{
-		flushGraphics();
+		hidScanInput();
+		HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
+		PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
+		ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
 
 		u64 kDown = keysDown(PressedInput);
 
@@ -843,14 +837,18 @@ public:
 			invalidate();
 		}
 
-		if (m_redraw)
+		return true;
+
+	}
+
+	bool gfxLoop()
+	{
+		if (Frame++ == 0 || m_redraw)
 		{
 			renderGraphics();
 			m_redraw = false;
 		}
-
 		return true;
-
 	}
 
 	/*
@@ -926,20 +924,6 @@ public:
 		SDL_RenderPresent(_renderer);
 	}
 
-	void flushGraphics()
-	{
-		if (Frame == 0)
-		{
-			renderGraphics();
-		}
-
-		Frame++;
-		hidScanInput();
-		HeldInput = hidKeysHeld(CONTROLLER_P1_AUTO);
-		PressedInput = hidKeysDown(CONTROLLER_P1_AUTO);
-		ReleasedInput = hidKeysUp(CONTROLLER_P1_AUTO);
-	}
-
 	Window*& focus() { return m_focus; }
 	Buffer<sptr<Window>>& windows() { return m_windows; }
 
@@ -991,3 +975,13 @@ protected:
 	Body* body;
 	Lock lock;
 };
+
+bool GuiThread::step()
+{
+	if (nutGui)
+	{
+		nutGui->gfxLoop();
+	}
+	nxSleep(100);
+	return true;
+}

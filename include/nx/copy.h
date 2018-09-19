@@ -3,6 +3,7 @@
 #include "nx/buffer.h"
 #include "nx/file.h"
 #include "nx/lock.h"
+#include "nx/thread2.h"
 
 class CopyBuffer
 {
@@ -19,62 +20,21 @@ private:
 
 
 
-class Copy
+class Copy : public Thread2
 {
 public:
-	Copy()
+	Copy() : Thread2()
 	{
-		threadRunningCount = 0;
-
 		totalSize = 0;
 		bytesRead = 0;
 		bytesWritten = 0;
-		m_shouldRun = true;
 
 		totalSize = 0;
-	}
-
-	virtual ~Copy()
-	{
-		print("killing thread\n");
-		if (shouldRun())
-		{
-			m_shouldRun = false;
-		}
-#ifdef __SWITCH__
-		threadWaitForExit(&writerThreadContext);
-		threadClose(&writerThreadContext);
-		print("thread died\n");
-#endif
-	}
-
-	bool startWriterThread()
-	{
-#ifdef __SWITCH__
-		memset(&writerThreadContext, 0, sizeof(writerThreadContext));
-		if (threadCreate(&writerThreadContext, (void(*)(void*))&writerThread, this, 1 * 1024 * 1024, 0x2D, getNextCpuId()))
-		{
-			error("Failed to create download thread!\n");
-			return false;
-		}
-
-		if (threadStart(&writerThreadContext))
-		{
-			error("Failed to start download thread!\n");
-			return false;
-		}
-#else
-		DWORD threadId;
-		SECURITY_ATTRIBUTES   threadAttributes;
-		ZeroMemory(&threadAttributes, sizeof(threadAttributes));
-		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&writerThread, this, 0, &threadId);
-#endif
-		return true;
 	}
 
 	bool start()
 	{
-		if (!startWriterThread())
+		if (!Thread2::start())
 		{
 			return false;
 		}
@@ -92,14 +52,6 @@ public:
 		}
 		print("copy complete\n");
 		return true;
-	}
-
-	static void WINAPI readerThread(Copy* ctx)
-	{
-		if (ctx)
-		{
-			ctx->readerWorker();
-		}
 	}
 
 	virtual void readerWorker()
@@ -138,12 +90,19 @@ public:
 		readerExit();
 	}
 
-	static void WINAPI writerThread(Copy* ctx)
+	virtual bool step() override
 	{
-		if (ctx)
-		{
-			ctx->writerWorker();
-		}
+		writerWorker();
+		return true;
+	}
+
+	virtual bool init() override
+	{
+		return true;
+	}
+
+	virtual void exit() override
+	{
 	}
 
 	virtual void writerWorker()
@@ -156,7 +115,6 @@ public:
 		CopyBuffer* buffer = NULL;
 
 		bytesWritten = 0;
-		threadRunningCount = true;
 
 		while (shouldRun())
 		{
@@ -187,7 +145,6 @@ public:
 			}
 		}
 		writerExit();
-		threadRunningCount--;
 	}
 
 	virtual u64 writeChunk(u64 offset, const Buffer<u8>& buffer)
@@ -219,6 +176,9 @@ public:
 
 	virtual void readChunkComplete(u64 offset, const void* buffer, u64 sz)
 	{
+		(void)offset;
+		(void)buffer;
+		(void)sz;
 	}
 
 	virtual bool readerInit()
@@ -231,14 +191,8 @@ public:
 		return true;
 	}
 
-	bool shouldRun() { return m_shouldRun; }
-
-	bool m_shouldRun;
-	u64 threadRunningCount;
 
 	NcaId ncaId;
-	Thread writerThreadContext;
-	Thread readerThreadContext;
 
 	u64 totalSize;
 	u64 bytesRead;
@@ -416,6 +370,8 @@ public:
 
 	void readChunkComplete(u64 offset, const void* data, u64 sz) override
 	{
+		(void)offset;
+
 		while (!buffers.canWrite())
 		{
 			warning("read timeout\n");

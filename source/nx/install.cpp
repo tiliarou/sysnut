@@ -181,8 +181,8 @@ bool Install::installNca(File* nca, NcaId ncaId)
 
 	nca->rewind();
 
-	//if (totalSize < 0x100000)
-
+	if (totalSize < 0x100000)
+	{
 		Buffer<u8> buffer;
 
 		while (nca->read(buffer, chunkSize))
@@ -194,13 +194,13 @@ bool Install::installNca(File* nca, NcaId ncaId)
 
 			buffer.resize(0);
 		}
-
-	/*else
+	}
+	else
 	{
 		InstallCopy copy(this, nca, ncaId);
 		copy.start();
 		print("Download complete\n");
-	}*/
+	}
 	//print("registering NCA\n");
 
 	print("\n");

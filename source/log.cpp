@@ -61,7 +61,7 @@ void print(const char * format, ...)
 	vsprintf(printBuffer, format, args);
 	printf("%s", printBuffer);
 
-	if (printBuffer[0] == '\r')
+	/*if (printBuffer[0] == '\r')
 	{
 		if (printLog().size())
 		{
@@ -82,7 +82,7 @@ void print(const char * format, ...)
 			line.push('\0');
 		}
 		printLog().push() = line;
-	}
+	}*/
 
 
 	va_end(args);

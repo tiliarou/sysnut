@@ -29,7 +29,7 @@ public:
 #endif
 	}
 
-	void start()
+	bool start()
 	{
 #ifdef __SWITCH__
 		memset(&t, 0, sizeof(t));
@@ -49,6 +49,7 @@ public:
 		ZeroMemory(&threadAttributes, sizeof(threadAttributes));
 		t = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)&__threadEntry, this, 0, &threadId);
 #endif
+		return true;
 	}
 
 	virtual bool init()
