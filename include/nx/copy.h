@@ -195,6 +195,7 @@ public:
 	ChineseSdBuffer<CopyBuffer, 4> buffers;
 };
 
+template<class ST = sptr<File>, class DT = sptr<File>>
 class FileCopy : public Copy
 {
 public:
@@ -209,7 +210,7 @@ public:
 		fdst->open(dst, "wb");
 	}
 
-	FileCopy(sptr<File> src, sptr<File> dst) : Copy()
+	FileCopy(ST src, DT dst) : Copy()
 	{
 		fsrc = src;
 		fdst = dst;
@@ -271,8 +272,8 @@ public:
 		return true;
 	}
 
-	sptr<File> fsrc;
-	sptr<File> fdst;
+	ST fsrc;
+	DT fdst;
 };
 
 class FileStreamBuffer : Buffer<u8>
@@ -344,14 +345,15 @@ private:
 	Buffer<u8> cache;
 };
 
-class FileStreamCopy : public FileCopy
+template<class ST = sptr<File>, class DT = sptr<File>>
+class FileStreamCopy : public FileCopy<ST, DT>
 {
 public:
 	FileStreamCopy(string src, string dst) : FileCopy(src, dst)
 	{
 	}
 
-	FileStreamCopy(sptr<File> src, sptr<File> dst) : FileCopy(src, dst)
+	FileStreamCopy(ST src, DT dst) : FileCopy(src, dst)
 	{
 	}
 
